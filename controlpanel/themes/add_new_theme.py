@@ -1,20 +1,14 @@
+
+import sys
 import asyncio
 import asyncssh
-import sys
 import subprocess
 from urllib.request import urlopen
 from urllib.parse import urlparse
 import os
 
+from .._utils import utils
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 async def run_client2():
     # logged in user, default SSH client keys or certificates
@@ -39,10 +33,9 @@ async def run_client():
         #print(remote_result.stdout, end='')
 
 
-print("#### ADDING ENTRANCE THEMES ####\n")
+utils.print_heading("add entrance themes")
 
-
-# get and check the url
+# get and check the url of the file
 have_good_input = False
 mp3_url = ""
 while not have_good_input:
@@ -56,23 +49,22 @@ while not have_good_input:
         with urlopen(mp3_url) as response:
             ct = response.info().get_content_type()
             if ct == "audio/mpeg":
-                print("File looks good.")
+                utils.print_styled(utils.ByteStyle.SUCCESS, "File looks good.")
                 have_good_input = True
             else:
-                print("\n* Something is funky about this file.  I expected type 'audio/mpeg' but got '{}'.  "
-                      "Make sure it was properly exported to an mp3.".format(ct))
+                utils.print_styled(utils.ByteStyle.FAIL,
+                                   "Something is funky about this file.  I expected type 'audio/mpeg' but got '{}'."
+                                   " Make sure it was properly exported to an mp3.".format(ct))
 
     except ValueError as e:
-        print(e)
+        utils.print_styled(utils.ByteStyle.FAIL, str(e))
 
-if have_good_input:
+if have_good_input:  # then get the file number
 
     have_good_input = False
     while not have_good_input:
         filename = os.path.basename(urlparse(mp3_url).path)
         name, ext = os.path.splitext(filename)
-
-        print("test")
 
         # check if the filename is already a number, and offer to use it
         try:
@@ -81,7 +73,8 @@ if have_good_input:
         except ValueError:
             good_name_already = False
 
-        mp3_number = "What number do you want to give it? " + ("[Enter] = {}".format(name) if good_name_already else "")
+        prompt = "What number (integers only) do you want to give it? " + ("[Enter] = {}".format(name) if good_name_already else "")
+        mp3_number = input(prompt)
 
         try:
             if good_name_already and mp3_number:
@@ -90,13 +83,12 @@ if have_good_input:
                 mp3_number = int(mp3_number)
             have_good_input = True
         except ValueError:
-            print("Dude, that wasn't a number! ")
+            utils.print_styled(utils.ByteStyle.FAIL, "Dude, that wasn't an integer! ")
             have_good_input = False
 
+    filename = "{}.mp3".format(mp3_number)
 
-    #mp3_name = input(prompt)
-
-    print("test: {}".format(mp3_url))
+    print("test: {}".format(filename))
 
     # try:
     #     asyncio.get_event_loop().run_until_complete(run_client())
