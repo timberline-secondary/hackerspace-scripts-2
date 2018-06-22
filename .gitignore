@@ -1,5 +1,6 @@
 pip-selfcheck.json
 .idea/
+vcs.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -96,7 +97,6 @@ venv.bak/
 # virtual env in .
 bin/
 include/
-lib/
 
 # Spyder project settings
 .spyderproject
