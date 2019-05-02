@@ -1,5 +1,5 @@
 import paramiko
-import getpass
+import subprocess
 
 pi_passwd = "hackerberry"
 pi_user = "pi"
@@ -7,7 +7,7 @@ tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
 tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
 reboot_cmd = "sudo reboot"
 
-def send_cmd(hostname, password, username, command):
+def connect_ssh(hostname, username, password, command):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
@@ -36,31 +36,44 @@ def send_cmd(hostname, password, username, command):
     ssh.close()
     return True
 
-def turnoff_pi_tvs_cmd(hostname, pi_pwd, username):
-    return send_cmd(hostname, pi_pwd, username, tv_turnoff_cmd)
-
-def turn_on_pi_tvs_cmd(hostname, pi_pwd, username):
-    return send_cmd(hostname, pi_pwd, username, tv_turnon_cmd)
-
-def pi_cmd(pi_name, command):
-    return send_cmd(pi_name, pi_passwd, pi_user, command)
-
-def login_send_cmd():
-    hostname_input = input("Which computer (hostname) would you like to send a command too? ")
-    name = input("What is the username? ")
-    password = getpass.getpass(prompt="What is the password? ")
-    command_input = input("What command would you like to run? ")
-    command = command_input
-    hostname = hostname_input
-    success =  send_cmd(hostname, password, name, command)
-    return success
+# def file_exists(username, hostname, filepath, filename):
 
 
-successful = False
-while not successful:
-    successful = login_send_cmd()
+    # status = subprocess.call(
+    #     ['ssh', username, '@', hostname, 'cd {} $$ test -f {}'.format(filepath ,filename)])
+    # if status == 0:
+    #     return True
+    # if status == 1:
+    #     return False
+    # raise Exception('SSH Failed')
 
 
-#give useful feedback when connection faisl, then try again
+
+# def turnoff_pi_tvs_cmd(hostname, pi_pwd, username):
+#     return send_cmd(hostname, pi_pwd, username, tv_turnoff_cmd)
+#
+# def turn_on_pi_tvs_cmd(hostname, pi_pwd, username):
+#     return send_cmd(hostname, pi_pwd, username, tv_turnon_cmd)
+#
+# def pi_cmd(pi_name, command):
+# #     return send_cmd(pi_name, pi_passwd, pi_user, command)
+#
+# def login_send_cmd():
+#     hostname_input = input("Which computer (hostname) would you like to send a command too? ")
+#     name = input("What is the username? ")
+#     password = getpass.getpass(prompt="What is the password? ")
+#     command_input = input("What command would you like to run? ")
+#     command = command_input
+#     hostname = hostname_input
+#     success =  send_cmd(hostname, password, name, command)
+#     return success
+
+#
+# successful = False
+# while not successful:
+#     successful = login_send_cmd()
+#
+
+
 
 #this code made by Nicky (Tseilorin) Keith
