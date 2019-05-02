@@ -1,40 +1,65 @@
 import paramiko
 import subprocess
 
-pi_passwd = "hackerberry"
-pi_user = "pi"
-tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
-tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
-reboot_cmd = "sudo reboot"
 
-def connect_ssh(hostname, username, password, command):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    try:
-            ssh.connect(hostname=hostname, username=username, password=password)
+class SSH():
 
-    except paramiko.ssh_exception.AuthenticationException:
+    def __init__(self, hostname, username, password):
+        self.hostname=hostname
+        self.username=username
+        self.password=password
+        self.pi_passwd = "hackerberry"
+        self.pi_user = "pi"
+        self.tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
+        self.tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
+        self.reboot_cmd = "sudo reboot"
+        self.ssh_client = None
+
+    def __str__(self):
+        return "SSH connection with {}@{}".format(self.username, self.hostname)
+
+    def connect(self):
+        self.ssh_client = paramiko.SSHClient()
+        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            self.ssh_client.connect(hostname=self.hostname, username=self.username, password=self.password)
+
+        except paramiko.ssh_exception.AuthenticationException:
             print ("\n\nConnection failed, credentials may be wrong.\n\n")
             return False
-    except paramiko.ssh_exception.BadAuthenticationType:
+        except paramiko.ssh_exception.BadAuthenticationType:
             print ("\n\nConnection failed, password may be wrong or server does not allow this connection type.\n\n")
             return False
-    except paramiko.ssh_exception.BadHostKeyException:
+        except paramiko.ssh_exception.BadHostKeyException:
             print ("\n\nThe host key given by the SSH did not match what we were expecting.\n\n")
             return False
-    except paramiko.ssh_exception.ChannelException:
+        except paramiko.ssh_exception.ChannelException:
             print ("\n\nThe attempt to open a new Channel failed.\n\n")
             return False
-    except paramiko.ssh_exception.NoValidConnectionsError:
+        except paramiko.ssh_exception.NoValidConnectionsError:
             print ("\n\nMultiple connection attempts were made and none succeeded.\n\n")
             return False
 
-    stdin,stdout,stderr = ssh.exec_command(command)
+        return True
 
-    for line in stdout.readlines():
-            print (line.strip())
-    ssh.close()
-    return True
+
+    def send_cmd(self, command, print_stdout=True):
+
+        if self.ssh_client == None:
+            print("SSH client not connected")
+            return False
+
+        stdin,stdout,stderr = self.ssh_client.exec_command(command)
+
+        if print_stdout:
+            for line in stdout.readlines():
+                    print (line.strip())
+
+        return True
+
+    def close(self):
+        self.ssh_client.close()
+
 
 # def file_exists(username, hostname, filepath, filename):
 
