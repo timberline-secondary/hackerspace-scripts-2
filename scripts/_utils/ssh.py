@@ -60,6 +60,10 @@ class SSH():
     def close(self):
         self.ssh_client.close()
 
+    #
+    # def file_exists(self, filename):
+    #
+
 
 # def file_exists(username, hostname, filepath, filename):
 

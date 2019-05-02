@@ -2,10 +2,8 @@ import os
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
-# import paramiko
-
 from scripts._utils import utils
-from scripts._utils import ssh
+from scripts._utils.ssh import SSH
 
 hostname = "pi-themes"
 username = "pi"
@@ -71,5 +69,8 @@ def add_new_theme_2():
         filepath = "/media/THEMES"
 
         # ssh.file_exists(username, hostname, filepath, filename)
+        ssh_connection = SSH(hostname, username, password)
+        ssh_connection.connect()
 
-        ssh.connect_ssh(hostname, username, password, command)
+        ssh_connection.send_cmd(command)
+        ssh_connection.close()
