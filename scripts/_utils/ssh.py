@@ -1,7 +1,6 @@
 import paramiko
 import subprocess
 
-
 class SSH():
 
     def __init__(self, hostname, username, password):
@@ -53,28 +52,33 @@ class SSH():
 
         if print_stdout:
             for line in stdout.readlines():
-                    print (line.strip())
+                print (line.strip())
 
-        return True
+
+        if print_stdout:
+            for line in stdin.readlines():
+                print (line.strip())
+
+
+        if print_stdout:
+            for line in stderr.readlines():
+                print (line.strip())
+
+        return stdout.readlines()
 
     def close(self):
         self.ssh_client.close()
 
-    #
-    # def file_exists(self, filename):
-    #
+    def file_exists(self, filepath, filename):
+        command = "test -f {}".format(filepath) + "{}".format(filename)
+        dssh = paramiko.SSHClient()
+        dssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        dssh.connect(self.hostname, username=self.username, password=self.password)
+        stdin, stdout, stderr = dssh.exec_command(command)
+        output = stdout.channel.recv_exit_status()
+        print(output)
 
 
-# def file_exists(username, hostname, filepath, filename):
-
-
-    # status = subprocess.call(
-    #     ['ssh', username, '@', hostname, 'cd {} $$ test -f {}'.format(filepath ,filename)])
-    # if status == 0:
-    #     return True
-    # if status == 1:
-    #     return False
-    # raise Exception('SSH Failed')
 
 
 
@@ -105,4 +109,4 @@ class SSH():
 
 
 
-#this code made by Nicky (Tseilorin) Keith
+#this code worked on by Nicky (Tseilorin) Keith

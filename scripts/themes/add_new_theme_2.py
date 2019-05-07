@@ -65,12 +65,20 @@ def add_new_theme_2():
         print("Sending %s to pi-themes." % filename)
 
         command = "wget -nc -O /media/THEMES/{} {} && exit".format(filename, mp3_url)
+        filepath = "/media/THEMES/"
 
-        filepath = "/media/THEMES"
-
-        # ssh.file_exists(username, hostname, filepath, filename)
         ssh_connection = SSH(hostname, username, password)
+
+        #checks if file exists, and if user wants to overwrite it
+        ssh_connection.file_exists(filepath, filename)
+
+
+
+        #connects to themes
         ssh_connection.connect()
 
+        #sends the command
         ssh_connection.send_cmd(command)
+
+        #closes ssh connection
         ssh_connection.close()
