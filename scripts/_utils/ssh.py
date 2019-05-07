@@ -70,13 +70,15 @@ class SSH():
         self.ssh_client.close()
 
     def file_exists(self, filepath, filename):
-        command = "test -f {}".format(filepath) + "{}".format(filename)
-        dssh = paramiko.SSHClient()
-        dssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        dssh.connect(self.hostname, username=self.username, password=self.password)
-        stdin, stdout, stderr = dssh.exec_command(command)
-        output = stdout.channel.recv_exit_status()
-        print(output)
+        # link to docs for test -f command
+        command = "test -f {}{}".format(filepath, filename)
+        stdin, stdout, stderr = self.ssh_client.exec_command(command)
+        exit_status = stdout.channel.recv_exit_status()
+
+        if exit_status == 0:
+            return True
+        else:
+            return False
 
 
 
