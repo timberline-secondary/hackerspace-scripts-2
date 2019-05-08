@@ -43,26 +43,28 @@ class SSH():
 
 
     def send_cmd(self, command, print_stdout=True):
+        if not self.is_connected():
+            return -1
 
         if self.ssh_client == None:
             print("SSH client not connected")
             return False
 
         stdin,stdout,stderr = self.ssh_client.exec_command(command)
-
-        if print_stdout:
-            for line in stdout.readlines():
-                print (line.strip())
-
-
-        if print_stdout:
-            for line in stdin.readlines():
-                print (line.strip())
-
-
-        if print_stdout:
-            for line in stderr.readlines():
-                print (line.strip())
+        #
+        # if print_stdout:
+        #     for line in stdout.readlines():
+        #         print (line.strip())
+        #
+        #
+        # if print_stdout:
+        #     for line in stdin.readlines():
+        #         print (line.strip())
+        #
+        #
+        # if print_stdout:
+        #     for line in stderr.readlines():
+        #         print (line.strip())
 
         return stdout.readlines()
 
@@ -70,6 +72,9 @@ class SSH():
         self.ssh_client.close()
 
     def file_exists(self, filepath, filename):
+        if not self.is_connected():
+            return -1
+
         # link to docs for test -f command
         command = "test -f {}{}".format(filepath, filename)
         stdin, stdout, stderr = self.ssh_client.exec_command(command)
@@ -80,8 +85,21 @@ class SSH():
         else:
             return False
 
+    def is_connected(self):
+        client = self.ssh_client
+        error_msg = "Not connected. You forgot to use .connect()"
+        if client and client.get_transport() is not None and client.get_transport().is_active():
+            try:
+                transport = client.get_transport()
+                transport.send_ignore()
+                return True
+            except EOFError as e:
+                # not connected
+                print(error_msg)
+                return False
 
-
+        print(error_msg)
+        return False
 
 
 # def turnoff_pi_tvs_cmd(hostname, pi_pwd, username):

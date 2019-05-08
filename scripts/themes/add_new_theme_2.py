@@ -20,18 +20,7 @@ def add_new_theme_2():
             break
 
                 #check content to ensure proper mp3 type
-        try:
-            with urlopen(mp3_url) as response:
-                ct = response.info().get_content_type()
-                if ct == "audio/mpeg":
-                    utils.print_styled(utils.ByteStyle.SUCCESS, "File looks good.")
-                    have_good_input = True
-                else:
-                    utils.print_styled(utils.ByteStyle.self.FAIL,
-                                    "Something is funky about this file. I expected type 'audio/mpeg' but got '{}'."
-                                        " Make sure it was properly exported to an mp3.".format(ct))
-        except ValueError as e:
-            utils.print_styled(utils.ByteStyle.FAIL, str(e))
+        have_good_input = utils.verify_mimetype(mp3_url, "audio/mpeg")
 
     if have_good_input: #then get file number
 
@@ -62,23 +51,38 @@ def add_new_theme_2():
 
         # print("test: {}".format(filename))
 
-        print("Sending %s to pi-themes." % filename)
+        print("Sending {} to pi-themes to see if file exists already with that name.".format(filename))
 
-        command = "wget -nc -O /media/THEMES/{} {} && exit".format(filename, mp3_url)
+        command = "wget -O /media/THEMES/{} {} && exit".format(filename, mp3_url)
         filepath = "/media/THEMES/"
 
         ssh_connection = SSH(hostname, username, password)
 
-        #checks if file exists, and if user wants to overwrite it
-        ssh_connection.file_exists(filepath, filename)
-
-
-
-        #connects to themes
         ssh_connection.connect()
+        #checks if file exists, and if user wants to overwrite it
+        already_exists = ssh_connection.file_exists(filepath, filename)
+
+        # asks user if they want to overwrite https://www.quora.com/I%E2%80%99m-new-to-Python-how-can-I-write-a-yes-no-question
+        if already_exists == True:
+            print("There is a file that already exists with that name. Do you want to overwrite it? (yes/no)")
+            overwrite = input(">")
+            if overwrite == "no":
+                add_new_theme_2()
+            elif overwrite == "yes":
+                pass
+            else:
+                print("yes/no")
+        elif already_exists == False:
+            pass
+        else:
+            print("Something went wrong. Expected true or false but got something else")
+
 
         #sends the command
         ssh_connection.send_cmd(command)
 
         #closes ssh connection
         ssh_connection.close()
+
+
+        #check if file really is mp3. check its mime type and its metadata
