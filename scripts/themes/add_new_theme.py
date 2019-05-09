@@ -9,7 +9,7 @@ hostname = "pi-themes"
 username = "pi"
 password = "hackerberry"
 
-def add_new_theme_2():
+def add_new_theme():
     #gets and checks the url of the file
     have_good_input = False
     mp3_url = ""
@@ -69,7 +69,7 @@ def add_new_theme_2():
             print("There is a file that already exists with that name. Do you want to overwrite it? (yes/no)")
             overwrite = input(">")
             if overwrite == "no":
-                add_new_theme_2()
+                add_new_theme()
             elif overwrite == "yes":
                 pass
             else:
@@ -86,5 +86,3 @@ def add_new_theme_2():
         #closes ssh connection
         ssh_connection.close()
 
-
-        #check if file really is mp3. check its mime type and its metadata
