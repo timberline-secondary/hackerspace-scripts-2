@@ -83,6 +83,15 @@ def add_new_theme():
         #sends the command
         ssh_connection.send_cmd(command)
 
+        another_code = input("Would you like to add another code? (yes/no)")
+        if another_code == "yes":
+            add_new_theme()
+        elif another_code == "no":
+            pass
+        else:
+            print("yes/no")
         #closes ssh connection
         ssh_connection.close()
 
+
+        #check if file really is mp3. check its mime type and its metadata
