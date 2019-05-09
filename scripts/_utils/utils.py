@@ -1,4 +1,5 @@
 import os
+from urllib.error import URLError
 from urllib.request import urlopen
 
 
@@ -30,6 +31,7 @@ def print_heading(title):
 
 
 def verify_mimetype(file_url, mimetype_string):
+    file_url = file_url.strip()
     try:
         with urlopen(file_url) as response:
             ct = response.info().get_content_type()
@@ -41,6 +43,9 @@ def verify_mimetype(file_url, mimetype_string):
                                    "Something is funky about this file. I expected type '{}' but got '{}'."
                                    " Make sure it was properly exported to an mp3.".format(mimetype_string, ct))
     except ValueError as e:
+        print_styled(ByteStyle.FAIL, str(e))
+    except URLError as e:
+        print('That is a bad URL.')
         print_styled(ByteStyle.FAIL, str(e))
 
     return False

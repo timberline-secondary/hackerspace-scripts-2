@@ -68,7 +68,7 @@ def control_panel():
         sub_module_choice_str = print_menu(list(sub_module_dict.keys()), module_choice)
         sub_module = sub_module_dict[sub_module_choice_str]
 
-        print(sub_module)
+        #print(sub_module)
         method = getattr(sub_module, sub_module_choice_str)
         utils.print_heading(sub_module_choice_str)
         method()
