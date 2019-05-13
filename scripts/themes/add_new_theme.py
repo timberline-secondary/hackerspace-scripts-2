@@ -73,7 +73,7 @@ def add_new_theme():
             elif overwrite == "yes":
                 pass
             else:
-                print("yes/no")
+                print("\n(yes/no)\n")
         elif already_exists == False:
             pass
         else:
@@ -94,4 +94,4 @@ def add_new_theme():
         ssh_connection.close()
 
 
-        #check if file really is mp3. check its mime type and its metadata
+#this code worked on by Nicky (Tseilorin) Keith

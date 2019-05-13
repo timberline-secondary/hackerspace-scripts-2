@@ -1,5 +1,5 @@
 import paramiko
-import subprocess
+
 
 class SSH():
 
@@ -50,23 +50,14 @@ class SSH():
             print("SSH client not connected")
             return False
 
-        stdin,stdout,stderr = self.ssh_client.exec_command(command)
-        #
-        # if print_stdout:
-        #     for line in stdout.readlines():
-        #         print (line.strip())
-        #
-        #
-        # if print_stdout:
-        #     for line in stdin.readlines():
-        #         print (line.strip())
-        #
-        #
-        # if print_stdout:
-        #     for line in stderr.readlines():
-        #         print (line.strip())
+        stdin, stdout, stderr = self.ssh_client.exec_command(command)
 
-        return stdout.readlines()
+        output = stdout.read()
+
+        if print_stdout:
+            print(output)
+
+        return stdout.read()
 
     def close(self):
         self.ssh_client.close()
