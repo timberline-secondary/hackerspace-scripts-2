@@ -1,9 +1,10 @@
 import paramiko
+from getpass import getpass
 
 
 class SSH():
 
-    def __init__(self, hostname, username, password):
+    def __init__(self, hostname, username, password=None):
         self.hostname=hostname
         self.username=username
         self.password=password
@@ -18,6 +19,9 @@ class SSH():
         return "SSH connection with {}@{}".format(self.username, self.hostname)
 
     def connect(self):
+        if self.password is None:
+            self.password=getpass("password: ")
+
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
@@ -93,31 +97,25 @@ class SSH():
         return False
 
 
-# def turnoff_pi_tvs_cmd(hostname, pi_pwd, username):
-#     return send_cmd(hostname, pi_pwd, username, tv_turnoff_cmd)
-#
-# def turn_on_pi_tvs_cmd(hostname, pi_pwd, username):
-#     return send_cmd(hostname, pi_pwd, username, tv_turnon_cmd)
-#
-# def pi_cmd(pi_name, command):
-# #     return send_cmd(pi_name, pi_passwd, pi_user, command)
-#
-# def login_send_cmd():
-#     hostname_input = input("Which computer (hostname) would you like to send a command too? ")
-#     name = input("What is the username? ")
-#     password = getpass.getpass(prompt="What is the password? ")
-#     command_input = input("What command would you like to run? ")
-#     command = command_input
-#     hostname = hostname_input
-#     success =  send_cmd(hostname, password, name, command)
-#     return success
+    def send_cmd_sudo(self, command, print_stdout=True):
+        if not self.is_connected():
+            return -1
 
-#
-# successful = False
-# while not successful:
-#     successful = login_send_cmd()
-#
+        if self.ssh_client == None:
+            print("SSH client not connected")
+            return False
 
+        command_real = "sudo -S -p {}".format(command)
 
+        stdin, stdout, stderr = self.ssh_client.exec_command(command_real, get_pty=True)
+        passwd_sudo = getpass.getpass("Sudo password: ")
 
-#this code worked on by Nicky (Tseilorin) Keith
+        stdin.write(passwd_sudo + "\n")
+        stdin.flush()
+
+        output = stdout.read()
+
+        if print_stdout:
+            print(output)
+
+        return stdout.read()
