@@ -14,7 +14,7 @@ def add_new_theme():
     have_good_input = False
     mp3_url = ""
     while not have_good_input:
-        mp3_url = input("Paste the url to the mp3 file you want to ad or [q]uit: ")
+        mp3_url = input("Paste the url to the mp3 file you want to add. (q to quit): ")
 
         if mp3_url == 'q':
             break
