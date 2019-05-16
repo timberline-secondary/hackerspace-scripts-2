@@ -46,7 +46,7 @@ class SSH():
         return True
 
 
-    def send_cmd(self, command, print_stdout=True):
+    def send_cmd(self, command, sudo=False, print_stdout=False):
         if not self.is_connected():
             return -1
 
@@ -54,7 +54,20 @@ class SSH():
             print("SSH client not connected")
             return False
 
-        stdin, stdout, stderr = self.ssh_client.exec_command(command)
+        if sudo:
+            transport = self.ssh_client.get_transport()
+            session = transport.open_session()
+            session.set_combine_stderr(True)
+            session.get_pty()
+
+            session.exec_command("sudo {}".format(command))
+            stdin = session.makefile("wb", -1)
+            stdout = session.makefile("rb", -1)
+
+            stdin.write(self.password + "\n")
+            stdin.flush()
+        else:
+            stdin, stdout, stderr = self.ssh_client.exec_command(command)
 
         output = stdout.read()
 
@@ -95,27 +108,3 @@ class SSH():
 
         print(error_msg)
         return False
-
-
-    def send_cmd_sudo(self, command, print_stdout=True):
-        if not self.is_connected():
-            return -1
-
-        if self.ssh_client == None:
-            print("SSH client not connected")
-            return False
-
-        command_real = "sudo -S -p {}".format(command)
-
-        stdin, stdout, stderr = self.ssh_client.exec_command(command_real, get_pty=True)
-        passwd_sudo = getpass.getpass("Sudo password: ")
-
-        stdin.write(passwd_sudo + "\n")
-        stdin.flush()
-
-        output = stdout.read()
-
-        if print_stdout:
-            print(output)
-
-        return stdout.read()
