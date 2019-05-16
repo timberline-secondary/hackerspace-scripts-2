@@ -34,7 +34,6 @@ def load_scripts(module):
     scripts = os.listdir(scripts_dir)
     scripts = [s for s in scripts if s[0] not in "_."]  # remove hidden files
     scripts = [s[:-3] for s in scripts]  # remove '.py'
-
     script_dict = {}
     module_dir = SCRIPTS_DIR
 
@@ -61,17 +60,21 @@ def control_panel():
     try:
         # get modules
         module_dict = load_modules()
-        module_choice = print_menu(list(module_dict.keys()), "Hackerspace Control Panel")
 
-        # get scripts from chosen module
-        sub_module_dict = load_scripts(module_choice)
-        sub_module_choice_str = print_menu(list(sub_module_dict.keys()), module_choice)
-        sub_module = sub_module_dict[sub_module_choice_str]
+        while True:
+            module_choice = print_menu(list(module_dict.keys()), "Hackerspace Control Panel")
 
-        print(sub_module)
-        method = getattr(sub_module, sub_module_choice_str)
-        utils.print_heading(sub_module_choice_str)
-        method()
+            # add b as a menu option so you can go back to the previous menu / when done with a certain menu have it go back to the same menu it came from (C said while loop)
+
+            # get scripts from chosen module
+            sub_module_dict = load_scripts(module_choice)
+            sub_module_choice_str = print_menu(list(sub_module_dict.keys()), module_choice)
+            sub_module = sub_module_dict[sub_module_choice_str]
+
+            #print(sub_module)
+            method = getattr(sub_module, sub_module_choice_str)
+            utils.print_heading(sub_module_choice_str)
+            method()
 
         # import the package module
         # print(control_panel.current_module)
