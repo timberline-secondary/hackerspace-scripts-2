@@ -15,11 +15,18 @@ def test():
     ssh_connection = SSH(hostname, username, password)
     ssh_connection.connect()
 
-    command = input("What command would you like to run with sudo?: ")
+    quitting = False
+    while not quitting:
+        command = input("What command would you like to run with sudo? (q to quit):  ")
 
-    output = ssh_connection.send_cmd(command)
-    print(output)
+        if command == 'q':
+            quitting = True
 
+        else:
+            output = ssh_connection.send_cmd(command)
+            print(output)
+
+            # closes ssh connection
     ssh_connection.close()
 
 # check the hackerspace github for some example sudo scripts that do work

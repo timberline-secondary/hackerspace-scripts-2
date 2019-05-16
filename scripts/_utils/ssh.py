@@ -105,13 +105,21 @@ class SSH():
             print("SSH client not connected")
             return False
 
-        command_real = "sudo -S -p {}".format(command)
+        command_real = "sudo -k {}".format(command)
+        passwd_sudo = getpass("Sudo password: ")
 
-        stdin, stdout, stderr = self.ssh_client.exec_command(command_real, get_pty=True)
-        passwd_sudo = getpass.getpass("Sudo password: ")
+        transport = self.ssh_client.get_transport()
+        session = transport.open_session()
+        session.set_combine.stderr(True)
+        session.get_pty()
 
+        session.exec_command(command_real)
+        stdin = session.makefile("wb", -1)
+        stdout = session.makefile("rb", -1)
+        #check if you really need to send password
         stdin.write(passwd_sudo + "\n")
         stdin.flush()
+
 
         output = stdout.read()
 

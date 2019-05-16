@@ -13,7 +13,6 @@ def speak():
     while not quitting:
         dialogue_old = input("What would you like me to say? (q to quit): ")
 
-        # confirmation = input("Are you sure you want me to say \"{}\"? ([y]/n)".format(dialogue_old))
         if dialogue_old == 'q':
             quitting = True
 

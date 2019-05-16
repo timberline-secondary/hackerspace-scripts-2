@@ -84,7 +84,7 @@ def add_new_theme():
         ssh_connection.send_cmd(command)
 
         another_code = input("Would you like to add another code? (yes/no)")
-        if another_code == "yes":
+        if not another_code or another_code == "yes":
             add_new_theme()
         elif another_code == "no":
             pass
