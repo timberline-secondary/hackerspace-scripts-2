@@ -5,8 +5,6 @@ from urllib.request import urlopen
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-#add new image to the tvs. ask user which tv to connect to, (if statement for each tv would be easiest). very similiar to add new theme. wget, format the name properly, check to make sure
-#it is actually a photo or a video, check if a file with the same name already exists
 
 def add_new_image():
     have_good_type = False
@@ -22,12 +20,16 @@ def add_new_image():
         if image_url == "q":
             break
 
-        file_extension = image_url[-4:]
+        name_wo_ext = None
+        extension = None
+        a = urlparse(image_url)
+        name_w_ext = os.path.basename(a.path)
+        name_wo_ext, extension = os.path.splitext(name_w_ext)
 
         expected_mime_type = None
-        if file_extension == ".png":
+        if extension == ".png":
             expected_mime_type = "image/png"
-        elif file_extension == ".jpg":
+        elif extension == ".jpg":
             expected_mime_type = "image/jpeg"
         else:
             print("I was expecting a png or jpg image file but that was something else.")
@@ -39,17 +41,21 @@ def add_new_image():
 
     if have_good_type: #then get file name
 
-            ext = image_url[-4:]
-
             student_number = input("Enter Student Number\n")
 
-            image_name = input("Name your image (MUST NAME IF YOU USED URL)\n")
+            image_name = None
+            name_good = input(("What is the name of this image? By default it will be {}").format(name_wo_ext))
+            if not name_good:
+                image_name = name_wo_ext
+            else:
+                image_name = name_good
 
             tv = input("What TV are you sending this to? (Just the number)\n")
 
-            filename = student_number + ".z." + image_name + ext
+            filename = student_number + ".z." + image_name + extension
 
             print("Sending {} to hightower to see if file exists already with that name.".format(filename))
+
             filepath = "/home/pi-slideshow/tv{}/".format(tv)
             command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, image_url)
 
@@ -64,9 +70,9 @@ def add_new_image():
             if already_exists == True:
                 print("There is a file that already exists with that name. Do you want to overwrite it? (yes/no)")
                 overwrite = input(">")
-                if overwrite == "no" or "n":
+                if overwrite == "no":
                     add_new_image()
-                elif overwrite == "yes" or "y":
+                elif overwrite == "yes":
                     pass
                 else:
                     print("\n(yes/no)\n")
@@ -76,7 +82,6 @@ def add_new_image():
                 print("Something went wrong. Expected true or false but got something else")
 
             ssh_connection.send_cmd(command)
-
 
             another_image = input("Would you like to add another image? ([yes]/no)")
             if not another_image or another_image == "yes":
