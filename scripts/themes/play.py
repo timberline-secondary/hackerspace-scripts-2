@@ -1,13 +1,9 @@
-import os
-from urllib.parse import urlparse
-from urllib.request import urlopen
-
-from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
 hostname = "pi-themes"
 username = "pi"
 password = "hackerberry"
+#this code worked on by Nicholas (Tseilorin) Hopkins
 
 def play():
     # opens start theme and plays a theme

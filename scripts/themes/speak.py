@@ -3,6 +3,7 @@ from scripts._utils.ssh import SSH
 hostname = "pi-themes"
 username = "pi"
 password = "hackerberry"
+#this code worked on by Nicholas (Tseilorin) Hopkins
 
 def speak():
     # get what the user wants to say

@@ -1,6 +1,7 @@
 import paramiko
 from getpass import getpass
 
+#this code worked on by Nicholas (Tseilorin) Hopkins
 
 class SSH():
 

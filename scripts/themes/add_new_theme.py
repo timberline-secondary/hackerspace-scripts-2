@@ -8,6 +8,8 @@ from scripts._utils.ssh import SSH
 hostname = "pi-themes"
 username = "pi"
 password = "hackerberry"
+#this code worked on by Nicholas (Tseilorin) Hopkins
+
 
 def add_new_theme():
     #gets and checks the url of the file
@@ -79,11 +81,10 @@ def add_new_theme():
         else:
             print("Something went wrong. Expected true or false but got something else")
 
-
         #sends the command
         ssh_connection.send_cmd(command)
 
-        another_code = input("Would you like to add another code? (yes/no)")
+        another_code = input("Would you like to add another code? ([yes]/no)")
         if not another_code or another_code == "yes":
             add_new_theme()
         elif another_code == "no":
@@ -92,6 +93,3 @@ def add_new_theme():
             print("yes/no")
         #closes ssh connection
         ssh_connection.close()
-
-
-#this code worked on by Nicky (Tseilorin) Keith

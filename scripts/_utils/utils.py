@@ -40,8 +40,8 @@ def verify_mimetype(file_url, mimetype_string):
                 return True
             else:
                 print_styled(ByteStyle.FAIL,
-                                   "Something is funky about this file. I expected type '{}' but got '{}'."
-                                   " Make sure it was properly exported to an mp3.".format(mimetype_string, ct))
+                             "Something is funky about this file. I expected type '{}' but got '{}'."
+                                .format(mimetype_string, ct))
     except ValueError as e:
         print_styled(ByteStyle.FAIL, str(e))
     except URLError as e:
