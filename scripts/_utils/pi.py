@@ -1,0 +1,2 @@
+username = "pi"
+password = "hackerberry"
