@@ -17,19 +17,15 @@ def add_new_image(student_number=None, tv=None):
         if image_url == "q":
             break
 
-        name_wo_ext = None
-        extension = None
-        a = urlparse(image_url)
-        name_w_ext = os.path.basename(a.path)
-        name_wo_ext, extension = os.path.splitext(name_w_ext)
+        parsed_url_tuple = urlparse(image_url)
+        name_with_ext = os.path.basename(parsed_url_tuple.path)
+        name_without_ext, extension = os.path.splitext(name_with_ext)
 
         expected_mime_type = None
         if extension == ".png":
             expected_mime_type = "image/png"
-        elif extension == ".jpg":
+        elif extension == ".jpg" or extension == ".jpeg":
             expected_mime_type = "image/jpeg"
-        else:
-            print("I was expecting a png or jpg image file but that was something else.")
 
         # checks if file is what it really says it is
         mime_type_good = utils.verify_mimetype(image_url, expected_mime_type)
@@ -38,20 +34,20 @@ def add_new_image(student_number=None, tv=None):
 
     if have_good_type: #then get file name
 
-            student_number_input = input(("Enter Student Number. Default right now is {}\n").format(student_number)).strip()
+            student_number_input = input(("Enter Student Number (default = {}): \n").format(student_number)).strip()
             if not student_number_input:
                 pass
             else:
                 student_number = student_number_input
 
             image_name = None
-            name_good = input(("What is the name of this image? By default it will be {}\n").format(name_wo_ext)).strip()
+            name_good = input(("What is the name of this image? (default = {}): \n").format(name_without_ext)).strip()
             if not name_good:
-                image_name = name_wo_ext
+                image_name = name_without_ext
             else:
                 image_name = name_good
 
-            tv_input = input(("What TV are you sending this to? (Just the number) Default right now is {}\n").format(tv)).strip()
+            tv_input = input(("What TV # are you sending this to? (default = {}): \n").format(tv)).strip()
             if not tv_input:
                 pass
             else:
