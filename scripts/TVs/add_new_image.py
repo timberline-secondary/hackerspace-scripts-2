@@ -2,6 +2,7 @@ import os
 from urllib.parse import urlparse
 
 from scripts._utils import utils
+from scripts._utils import pi
 from scripts._utils.ssh import SSH
 
 #this code worked on by Nicholas (Tseilorin) Hopkins
@@ -70,9 +71,8 @@ def add_new_image(student_number=None, tv=None):
 
         hostname = "hightower"
         username = "pi-slideshow"
-        password = "hackerberry"
 
-        ssh_connection = SSH(hostname, username, password)
+        ssh_connection = SSH(hostname, username, pi.password)
         ssh_connection.connect()
         already_exists = ssh_connection.file_exists(filepath, filename)
 

@@ -1,13 +1,13 @@
 from scripts._utils.ssh import SSH
+from scripts._utils import pi
 
 hostname = "pi-themes"
-username = "pi"
-password = "hackerberry"
+
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
 def speak():
     # get what the user wants to say
-    ssh_connection = SSH(hostname, username, password)
+    ssh_connection = SSH(hostname, pi.username, pi.password)
     ssh_connection.connect()
 
     quitting = False

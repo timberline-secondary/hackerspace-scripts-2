@@ -1,13 +1,13 @@
 import os
 from urllib.parse import urlparse
 from urllib.request import urlopen
+from scripts._utils import pi
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
 hostname = "pi-themes"
-username = "pi"
-password = "hackerberry"
+
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
 
@@ -62,7 +62,7 @@ def add_new_theme():
             command = "wget -O /media/THEMES/{} {} && exit".format(filename, mp3_url)
             filepath = "/media/THEMES/"
 
-            ssh_connection = SSH(hostname, username, password)
+            ssh_connection = SSH(hostname, pi.username, pi.password)
 
             ssh_connection.connect()
             #checks if file exists, and if user wants to overwrite it
