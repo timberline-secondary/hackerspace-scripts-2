@@ -101,12 +101,11 @@ def add_new_image(student_number=None, tv=None):
                     print("(y/n)")
 
         if already_exists == False:
+            ssh_connection.send_cmd(command)
             print(("{} was succesfully sent over to pi-tv{}").format(filename, tv))
             pass
         else:
             print("Something went wrong. Expected true or false but got something else")
-
-        ssh_connection.send_cmd(command)
 
         another_image = input("Would you like to add another image? ([y]/n)")
         if not another_image or another_image == "y":
