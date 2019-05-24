@@ -5,7 +5,7 @@ hostname = "pi-themes"
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
 def play():
-    # opens start theme and plays a theme
+    # connect to pi-themes
     ssh_connection = SSH(hostname, pi.username, pi.password)
     ssh_connection.connect()
     transport = ssh_connection.ssh_client.get_transport()
@@ -13,12 +13,15 @@ def play():
     session.set_combine_stderr(True)
     session.get_pty()
 
+    #opens startthemes
     session.exec_command("sudo bash startthemes.sh")
     stdin = session.makefile("wb", -1)
     quitting = False
     while not quitting:
+        #gets user input for whatever song they want to play
         song_number = input("Give me a song number. (q to quit): ")
 
+        #exits while loop
         if song_number == 'q':
             quitting = True
 
