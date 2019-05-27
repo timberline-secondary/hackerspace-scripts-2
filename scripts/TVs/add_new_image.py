@@ -117,7 +117,7 @@ def add_new_image(student_number=None, tv=None):
 
         #asks user if they want to add another image
         another_image = input("Would you like to add another image? ([y]/n)")
-        if not another_image or another_image == "y":
+        if not another_image or another_image.lower()[0] == "y":
             image_url = True
         elif another_image.lower()[0] == "n":
             pass
