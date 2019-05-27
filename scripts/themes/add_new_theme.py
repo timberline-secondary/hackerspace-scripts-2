@@ -8,9 +8,6 @@ from scripts._utils.ssh import SSH
 
 hostname = "pi-themes"
 
-#this code worked on by Nicholas (Tseilorin) Hopkins
-
-
 def add_new_theme():
     #gets and checks the url of the file
     mp3_url = True
