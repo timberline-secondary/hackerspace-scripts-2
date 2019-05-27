@@ -1,17 +1,13 @@
-import os
-from urllib.parse import urlparse
-from urllib.request import urlopen
 
-from scripts._utils import utils
 from scripts._utils.ssh import SSH
+from scripts._utils import pi
 
 hostname = "pi-themes"
-username = "pi"
-password = "hackerberry"
+#this code worked on by Nicholas (Tseilorin) Hopkins
 
 def play():
-    # opens start theme and plays a theme
-    ssh_connection = SSH(hostname, username, password)
+    # connect to pi-themes
+    ssh_connection = SSH(hostname, pi.username, pi.password)
     ssh_connection.connect()
     transport = ssh_connection.ssh_client.get_transport()
     session = transport.open_session()
@@ -22,8 +18,8 @@ def play():
     stdin = session.makefile("wb", -1)
     quitting = False
     while not quitting:
+        #gets user input for whatever song they want to play
         song_number = input("Give me a song number. (q to quit): ")
-
         if song_number == 'q':
             quitting = True
 
