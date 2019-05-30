@@ -17,7 +17,7 @@ def print_styled(color, text):
     print(color + text + ByteStyle.ENDC)
 
 def input_styled(color, text):
-    input(color + text + ByteStyle.ENDC)
+    return input(color + text + ByteStyle.ENDC).strip()
 
 def print_heading(title):
     width = 60
