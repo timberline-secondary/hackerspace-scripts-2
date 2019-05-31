@@ -1,5 +1,6 @@
 from scripts._utils.ssh import SSH
 from scripts._utils import pi
+from scripts._utils import utils
 
 hostname = "pi-themes"
 
@@ -13,7 +14,7 @@ def speak():
     quitting = False
     while not quitting:
         #makes while loop and gets user input as to what to say
-        dialogue_old = input("What would you like me to say? (q to quit): ")
+        dialogue_old = utils.input_styled(utils.ByteStyle.INPUT, "What would you like me to say? (q to quit): \n")
 
         if dialogue_old == 'q':
             quitting = True

@@ -12,7 +12,7 @@ def get_image_url():
     mime_type_good = False
     #creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
-        image_url = input("Paste the url to the image file you want to add. (q to quit): ").strip()
+        image_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste image url: \n")
 
         if image_url == "q":
             return None, None, None
@@ -45,20 +45,18 @@ def add_new_image(student_number=None, tv=None):
             return
 
         #collects information to name the file, and as to which tv to send it to
-        student_number_input = input(("Enter Student Number (default = {}): \n").format(student_number)).strip()
+        student_number_input = utils.input_styled(utils.ByteStyle.INPUT, "Enter Student Number (default = {}): \n").format(student_number)
         if not student_number_input:
             pass
         else:
             student_number = student_number_input
-
         image_name = None
-        name_good = input(("What is the name of this image? (default = {}): \n").format(name_without_ext)).strip()
+        name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? (default = {}): \n").format(name_without_ext)
         if not name_good:
             image_name = name_without_ext
         else:
             image_name = name_good
-
-        tv_input = input(("What TV # are you sending this to? (default = {}): \n").format(tv)).strip()
+        tv_input = utils.input_styled(utils.ByteStyle.INPUT, "What TV # are you sending this to? (default = {}): \n").format(tv)
         if not tv_input:
             pass
         else:
@@ -84,15 +82,14 @@ def add_new_image(student_number=None, tv=None):
         #if it does exist, asks user if they want to overwrite it
         if already_exists == True:
             while already_exists == True:
-                should_we_overwrite = input("There is a file that already exists with that name. Do you want to overwrite it? (y/[n])")
+                should_we_overwrite = utils.input_styled(utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
                 if not should_we_overwrite or should_we_overwrite.lower()[0] == 'n':
                     #calls the function to run through the name and extension grabbing process again
                     image_url, name_without_ext, extension = get_image_url()
                     if image_url is None:
                         return
                     #asks user to change name of it
-                    name_good = input(
-                        ("What is the name of this image? (default = {}): \n").format(name_without_ext)).strip()
+                    name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? (default = {}): \n")
                     if not name_good:
                         image_name = name_without_ext
                     else:
@@ -105,23 +102,24 @@ def add_new_image(student_number=None, tv=None):
                     already_exists = False
                     pass
                 else:
-                    print("(y/n)")
+                    utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
 
         #if file does not exist already it wgets it and places it in the correct tv folder
         if already_exists == False:
             ssh_connection.send_cmd(command)
-            print(("{} was succesfully sent over to pi-tv{}").format(filename, tv))
+            utils.print_styled(utils.ByteStyle.SUCCESS, "{} was succesfully sent over to pi-tv{}").format(filename, tv)
             pass
         else:
-            print("Something went wrong. Expected true or false but got something else")
+            utils.print_styled(utils.ByteStyle.FAIL,
+                               "Something went wrong. Expected true or false but got something else")
 
         #asks user if they want to add another image
-        another_image = input("Would you like to add another image? ([y]/n)")
+        another_image = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add another image? ([y]/n) \n")
         if not another_image or another_image.lower()[0] == "y":
             image_url = True
         elif another_image.lower()[0] == "n":
             pass
         else:
-            print("y/n")
+            utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
 
     ssh_connection.close()

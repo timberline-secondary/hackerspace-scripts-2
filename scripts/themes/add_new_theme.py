@@ -15,7 +15,7 @@ def add_new_theme():
         have_good_input = False
         mp3_url = ""
         while not have_good_input:
-            mp3_url = input("Paste the url to the mp3 file you want to add. (q to quit): ")
+            mp3_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste the url to the mp3 file you want to add. (q to quit): \n")
 
             if mp3_url == 'q':
                 break
@@ -39,7 +39,7 @@ def add_new_theme():
                     good_name_already = False
 
                 prompt = "What number (integers only) do you want to give it?" + (" [Enter] = {}".format(name) if good_name_already else "") + "\n"
-                mp3_number = input(prompt)
+                mp3_number = utils.input_styled(utils.ByteStyle.INPUT, prompt)
 
                 try:
                     if good_name_already and not mp3_number:
@@ -67,30 +67,31 @@ def add_new_theme():
 
             # asks user if they want to overwrite https://www.quora.com/I%E2%80%99m-new-to-Python-how-can-I-write-a-yes-no-question
             if already_exists == True:
-                overwrite = input("There is a file that already exists with that name. Do you want to overwrite it? (y/[n])")
+                overwrite = utils.input_styled(utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
                 if not overwrite or overwrite.lower()[0] == "n":
                     mp3_url = True
                 elif overwrite.lower()[0] == "y":
                     already_exists = False
                     pass
                 else:
-                    print("\n(y/n)\n")
+                    utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
             elif already_exists == False:
                 pass
             else:
-                print("Something went wrong. Expected true or false but got something else")
+                utils.print_styled(utils.ByteStyle.FAIL,
+                                   "Something went wrong. Expected true or false but got something else")
 
             #sends the command
             if already_exists == False:
                 ssh_connection.send_cmd(command)
 
-            another_code = input("Would you like to add another code? ([y]/n)")
+            another_code = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add another code? ([y]/n) \n")
             if not another_code or another_code.lower()[0] == "y":
                 mp3_url = True
                 pass
             elif another_code.lower()[0] == "n":
                 mp3_url = False
             else:
-                print("y/n")
+                utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
             #closes ssh connection
             ssh_connection.close()

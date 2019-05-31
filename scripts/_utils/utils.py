@@ -12,6 +12,7 @@ class ByteStyle:
     BOLD = '\033[1m' #makes it bold
     UNDERLINE = '\033[4m' #underlines
     INPUT = '\033[1;33m' #bold yellow
+    Y_N = '[0;33m' #dark yellow (brown)
 
 def print_styled(color, text):
     print(color + text + ByteStyle.ENDC)
