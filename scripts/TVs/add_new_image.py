@@ -45,18 +45,18 @@ def add_new_image(student_number=None, tv=None):
             return
 
         #collects information to name the file, and as to which tv to send it to
-        student_number_input = utils.input_styled(utils.ByteStyle.INPUT, "Enter Student Number (default = {}): \n").format(student_number)
+        student_number_input = utils.input_styled(utils.ByteStyle.INPUT, "Enter Student Number (default = {}): \n".format(student_number))
         if not student_number_input:
             pass
         else:
             student_number = student_number_input
         image_name = None
-        name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? (default = {}): \n").format(name_without_ext)
+        name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? (default = {}): \n".format(name_without_ext))
         if not name_good:
             image_name = name_without_ext
         else:
             image_name = name_good
-        tv_input = utils.input_styled(utils.ByteStyle.INPUT, "What TV # are you sending this to? (default = {}): \n").format(tv)
+        tv_input = utils.input_styled(utils.ByteStyle.INPUT, "What TV # are you sending this to? (default = {}): \n".format(tv))
         if not tv_input:
             pass
         else:
@@ -89,7 +89,7 @@ def add_new_image(student_number=None, tv=None):
                     if image_url is None:
                         return
                     #asks user to change name of it
-                    name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? (default = {}): \n")
+                    name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? \n")
                     if not name_good:
                         image_name = name_without_ext
                     else:
@@ -107,7 +107,7 @@ def add_new_image(student_number=None, tv=None):
         #if file does not exist already it wgets it and places it in the correct tv folder
         if already_exists == False:
             ssh_connection.send_cmd(command)
-            utils.print_styled(utils.ByteStyle.SUCCESS, "{} was succesfully sent over to pi-tv{}").format(filename, tv)
+            utils.print_styled(utils.ByteStyle.SUCCESS, "{} was succesfully sent over to pi-tv{}".format(filename, tv))
             pass
         else:
             utils.print_styled(utils.ByteStyle.FAIL,
