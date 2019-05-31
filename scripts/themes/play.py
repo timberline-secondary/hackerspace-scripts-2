@@ -1,6 +1,8 @@
 
 from scripts._utils.ssh import SSH
 from scripts._utils import pi
+from scripts._utils import utils
+
 
 hostname = "pi-themes"
 #this code worked on by Nicholas (Tseilorin) Hopkins
@@ -19,7 +21,7 @@ def play():
     quitting = False
     while not quitting:
         #gets user input for whatever song they want to play
-        song_number = input("Give me a song number. (q to quit): ")
+        song_number = utils.input_styled(utils.ByteStyle.INPUT, "Give me a song number. (q to quit): \n")
         if song_number == 'q':
             quitting = True
 
