@@ -1,6 +1,9 @@
 import os
 import sys
 from importlib import import_module
+from pip._internal import main as pipmain
+
+#!/usr/bin/python
 
 from scripts._utils import utils
 # from scripts import themes
@@ -54,12 +57,20 @@ def print_menu(menu_items, title):
 
     return menu_items[int(choice)]
 
+def pip_install():
+    utils.print_styled(utils.ByteStyle.WARNING, "Checking to see if all necassary pip modules are installed. \n")
+    pipmain(['install', 'paramiko'])
+    pipmain(['install', 'inquirer'])
+    utils.print_styled(utils.ByteStyle.SUCCESS, "Everything is installed!")
+    os.system('clear')
 
 def control_panel():
 
     try:
         # get modules
         module_dict = load_modules()
+
+        pip_install()
 
         while True:
             module_choice = print_menu(list(module_dict.keys()), "Hackerspace Control Panel")
