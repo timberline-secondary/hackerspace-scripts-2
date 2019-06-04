@@ -8,7 +8,7 @@ cd $installdir/PycharmProjects/hackerspace-scripts-2
 
 
 echo -e "export PATH=\$PATH:$localdir/" >> $FILE
-echo "log out then back in, successfuly made 'controlpanel.sh' a linked command!"
+echo "log out then back in, successfuly made 'control-panel' a linked command!"
 
 if [ ! -f $installdir/venv/bin/activate ]; then
     virtualenv -p python3 $installdir
