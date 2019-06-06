@@ -20,5 +20,5 @@ if [ ! -f $installdir/venv/bin/activate ]; then
     virtualenv -p python3 $installdir
 fi
 
-source $installdir/bin/activate
+source $installdir/venv/bin/activate
 python $installdir/controlpanel.py
