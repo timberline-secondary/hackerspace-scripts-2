@@ -17,8 +17,9 @@ else
 fi
 
 if [ ! -f $installdir/venv/bin/activate ]; then
-    virtualenv -p python3 $installdir
+    virtualenv -p python3 $installdir/venv
 fi
 
 source $installdir/venv/bin/activate
+pip install -r requirements.txt
 python $installdir/controlpanel.py
