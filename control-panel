@@ -3,14 +3,18 @@
 installdir="/home/$USER/bin/hackerspace-scripts-2"
 FILE="/home/$USER/.profile"
 localdir="$(pwd)"
+string="export PATH=\$PATH:$localdir/"
 
 cd $installdir
 
 git pull
 
-#echo -e "export PATH=\$PATH:$localdir/" >> $FILE
-echo "log out then back in, successfuly made 'control-panel' a linked command!"
-cp control-panel /usr/local/bin
+if grep -q "$string" $FILE;
+then
+    echo "log out then back in, successfuly made 'control-panel' a linked command!"
+else
+    echo -e "export PATH=\$PATH:$localdir/" >> $FILE
+fi
 
 if [ ! -f $installdir/venv/bin/activate ]; then
     virtualenv -p python3 $installdir
