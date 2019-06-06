@@ -21,4 +21,5 @@ if [ ! -f $installdir/venv/bin/activate ]; then
 fi
 
 source $installdir/venv/bin/activate
+pip install -r requirements.txt
 python $installdir/controlpanel.py
