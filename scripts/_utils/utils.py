@@ -4,21 +4,24 @@ from urllib.request import urlopen
 
 
 class ByteStyle:
-    HEADER = '\033[95m' #intense purple
-    SUCCESS = '\033[92m' #intense green
-    WARNING = '\033[93m' #intense yellow
-    FAIL = '\033[91m' #intense red
-    ENDC = '\033[0m' #resets
-    BOLD = '\033[1m' #makes it bold
-    UNDERLINE = '\033[4m' #underlines
-    INPUT = '\033[1;33m' #bold yellow
-    Y_N = '\033[0;33m' #dark yellow (brown)
+    HEADER = '\033[95m'  # intense purple
+    SUCCESS = '\033[92m'  # intense green
+    WARNING = '\033[93m'  # intense yellow
+    FAIL = '\033[91m'  # intense red
+    ENDC = '\033[0m'  # resets
+    BOLD = '\033[1m'  # makes it bold
+    UNDERLINE = '\033[4m'  # underlines
+    INPUT = '\033[1;33m'  # bold yellow
+    Y_N = '\033[0;33m'  # dark yellow (brown)
+
 
 def print_styled(color, text):
     print(color + text + ByteStyle.ENDC)
 
-def input_styled(color, text):
+
+def input_styled(text, color=ByteStyle.INPUT):
     return input(color + text + ByteStyle.ENDC).strip()
+
 
 def print_heading(title):
     width = 60
