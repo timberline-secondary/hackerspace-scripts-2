@@ -1,5 +1,6 @@
 pip-selfcheck.json
 .idea/
+.vscode/
 vcs.xml
 
 # Byte-compiled / optimized / DLL files

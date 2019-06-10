@@ -53,10 +53,12 @@ def add_new_title():
     filepath_pi = "/home/pi-slideshow/tv{}/".format(tv)
 
     #scps into the tv photo directory
-    command = "scp {}{}.png {}@{}:{}".format(temp_dir, filename, username, hostname, filepath_pi)
+    command = 'sshpass -p "{}" scp {}{}.png {}@{}:{}'.format(pi.password, temp_dir, filename, username, hostname, filepath_pi)
     os.system(command)
 
     #removes all files it created
     os.system('rm {}{}.png'.format(temp_dir, filename))
     os.system('rm {}{}.svg'.format(temp_dir, filename))
     os.system('rm {}.png'.format(filename))
+
+    utils.print_styled(utils.ByteStyle.SUCCESS, "{} was successfully sent over to hightower!".format(filename))
