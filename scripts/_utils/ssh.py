@@ -47,13 +47,26 @@ class SSH():
         return True
 
 
-    def send_cmd(self, command, sudo=False, print_stdout=False):
+    def send_cmd(self, command, sudo=False, cd=False, print_stdout=False):
         if not self.is_connected():
             return -1
 
         if self.ssh_client == None:
             print("SSH client not connected")
             return False
+
+        if cd:
+            transport = self.ssh_client.get_transport()
+            session = transport.open_session()
+            session.set_combine_stderr(True)
+            session.get_pty()
+
+            session.exec_command('sudo su root -c  "{}"'.format(command))
+            stdin = session.makefile("wb", -1)
+            stdout = session.makefile("rb", -1)
+
+            stdin.write(self.password + "\n")
+            stdin.flush()
 
         if sudo:
             transport = self.ssh_client.get_transport()
