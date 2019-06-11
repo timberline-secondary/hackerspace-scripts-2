@@ -14,7 +14,7 @@ def speak():
     quitting = False
     while not quitting:
         #makes while loop and gets user input as to what to say
-        dialogue_old = utils.input_styled("What would you like me to say? (q to quit): \n")
+        dialogue_old = utils.input_styled(utils.ByteStyle.INPUT, "What would you like me to say? (q to quit): \n")
 
         if dialogue_old == 'q':
             quitting = True

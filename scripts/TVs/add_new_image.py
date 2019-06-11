@@ -12,7 +12,7 @@ def get_image_url():
     mime_type_good = False
     #creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
-        image_url = utils.input_styled("Paste image url: \n")
+        image_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste image url: \n")
 
         if image_url == "q":
             return None, None, None
@@ -45,18 +45,18 @@ def add_new_image(student_number=None, tv=None):
             return
 
         #collects information to name the file, and as to which tv to send it to
-        student_number_input = utils.input_styled("Enter Student Number (default = {}): \n".format(student_number))
+        student_number_input = utils.input_styled(utils.ByteStyle.INPUT, "Enter Student Number (default = {}): \n".format(student_number))
         if not student_number_input:
             pass
         else:
             student_number = student_number_input
         image_name = None
-        name_good = utils.input_styled("What is the name of this image? (default = {}): \n".format(name_without_ext))
+        name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? (default = {}): \n".format(name_without_ext))
         if not name_good:
             image_name = name_without_ext
         else:
             image_name = name_good
-        tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): \n".format(tv))
+        tv_input = utils.input_styled(utils.ByteStyle.INPUT, "What TV # are you sending this to? (default = {}): \n".format(tv))
         if not tv_input:
             pass
         else:
@@ -64,7 +64,7 @@ def add_new_image(student_number=None, tv=None):
 
         filename = student_number + ".z." + image_name + extension
 
-        print("Sending {} to hightower to see if file exists already with that name.".format(filename))
+        utils.print_styled(utils.ByteStyle.WARNING, "Sending {} to hightower to see if file exists already with that name.".format(filename))
 
 
         filepath = "/home/pi-slideshow/tv{}/".format(tv)
@@ -89,7 +89,7 @@ def add_new_image(student_number=None, tv=None):
                     if image_url is None:
                         return
                     #asks user to change name of it
-                    name_good = utils.input_styled("What is the name of this image? \n")
+                    name_good = utils.input_styled(utils.ByteStyle.Y_N, "What is the name of this image? \n")
                     if not name_good:
                         image_name = name_without_ext
                     else:

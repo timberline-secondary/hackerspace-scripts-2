@@ -5,15 +5,16 @@ import inquirer
 import getpass
 from scripts._utils import pi
 from scripts._utils.ssh import SSH
+from scripts.TVs import add_new_image
 
 temp_dir = "/tmp/"
 
 def add_new_title():
     #gets info of the student who made the art
-    first_name = utils.input_styled("First name: \n")
-    last_name = utils.input_styled("Last name: \n")
-    grad_year = utils.input_styled("Grad Year: \n")
-    student_number = utils.input_styled("Student number: \n")
+    first_name = utils.input_styled(utils.ByteStyle.INPUT, "First name: \n")
+    last_name = utils.input_styled(utils.ByteStyle.INPUT, "Last name: \n")
+    grad_year = utils.input_styled(utils.ByteStyle.INPUT, "Grad Year: \n")
+    student_number = utils.input_styled(utils.ByteStyle.INPUT, "Student number: \n")
 
     #https://pypi.org/project/inquirer/
 
@@ -28,12 +29,12 @@ def add_new_title():
 
     #gets user to input a custom subject if they so choose
     if choose_subject == "Custom subject:":
-        custom_subject = utils.input_styled("Well then what are they in? \n")
+        custom_subject = utils.input_styled(utils.ByteStyle.INPUT, "Well then what are they in? \n")
         choose_subject = custom_subject
     else:
         pass
 
-    tv = utils.input_styled("Which TV # are you sending this to?: \n")
+    tv = utils.input_styled(utils.ByteStyle.INPUT, "Which TV # are you sending this to?: \n")
 
     filename = student_number + ".a." + first_name + last_name
     template = "_template.svg"
@@ -62,3 +63,11 @@ def add_new_title():
     os.system('rm {}.png'.format(filename))
 
     utils.print_styled(utils.ByteStyle.SUCCESS, "{} was successfully sent over to hightower!".format(filename))
+
+    add_images = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add images to {} {} shrine? ([y]/n)\n")
+    if not add_images or add_images.lower()[0] == "y":
+        add_new_image.add_new_image(student_number, tv)
+    elif add_images.lower()[0] == "n":
+        pass
+    else:
+        utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")

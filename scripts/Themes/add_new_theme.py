@@ -15,7 +15,7 @@ def add_new_theme():
         have_good_input = False
         mp3_url = ""
         while not have_good_input:
-            mp3_url = utils.input_styled("Paste the url to the mp3 file you want to add. (q to quit): \n")
+            mp3_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste the url to the mp3 file you want to add. (q to quit): \n")
 
             if mp3_url == 'q':
                 break
@@ -39,7 +39,7 @@ def add_new_theme():
                     good_name_already = False
 
                 prompt = "What number (integers only) do you want to give it?" + (" [Enter] = {}".format(name) if good_name_already else "") + "\n"
-                mp3_number = utils.input_styled(prompt)
+                mp3_number = utils.input_styled(utils.ByteStyle.INPUT, prompt)
 
                 try:
                     if good_name_already and not mp3_number:
