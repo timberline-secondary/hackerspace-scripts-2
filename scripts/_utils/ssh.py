@@ -47,7 +47,7 @@ class SSH():
         return True
 
 
-    def send_cmd(self, command, sudo=False, print_stdout=False):
+    def send_cmd(self, command, sudo=False, cd=False, print_stdout=False):
         if not self.is_connected():
             return -1
 
