@@ -56,5 +56,7 @@ def verify_mimetype(file_url, mimetype_string):
 
     return False
 
-
-
+def check_student_number(student_number):
+    verify_student = os.system("getent passwd | grep {}".format(student_number))
+    print(verify_student)
+    return verify_student
