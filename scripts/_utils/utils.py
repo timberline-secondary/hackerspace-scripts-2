@@ -19,7 +19,7 @@ def print_styled(color, text):
     print(color + text + ByteStyle.ENDC)
 
 
-def input_styled(text, color=ByteStyle.INPUT):
+def input_styled(color, text):
     return input(color + text + ByteStyle.ENDC).strip()
 
 

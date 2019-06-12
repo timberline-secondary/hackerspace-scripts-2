@@ -21,7 +21,7 @@ def play():
     quitting = False
     while not quitting:
         #gets user input for whatever song they want to play
-        song_number = utils.input_styled("Give me a song number. (q to quit): \n")
+        song_number = utils.input_styled(utils.ByteStyle.INPUT, "Give me a song number. (q to quit): \n")
         if song_number == 'q':
             quitting = True
 
