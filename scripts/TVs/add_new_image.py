@@ -122,4 +122,5 @@ def add_new_image(student_number=None, tv=None):
         else:
             utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
 
+    utils.input_styled(utils.ByteStyle.INPUT, "Hit Enter to return to the main menu.")
     ssh_connection.close()
