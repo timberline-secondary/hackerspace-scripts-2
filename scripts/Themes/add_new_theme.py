@@ -95,3 +95,4 @@ def add_new_theme():
                 utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
             #closes ssh connection
             ssh_connection.close()
+    utils.input_styled(utils.ByteStyle.INPUT, "Hit Enter to return to the main menu.")

@@ -64,7 +64,7 @@ def add_new_image(student_number=None, tv=None):
 
         filename = student_number + ".z." + image_name + extension
 
-        print("Sending {} to hightower to see if file exists already with that name.".format(filename))
+        utils.print_styled(utils.ByteStyle.WARNING, "Sending {} to hightower to see if file exists already with that name.".format(filename))
 
 
         filepath = "/home/pi-slideshow/tv{}/".format(tv)
@@ -89,7 +89,7 @@ def add_new_image(student_number=None, tv=None):
                     if image_url is None:
                         return
                     #asks user to change name of it
-                    name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? \n")
+                    name_good = utils.input_styled(utils.ByteStyle.Y_N, "What is the name of this image? \n")
                     if not name_good:
                         image_name = name_without_ext
                     else:
@@ -122,4 +122,5 @@ def add_new_image(student_number=None, tv=None):
         else:
             utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
 
+    utils.input_styled(utils.ByteStyle.INPUT, "Hit Enter to return to the main menu.")
     ssh_connection.close()
