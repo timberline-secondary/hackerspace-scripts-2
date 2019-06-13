@@ -3,4 +3,4 @@ import os
 
 def missile():
     utils.print_styled(utils.ByteStyle.BOLD, "Activating missile launcher.")
-    os.system('sudo su root -c "source /root/pyusb/bin/activate/ && cd /root/pyusb && python stormLauncher.py && deactivate"')
+    os.system('su -c "sudo -S ./.launchStage2.sh" -m hackerspace_admin')
