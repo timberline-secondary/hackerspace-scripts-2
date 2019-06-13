@@ -84,4 +84,3 @@ def add_new_title():
         else:
             utils.print_styled(utils.ByteStyle.FAIL, "Something went wrong. Expected true or false but got something else...")
             
-    utils.input_styled(utils.ByteStyle.INPUT, "Hit Enter to return to the main menu.")

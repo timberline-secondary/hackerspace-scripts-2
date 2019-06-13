@@ -110,8 +110,7 @@ def add_new_image(student_number=None, tv=None):
             utils.print_styled(utils.ByteStyle.SUCCESS, "{} was succesfully sent over to pi-tv{}".format(filename, tv))
             pass
         else:
-            utils.print_styled(utils.ByteStyle.FAIL,
-                               "Something went wrong. Expected true or false but got something else")
+            utils.print_styled(utils.ByteStyle.FAIL, "Something went wrong. Expected true or false but got something else")
 
         #asks user if they want to add another image
         another_image = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add another image? ([y]/n) \n")
@@ -122,5 +121,4 @@ def add_new_image(student_number=None, tv=None):
         else:
             utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
 
-    utils.input_styled(utils.ByteStyle.INPUT, "Hit Enter to return to the main menu.")
     ssh_connection.close()
