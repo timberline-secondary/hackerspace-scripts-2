@@ -37,6 +37,10 @@ def print_heading(title):
 
 
 def verify_mimetype(file_url, mimetype_string):
+    if mimetype_string is None:
+        print_styled(ByteStyle.FAIL, " This media type is not supported.")
+        return False
+        
     file_url = file_url.strip()
     try:
         with urlopen(file_url) as response:
