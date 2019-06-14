@@ -22,4 +22,5 @@ fi
 
 source $installdir/venv/bin/activate
 pip install -r requirements.txt
+python $installdir/bootstrap.py
 python $installdir/controlpanel.py
