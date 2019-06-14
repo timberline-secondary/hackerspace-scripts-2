@@ -20,18 +20,18 @@ mime_types = {
     ".svg": "image/svg+xml",
 }
 
-def get_image_url():
+def get_media_url():
 
     mime_type_good = False
     #creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
-        image_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste image (png, jpg, svg) or video (mp4, avi, mpeg, etc.) url: \n")
+        media_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url: \n")
 
-        if image_url == "q":
+        if media_url == "q":
             return None, None, None
 
         #takes url and breaks it into name with no extension, and the extension into variables
-        parsed_url_tuple = urlparse(image_url)
+        parsed_url_tuple = urlparse(media_url)
         name_with_ext = os.path.basename(parsed_url_tuple.path)
         name_without_ext, extension = os.path.splitext(name_with_ext)
 
@@ -44,18 +44,18 @@ def get_image_url():
             expected_mime_type = None
 
         # checks if file is what it really says it is
-        mime_type_good = utils.verify_mimetype(image_url, expected_mime_type)
+        mime_type_good = utils.verify_mimetype(media_url, expected_mime_type)
 
         #returns necessary veriables to continue the code once mime type has been verified
-    return image_url, name_without_ext, extension
+    return media_url, name_without_ext, extension
 
 
 def add_new_media(student_number=None, tv=None):
-    image_url = True
-    while image_url == True:
+    media_url = True
+    while media_url == True:
         #gets and checks the url of the file
-        image_url, name_without_ext, extension = get_image_url()
-        if image_url is None:
+        media_url, name_without_ext, extension = get_media_url()
+        if media_url is None:
             return
 
         #collects information to name the file, and as to which tv to send it to
@@ -82,7 +82,7 @@ def add_new_media(student_number=None, tv=None):
 
 
         filepath = "/home/pi-slideshow/tv{}/".format(tv)
-        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, image_url)
+        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
 
         hostname = "hightower"
         username = "pi-slideshow"
@@ -99,8 +99,8 @@ def add_new_media(student_number=None, tv=None):
                 should_we_overwrite = utils.input_styled(utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
                 if not should_we_overwrite or should_we_overwrite.lower()[0] == 'n':
                     #calls the function to run through the name and extension grabbing process again
-                    image_url, name_without_ext, extension = get_image_url()
-                    if image_url is None:
+                    media_url, name_without_ext, extension = get_media_url()
+                    if media_url is None:
                         return
                     #asks user to change name of it
                     name_good = utils.input_styled(utils.ByteStyle.Y_N, "What is the name of this image? \n")
@@ -109,7 +109,7 @@ def add_new_media(student_number=None, tv=None):
                     else:
                         image_name = name_good
                         filename = student_number + ".z." + image_name + extension
-                        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, image_url)
+                        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
                         already_exists = False
                         pass
                 elif should_we_overwrite.lower()[0] == 'y':
@@ -129,7 +129,7 @@ def add_new_media(student_number=None, tv=None):
         #asks user if they want to add another image
         another_image = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add another image? ([y]/n) \n")
         if not another_image or another_image.lower()[0] == "y":
-            image_url = True
+            media_url = True
         elif another_image.lower()[0] == "n":
             pass
         else:
