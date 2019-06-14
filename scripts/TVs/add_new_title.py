@@ -5,7 +5,7 @@ import inquirer
 import getpass
 from scripts._utils import pi
 from scripts._utils.ssh import SSH
-from scripts.TVs import add_new_image
+from scripts.TVs import add_new_media
 import subprocess
 
 temp_dir = "/tmp/"
@@ -77,7 +77,7 @@ def add_new_title():
         utils.print_styled(utils.ByteStyle.SUCCESS, "{} was successfully sent over to TV {}".format(filename_png, tv))
         add_images = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add images to {}'s new shrine? ([y]/n)\n".format(first_name) )
         if not add_images or add_images.lower()[0] == "y":
-            add_new_image.add_new_image(student_number, tv)
+            add_new_media.add_new_media(student_number, tv)
         else:
             utils.print_styled(utils.ByteStyle.FAIL, "The title image was not added.")
     else:

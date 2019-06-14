@@ -12,7 +12,7 @@ def get_image_url():
     mime_type_good = False
     #creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
-        image_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste image url: \n")
+        image_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url: \n")
 
         if image_url == "q":
             return None, None, None
@@ -28,6 +28,18 @@ def get_image_url():
             expected_mime_type = "image/png"
         elif extension == ".jpg" or extension == ".jpeg":
             expected_mime_type = "image/jpeg"
+        elif extension == ".avi":
+            expected_mime_type = "video/x-msvideo"
+        elif extension == ".mpeg":
+            expected_mime_type = "video/mpeg"
+        elif extension == ".mp4":
+            expected_mime_type = "video/mp4"
+        elif extension == ".ogv":
+            expected_mime_type = "video/ogg"
+        elif extension == ".webm":
+            expected_mime_type = "video/webm"
+        elif extension == ".mkv":
+            expected_mime_type = "video/x-matroska"
 
         # checks if file is what it really says it is
         mime_type_good = utils.verify_mimetype(image_url, expected_mime_type)
@@ -36,7 +48,7 @@ def get_image_url():
     return image_url, name_without_ext, extension
 
 
-def add_new_image(student_number=None, tv=None):
+def add_new_media(student_number=None, tv=None):
     image_url = True
     while image_url == True:
         #gets and checks the url of the file
