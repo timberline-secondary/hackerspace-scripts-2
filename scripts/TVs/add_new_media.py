@@ -79,7 +79,7 @@ def add_new_media(student_number=None, tv=None):
 
         filename = student_number + ".z." + image_name + extension
 
-        utils.print_styled(utils.ByteStyle.WARNING, "Sending {} to hightower to see if file exists already with that name.".format(filename))
+        utils.print_warning("Sending {} to hightower to see if file exists already with that name.".format(filename))
 
 
         filepath = "/home/pi-slideshow/tv{}/".format(tv)
@@ -117,31 +117,31 @@ def add_new_media(student_number=None, tv=None):
                     already_exists = False
                     pass
                 else:
-                    utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
+                    utils.print_styled("(y/n)", utils.ByteStyle.Y_N)
 
         #if file does not exist already it wgets it and places it in the correct tv folder
         if already_exists == False:
             ssh_connection.send_cmd(command)
-            utils.print_styled(utils.ByteStyle.SUCCESS, "{} was succesfully sent over to pi-tv{}".format(filename, tv))
+            utils.print_success("{} was succesfully sent over to pi-tv{}".format(filename, tv))
             pass
         else:
-            utils.print_styled(utils.ByteStyle.FAIL, "Something went wrong. Expected true or false but got something else")
+            utils.print_error("Something went wrong. Expected true or false but got something else")
 
         #asks user if they want to add another image
-        another_image = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add another image? ([y]/n) \n")
+        another_image = utils.input_styled("Would you like to add another image? ([y]/n) \n")
         if not another_image or another_image.lower()[0] == "y":
             media_url = True
         elif another_image.lower()[0] == "n":
             pass
         else:
-            utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
+            utils.print_styled( "(y/n)", utils.ByteStyle.Y_N)
 
     ssh_connection.close()
 
-    make_movie = utils.input_styled(utils.ByteStyle.Y_N, "Do you want to make a movie? ([y]/n) \n")
+    make_movie = utils.input_styled("Do you want to make a movie? ([y]/n) \n")
     if not make_movie or make_movie.lower()[0] == "y":
         movie_maker()
     elif make_movie.lower()[0] == "n":
         pass
     else:
-        utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
+        utils.print_styled("(y/n)", utils.ByteStyle.Y_N)

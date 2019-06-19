@@ -74,12 +74,12 @@ def add_new_title():
     title_exists = ssh_connection.file_exists(filepath_pi, filename_png)
 
     if title_exists:
-        utils.print_styled(utils.ByteStyle.SUCCESS, "{} was successfully sent over to TV {}".format(filename_png, tv))
+        utils.print_success("{} was successfully sent over to TV {}".format(filename_png, tv))
         add_images = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add images to {}'s new shrine? ([y]/n)\n".format(first_name) )
         if not add_images or add_images.lower()[0] == "y":
             add_new_media.add_new_media(student_number, tv)
         else:
-            utils.print_styled(utils.ByteStyle.FAIL, "The title image was not added.")
+            utils.print_error("The title image was not added.")
     else:
-        utils.print_styled(utils.ByteStyle.FAIL, "{} was not sent to hightower. Is sshpass installed?".format(filename_png))
+        utils.print_error("{} was not sent to hightower. Is sshpass installed?".format(filename_png))
             

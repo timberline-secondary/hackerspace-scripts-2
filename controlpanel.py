@@ -57,10 +57,10 @@ def print_menu(menu_items, title):
     return menu_items[int(choice)]
 
 def pip_install():
-    utils.print_styled(utils.ByteStyle.WARNING, "Checking to see if all necassary pip modules are installed. \n")
+    utils.print_warning("Checking to see if all necassary pip modules are installed. \n")
     pipmain(['install', 'paramiko'])
     pipmain(['install', 'inquirer'])
-    utils.print_styled(utils.ByteStyle.SUCCESS, "Everything is installed!")
+    utils.print_success("Everything is installed!")
     os.system('clear')
 
 def control_panel():
