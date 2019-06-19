@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from scripts._utils import utils
 from scripts._utils import pi
 from scripts._utils.ssh import SSH
+from scripts._utils.movie_maker import movie_maker
 
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
@@ -136,3 +137,11 @@ def add_new_media(student_number=None, tv=None):
             utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
 
     ssh_connection.close()
+
+    make_movie = utils.input_styled(utils.ByteStyle.Y_N, "Do you want to make a movie? ([y]/n) \n")
+    if not make_movie or make_movie.lower()[0] == "y":
+        movie_maker()
+    elif make_movie.lower()[0] == "n":
+        pass
+    else:
+        utils.print_styled(utils.ByteStyle.Y_N, "(y/n)")
