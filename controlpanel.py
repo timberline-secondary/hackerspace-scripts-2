@@ -85,7 +85,7 @@ def control_panel():
             method = getattr(sub_module, sub_module_choice_str)
             utils.print_heading(sub_module_choice_str)
             method()
-            utils.input_styled(utils.ByteStyle.INPUT, "Hit Enter to return to the main menu.")
+            utils.input_styled("Hit Enter to return to the main menu.")
 
         # import the package module
         # print(control_panel.current_module)

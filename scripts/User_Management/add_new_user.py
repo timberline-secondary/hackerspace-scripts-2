@@ -16,11 +16,11 @@ def add_new_user():
 
     created = False
     while not created:
-        student_number = utils.input_styled(utils.ByteStyle.INPUT, "Enter Student Number: \n")
-        first_name = utils.input_styled(utils.ByteStyle.INPUT, "First Name: \n").upper()
-        last_name = utils.input_styled(utils.ByteStyle.INPUT, "Last Name: \n").upper()
+        student_number = utils.input_styled("Enter Student Number: \n")
+        first_name = utils.input_styled("First Name: \n").upper()
+        last_name = utils.input_styled("Last Name: \n").upper()
 
-        create = utils.input_styled(utils.ByteStyle.INPUT, "Create account for {} {} {}? y/[n] \n".format(student_number, first_name, last_name))
+        create = utils.input_styled("Create account for {} {} {}? y/[n] \n".format(student_number, first_name, last_name))
 
         if create is 'y':
             # ssh_connection.send_cmd('pwd', print_stdout=True)

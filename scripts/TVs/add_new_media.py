@@ -26,7 +26,7 @@ def get_media_url():
     mime_type_good = False
     #creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
-        media_url = utils.input_styled(utils.ByteStyle.INPUT, "Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url: \n")
+        media_url = utils.input_styled("Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url: \n")
 
         if media_url == "q":
             return None, None, None
@@ -60,18 +60,18 @@ def add_new_media(student_number=None, tv=None):
             return
 
         #collects information to name the file, and as to which tv to send it to
-        student_number_input = utils.input_styled(utils.ByteStyle.INPUT, "Enter Student Number (default = {}): \n".format(student_number))
+        student_number_input = utils.input_styled("Enter Student Number (default = {}): \n".format(student_number))
         if not student_number_input:
             pass
         else:
             student_number = student_number_input
         image_name = None
-        name_good = utils.input_styled(utils.ByteStyle.INPUT, "What is the name of this image? (default = {}): \n".format(name_without_ext))
+        name_good = utils.input_styled("What is the name of this image? (default = {}): \n".format(name_without_ext))
         if not name_good:
             image_name = name_without_ext
         else:
             image_name = name_good
-        tv_input = utils.input_styled(utils.ByteStyle.INPUT, "What TV # are you sending this to? (default = {}): \n".format(tv))
+        tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): \n".format(tv))
         if not tv_input:
             pass
         else:
