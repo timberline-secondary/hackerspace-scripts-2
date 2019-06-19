@@ -10,8 +10,7 @@ hostname = "pi-themes"
 def play():
     # connect to pi-themes
     ssh_connection = SSH(hostname, pi.username, pi.password)
-    ssh_connection.connect()
-    transport = ssh_connection.ssh_client.get_transport()
+    transport = ssh_connection.client.get_transport()
     session = transport.open_session()
     session.set_combine_stderr(True)
     session.get_pty()
