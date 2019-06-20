@@ -10,10 +10,7 @@ hostname = "pi-themes"
 def play():
     # connect to pi-themes
     ssh_connection = SSH(hostname, pi.username, pi.password)
-    transport = ssh_connection.client.get_transport()
-    session = transport.open_session()
-    session.set_combine_stderr(True)
-    session.get_pty()
+    session = ssh_connection.open_session()
 
     session.exec_command("sudo bash startthemes.sh")
     stdin = session.makefile("wb", -1)
@@ -23,9 +20,7 @@ def play():
         song_number = utils.input_styled("Give me a song number. (q to quit): \n")
         if song_number == 'q':
             quitting = True
-
         else:
-
             stdin.write(song_number + "\n")
             stdin.flush()
 
