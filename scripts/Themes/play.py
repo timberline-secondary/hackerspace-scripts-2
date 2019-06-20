@@ -10,7 +10,7 @@ hostname = "pi-themes"
 def play():
     # connect to pi-themes
     ssh_connection = SSH(hostname, pi.username, pi.password)
-    session = ssh_connection.open_session()
+    session = ssh_connection.get_open_session()
 
     session.exec_command("sudo bash startthemes.sh")
     stdin = session.makefile("wb", -1)

@@ -1,4 +1,5 @@
 import os
+import pwd
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -34,7 +35,6 @@ def input_styled(text, color=ByteStyle.INPUT):
 def print_heading(title):
     width = 60
     title = title.upper()
-    cwd = os.getcwd()
     if len(title) > width-4:
         title = title[:width-7] + "..."
     print_styled("#" * width, color=ByteStyle.HEADER)
@@ -65,7 +65,15 @@ def verify_mimetype(file_url, mimetype_string):
 
     return False
 
+def user_exists(username):
+    try:
+        pwd.getpwnam(username)
+        return True
+    except KeyError:
+        return False
+
 def check_student_number(student_number):
+    # this doesn't work, needs sudo to get other users.
     verify_student = os.system("getent passwd | grep {}".format(student_number))
     print(verify_student)
     return verify_student
