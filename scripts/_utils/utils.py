@@ -72,8 +72,8 @@ def user_exists(username):
     except KeyError:
         return False
 
-def check_student_number(student_number):
-    # this doesn't work, needs sudo to get other users.
-    verify_student = os.system("getent passwd | grep {}".format(student_number))
-    print(verify_student)
-    return verify_student
+# def check_student_number(student_number):
+#     # this doesn't work, needs sudo to get other users.
+#     verify_student = os.system("getent passwd | grep {}".format(student_number))
+#     print(verify_student)
+#     return verify_student

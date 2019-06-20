@@ -1,7 +1,7 @@
 import os
 from urllib.parse import urlparse
 
-from scripts._utils.utils import input_styled, print_warning, print_success, check_student_number
+from scripts._utils.utils import input_styled, print_warning, print_success
 from scripts._utils.ssh import SSH
 
 hostname = 'tyrell'
