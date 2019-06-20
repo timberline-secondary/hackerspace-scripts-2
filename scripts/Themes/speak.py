@@ -9,7 +9,6 @@ hostname = "pi-themes"
 def speak():
     # connects to pi themes
     ssh_connection = SSH(hostname, pi.username, pi.password)
-    ssh_connection.connect()
 
     quitting = False
     while not quitting:

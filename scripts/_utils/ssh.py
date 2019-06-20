@@ -7,13 +7,29 @@ from .utils import print_error, print_success, print_warning, input_styled
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
 class SSH():
+    """
+    Wrapper for paramiko common use cases
+
+    Basic use (for sending single commands):
+        ssh_connection = SSH(hostname, username, password=None) # will establish an ssh connection to the host and ask for password if not provided
+        ssh_connection.send_cmd('ls')  # send a command and print the output.
+
+    Advanced use (for sending multiple or complex commands requiring interactivity or sudo)
+        ssh_connection = SSH(hostname, username, password=None, transport=True)
+        ssh_connection.open_shell() # open an interactive shell on the host
+
+        # need example hot to interact with code! Maybe send a dictionary of input/output commands?
+        
+    """
+
+    tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
+    tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
 
     def __init__(self, hostname, username, password=None, transport=False):
         self.hostname=hostname
         self.username=username
         self.password=password
-        self.tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
-        self.tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
+
         self.client = None
         self.transport = None
         self.shell = None
@@ -146,7 +162,7 @@ class SSH():
 
     def is_connected(self):
         client = self.client
-        error_msg = "Not connected. You forgot to use .connect()"
+        error_msg = "Not connected."
         if client and client.get_transport() is not None and client.get_transport().is_active():
             try:
                 transport = client.get_transport()

@@ -90,7 +90,6 @@ def add_new_media(student_number=None, tv=None):
 
         #connects and checks to see if file with the same name already exisits
         ssh_connection = SSH(hostname, username, pi.password)
-        ssh_connection.connect()
         already_exists = ssh_connection.file_exists(filepath, filename)
 
 

@@ -61,7 +61,6 @@ def add_new_theme():
 
             ssh_connection = SSH(hostname, pi.username, pi.password)
 
-            ssh_connection.connect()
             #checks if file exists, and if user wants to overwrite it
             already_exists = ssh_connection.file_exists(filepath, filename)
 

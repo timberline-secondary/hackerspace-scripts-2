@@ -70,7 +70,6 @@ def add_new_title():
     #os.system('rm {}.png'.format(filename))
 
     ssh_connection = SSH(hostname, username, pi.password)
-    ssh_connection.connect()
     title_exists = ssh_connection.file_exists(filepath_pi, filename_png)
 
     if title_exists:

@@ -12,7 +12,6 @@ def add_new_user():
     input("Under Construction...[Enter]")
 
     ssh_connection = SSH(hostname, username)
-    ssh_connection.connect()
 
     created = False
     while not created:

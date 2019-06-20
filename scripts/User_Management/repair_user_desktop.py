@@ -9,7 +9,6 @@ username = 'hackerspace_admin'
 
 def repair_user_desktop():
     ssh_connection = SSH(hostname, username)
-    ssh_connection.connect()
     utils.print_warning("Make sure the student is logged out before running this repair.\n")
     student_number = utils.input_styled("Enter Student Number: \n")
 
