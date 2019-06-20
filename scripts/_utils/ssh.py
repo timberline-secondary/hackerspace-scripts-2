@@ -19,9 +19,6 @@ class Session():
     def send_cmd(self, command):
         self.session.exec_command(command)
 
-     
-
-    
 
 
 class SSH():
@@ -233,4 +230,4 @@ class SSH():
             return True
         else:
             return False
-
+            
