@@ -12,10 +12,7 @@ def repair_user_desktop():
     print_warning("Make sure the student is logged out before running this repair.\n")
     student_number = input_styled("Enter Student Number: \n")
 
-    check_student_number(student_number)
-
     command = "rm -r /nfshome/{}/.cache".format(student_number)
     ssh_connection.send_cmd(command, sudo=True)
 
-    print_success("Have the student log in again. Their cache should be cleared noew.")
-    input("Hit enter to continue.\n")
+    print_success("Have the student log in again. Their cache should be cleared now.")
