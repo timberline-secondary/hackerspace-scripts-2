@@ -7,58 +7,26 @@ from scripts._utils.ssh import SSH
 
 hostname = socket.gethostname() # can use the local computer
 username = 'hackerspace_admin'
+default_pw = 'wolf'
 
 def reset_password():
-    sn = utils.input_styled(
-        "Enter the student number of the student whose password you want to reset to 'wolf': ")
+    student_number = utils.input_styled(
+        'Enter the student number of the student whose password you want to reset to "{}": '.format(default_pw))
 
-    pw = getpass("You'll have to enter the Hackerspace's admin password twice. Password: ")
+    password = getpass("Enter the admin password: ")
     
-    cmd = 'su -c "echo -e \\"{}\nwolf\nwolf\\" | sudo -S passwd {}" -m hackerspace_admin'.format(pw, sn)
-    os.system(cmd)
+    ssh_connection = SSH(hostname, username, password)
 
-# def reset_password():
-#     sn = utils.input_styled(
-#         "Enter the student number of the student whose password you want to reset to 'wolf': ") 
-#     pw = getpass("Password: ")
+    prompt_string = "{}@{}:~$".format(username, hostname)
+    command_response_list = [
+                                ("sudo passwd {}".format(student_number), "[sudo] password for {}:".format(username), None),
+                                (password, "New password: ", None),
+                                ("wolf", "Re-enter new password: ", None),
+                                ("wolf", prompt_string, "password updated successfully"),
+                            ]
+    success = ssh_connection.send_interactive_commands(command_response_list)
 
-#     ssh_connection = SSH(hostname, username, pw)
+    if success:
+        utils.print_success("Password for {} successfully reset to {}".format(student_number, default_pw))
 
-#     # https://www.youtube.com/watch?v=lLKdxIu3-A4
-#     channel = ssh.invoke_shell()
-
-#     stdin, stdout, stderr = ssh_connection.client.exec_command("sudo passwd {}".format(sn))
-
-#     stdin.write(pw)
-#     stdin.write('\n')
-#     stdin.flush()
-#     stdin.write('wolf')
-#     stdin.write('\n')
-#     stdin.flush()
-#     stdin.write('wolf')
-#     stdin.write('\n')
-    
-#     output = stdout.readlines()
-#     print('\n'.join(output))
-
-#     # output = str(stdout.read(), 'utf8') # convert from bytestring for newlines to work
-#     # print (output)
-
-#     ssh_connection.close()
-
-
-
-    # session = ssh_connection.get_open_session()
-
-    # session.exec_command("sudo passwd {}".format(sn))
-    # stdin.write(pw + "\n") # sudo
-    # stdin.flush()
-    # stdin.write('wolf\n')
-    # stdin.flush()
-    # stdin.write('wolf\n')
-    # stdin.flush()
-    
-    # stdout = session.makefile("rb", -1)
-    # output = str(stdout.read(), 'utf8')
-    # print(output)
-
+    ssh_connection.close()

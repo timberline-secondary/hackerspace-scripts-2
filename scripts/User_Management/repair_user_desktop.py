@@ -16,3 +16,4 @@ def repair_user_desktop():
     ssh_connection.send_cmd(command, sudo=True)
 
     print_success("Have the student log in again. Their cache should be cleared now.")
+    ssh_connection.close()

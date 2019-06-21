@@ -100,6 +100,17 @@ class SSH():
     def connect_sftp(self):
         self.sftp = paramiko.SFTPClient.from_transport(self.transport)
 
+    def get_open_session(self):
+        """Opens a sessions for sending interactive commands
+        
+        Returns:
+            paramiko.channel.Channel -- the session channel object
+        """
+        session = self.transport.open_session()
+        session.set_combine_stderr(True)
+        session.get_pty()
+        return session
+
     def send_simple_cmd(self, command):
         """Sends a command to the host using the most basic paramiko method.
         Mostly here for documention to show alternate methods of using paramiko. Just use send_cmd()
@@ -149,34 +160,60 @@ class SSH():
 
         output = str(stdout.read(), 'utf8') # convert from bytestring for newlines to work
         if print_stdout:
-            print(output)
+            print(output.replace(self.password, "*****"))
         return output
 
-    def send_interactive_commands(self, command_result_response):
+    def send_interactive_commands(self, command_response_list):
         """[summary]
         
         Arguments:
-            command_response {list} -- a list of string doublets:  [(input, expected_output), ], where
+            command_response_list {list} -- a list of string triplets:  [(input, response_expected, response_contains), ], where
                 input {str} -- the keystrokes to provide as input, this could be a command or interactive input.
-                expected_response {str} -- the expected output if the command was successful, or the input was received as expected.
+                response_expected {str} -- the expected output if the command was successful, or the input was received as expected.
                     This string is compared to the end of the output, so if you are extecting a prompt after the last input, then
                     "$" will work just as well as "user@hostname:~$"
+                response_contains {str} -- a string to look for WITHIN the output data.  Can be None.
 
-            Example for reseting a user's password to 'wolf':
-                      [
-                       ("sudo passwd username", "[sudo] password for admin_user: ", ),
-                       (admin password, "New password: "),
-                       ("wolf", "Re-enter new password: "),
-                       ("wolf", "password updated successfully"),
-                      ]
+            Example for resetting a user's password to 'wolf':
+                [
+                    ("sudo passwd username", "[sudo] password for admin_username: ", None),
+                    (password, "New password: ", None),
+                    ("wolf", "Re-enter new password: ", None),
+                    ("wolf", "hackerspace_admin@tbl-hackerspace-13-s:~$ ", "password updated successfully"),
+                ]
+        Returns:
+            bool -- whether successful or not
         """
+
+        # e.g. "hackerspace_admin@tbl-hackerspace-13-s:~$ " <-- trailing space!
+        prompt_string = "{}@{}:~$ ".format(self.username, self.hostname)
+        channel = self.client.invoke_shell()
+        channel.send(prompt_string + '\n')
+        # wait for the prompt
+        output = self.read_data(channel, prompt_string)
+        print(prompt_string)
+
+        if output is not None:
+
+            # send commands/input
+            for cmd, response, contains in command_response_list:
+                # print("Sending command: ########  {} ##############".format(cmd))
+                channel.send(cmd + '\n')
+                output = self.read_data(channel, response, contains)
+                
+                if output is None:
+                    return False
+                else:
+                    print(output)
+
+        return True      
 
     def read_data(self, channel, response_expected, response_contains=None, timeout=5.0):
         """Read channel output until expected_reponse is found at the end of the output and, if applicable, the response_contains
         is found within, or timeout, whichever comes first. 
         
         Arguments:
-            channel {} -- the channel to read data from
+            channel {paramiko.channel.Channel} -- the channel to read data from
             response_expected {str} -- a string to look for at the END of the output data
 
         Keyword Arguments:
@@ -186,10 +223,10 @@ class SSH():
         Returns:
             str -- the output data, None if timeout occurs
         """
-
         channel_data = ""
         start_time = time()
         response_found = False
+
         while True:
             elapsed_time = time() - start_time
             if channel.recv_ready():  # if there is data ready to receive
@@ -197,7 +234,7 @@ class SSH():
                 channel_data += str(channel.recv(9999), 'utf8') # receive max # of bytes
 
                 # New data received, check if we got the expected output yet:
-                if response_expected and channel_data.endswith(response_expected):
+                if response_expected and channel_data.strip().endswith(response_expected.strip()):
                     # if we also need to look for content within the output, cehck that too
                     if response_contains is not None:
                         if response_contains in channel_data:
@@ -221,7 +258,7 @@ class SSH():
     def close(self):
         if(self.client != None):
             self.client.close()
-        self.sftp.close()
+        # self.sftp.close()
         self.transport.close()
 
     def is_connected(self):
