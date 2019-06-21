@@ -1,5 +1,6 @@
 import paramiko
 import threading
+from time import time
 from getpass import getpass
 from .utils import print_error, print_success, print_warning, input_styled
 
@@ -43,7 +44,7 @@ class SSH():
     tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
     tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
 
-    def __init__(self, hostname, username, password=None, threaded=False):
+    def __init__(self, hostname, username, password=None):
         self.hostname=hostname
         self.username=username
         self.password=password
@@ -53,7 +54,7 @@ class SSH():
         self.sftp = None  # used for file operations
 
         self.connect()
-        self.connect_transport(threaded)
+        self.connect_transport()
         self.connect_sftp()
 
     def __del__(self):
@@ -91,7 +92,7 @@ class SSH():
         print_success("{} successful.".format(str(self)))
         return True
 
-    def connect_transport(self, threaded=False):
+    def connect_transport(self):
         # connect transport for interactive shell and complicated commands etc
         # https://daanlenaerts.com/blog/2016/07/01/python-and-ssh-paramiko-shell/
         self.transport = self.client.get_transport()
@@ -99,26 +100,9 @@ class SSH():
     def connect_sftp(self):
         self.sftp = paramiko.SFTPClient.from_transport(self.transport)
 
-    # def invoke_shell(self):
-    #     self.shell = self.client.invoke_shell()
-
-    # def send_shell_cmd(self, command):
-    #     if(self.shell):
-    #         self.shell.send(command + "\n")
-    #     else:
-    #         print_error("Attempting to send a shell command but the shell isn't opened.  Need to call invoke_shell() first.")
-
-    # def open_shell(self):
-    #     self.invoke_shell()
-    #     while True:
-    #         command = input_styled('').strip()
-    #         self.send_shell_cmd(command)
-    #         if command == 'exit':
-    #             return
-
     def send_simple_cmd(self, command):
         """Sends a command to the host using the most basic paramiko method.
-        Mostly here for documention, just use send_cmd()
+        Mostly here for documention to show alternate methods of using paramiko. Just use send_cmd()
         
         Arguments:
             command {str} -- the bash command
@@ -132,6 +116,19 @@ class SSH():
         return output
 
     def send_cmd(self, command, sudo=False, print_stdout=True):
+        """Sends a command to the host using a temporary session. Automatically provides the sudo password if needed.
+        
+        Arguments:
+            command {str} -- The command.  To run a sudo command, do not add sudo in front, 
+            instead set the sudo parameter to True.
+        
+        Keyword Arguments:
+            sudo {bool} -- run the command as sudo. (default: {False})
+            print_stdout {bool} -- Print the output of the command (default: {True})
+        
+        Returns:
+            [type] -- [description]
+        """
         if not self.is_connected():
             print_error("SSH client not connected")
             return False
@@ -155,16 +152,71 @@ class SSH():
             print(output)
         return output
 
-    def get_open_session(self):
-        """Opens a sessions for sending interactive commands
+    def send_interactive_commands(self, command_result_response):
+        """[summary]
         
-        Returns:
-            paramiko.channel.Channel -- the session channel object
+        Arguments:
+            command_response {list} -- a list of string doublets:  [(input, expected_output), ], where
+                input {str} -- the keystrokes to provide as input, this could be a command or interactive input.
+                expected_response {str} -- the expected output if the command was successful, or the input was received as expected.
+                    This string is compared to the end of the output, so if you are extecting a prompt after the last input, then
+                    "$" will work just as well as "user@hostname:~$"
+
+            Example for reseting a user's password to 'wolf':
+                      [
+                       ("sudo passwd username", "[sudo] password for admin_user: ", ),
+                       (admin password, "New password: "),
+                       ("wolf", "Re-enter new password: "),
+                       ("wolf", "password updated successfully"),
+                      ]
         """
-        session = self.transport.open_session()
-        session.set_combine_stderr(True)
-        session.get_pty()
-        return session
+
+    def read_data(self, channel, response_expected, response_contains=None, timeout=5.0):
+        """Read channel output until expected_reponse is found at the end of the output and, if applicable, the response_contains
+        is found within, or timeout, whichever comes first. 
+        
+        Arguments:
+            channel {} -- the channel to read data from
+            response_expected {str} -- a string to look for at the END of the output data
+
+        Keyword Arguments:
+            response_contains {str} -- a string to look for WITHIN the output data (default: {None})
+            timeout {float} -- in seconds (default: {5.0})
+
+        Returns:
+            str -- the output data, None if timeout occurs
+        """
+
+        channel_data = ""
+        start_time = time()
+        response_found = False
+        while True:
+            elapsed_time = time() - start_time
+            if channel.recv_ready():  # if there is data ready to receive
+                # Get the data
+                channel_data += str(channel.recv(9999), 'utf8') # receive max # of bytes
+
+                # New data received, check if we got the expected output yet:
+                if response_expected and channel_data.endswith(response_expected):
+                    # if we also need to look for content within the output, cehck that too
+                    if response_contains is not None:
+                        if response_contains in channel_data:
+                            response_found = True
+                    else:
+                        response_found = True
+
+                if response_found:
+                    return channel_data
+                    
+            elif timeout < elapsed_time:
+                print("Command timed out or unexpected response.")
+                print("Got response: ")
+                print(channel_data)
+                print("Expecetd response: ")
+                print(response_expected)
+                print("ABORTING...\n")
+                return None 
+
 
     def close(self):
         if(self.client != None):
@@ -231,3 +283,4 @@ class SSH():
         else:
             return False
             
+
