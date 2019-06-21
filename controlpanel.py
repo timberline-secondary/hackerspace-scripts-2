@@ -86,22 +86,31 @@ def control_panel():
 
             if menu_choice == 'q':
                 break
-            module_choice = menu_items[int(menu_choice)]
+            
+            try:
+                module_choice = menu_items[int(menu_choice)]
 
-            # add b as a menu option so you can go back to the previous menu / when done with a certain menu have it go back to the same menu it came from (C said while loop)
+                # add b as a menu option so you can go back to the previous menu / when done with a certain menu have it go back to the same menu it came from (C said while loop)
 
-            # get scripts from chosen module
-            sub_module_dict = load_scripts(module_choice)
-            menu_items = list(sub_module_dict.keys())
-            sub_module_choice_str = print_menu(menu_items, module_choice, back_option=True)
+                # get scripts from chosen module
+                sub_module_dict = load_scripts(module_choice)
+                menu_items = list(sub_module_dict.keys())
+                sub_module_choice_str = print_menu(menu_items, module_choice, back_option=True)
 
-            if sub_module_choice_str == 'q':
-                break
+                if sub_module_choice_str == 'q':
+                    break
 
-            if sub_module_choice_str == 'b':
+                if sub_module_choice_str == 'b':
+                    continue
+
+                sub_module_key = menu_items[int(sub_module_choice_str)]
+            except ValueError:
+                input("\nBleep bloop, sorry, I didn't understand that.  Can you speak slower? I'm just a simple menu...[hit Enter to continue]\n")
+
                 continue
-
-            sub_module_key = menu_items[int(sub_module_choice_str)]
+            except IndexError:
+                input("\nDude, that wasn't an option, please read the menu more carefully, thanks! [hit Enter to continue]")          
+                continue          
 
             sub_module = sub_module_dict[sub_module_key]
 
