@@ -1,6 +1,7 @@
 
 import os
 import sys
+from collections import OrderedDict
 from importlib import import_module
 from pip._internal import main as pipmain
 
@@ -28,7 +29,8 @@ def load_modules():
     for d in directories:
         module_dict[d] = __import__(module_dir + "." + d, fromlist=["*"])
 
-    return module_dict
+    # sort by key
+    return OrderedDict(sorted(module_dict.items()))
 
 
 def load_scripts(module):
@@ -41,20 +43,27 @@ def load_scripts(module):
 
     for s in scripts:
         script_dict[s] = __import__(module_dir + "." + module + "." + s, fromlist=["*"])
-    return script_dict
+
+    # sort by key
+    return OrderedDict(sorted(script_dict.items()))
 
 
-def print_menu(menu_items, title):
+def print_menu(menu_items, title, quit_option=True, back_option=False):
     os.system('clear')
     utils.print_heading(title)
 
     for i, item in enumerate(menu_items):
         print("{}. {}".format(i, item))
-    print("Ctrl+C to quit")
+
+    if back_option:
+        print("[b]ack")
+
+    if quit_option:
+        print("[q]uit")
 
     choice = input("\nChoose an item: ")
 
-    return menu_items[int(choice)]
+    return choice
 
 def pip_install():
     utils.print_warning("Checking to see if all necassary pip modules are installed. \n")
@@ -72,29 +81,39 @@ def control_panel():
         pip_install()
 
         while True:
-            module_choice = print_menu(list(module_dict.keys()), "Hackerspace Control Panel")
+            menu_items = list(module_dict.keys())
+            menu_choice = print_menu(menu_items, "Hackerspace Control Panel")
+
+            if menu_choice == 'q':
+                break
+            module_choice = menu_items[int(menu_choice)]
 
             # add b as a menu option so you can go back to the previous menu / when done with a certain menu have it go back to the same menu it came from (C said while loop)
 
             # get scripts from chosen module
             sub_module_dict = load_scripts(module_choice)
-            sub_module_choice_str = print_menu(list(sub_module_dict.keys()), module_choice)
-            sub_module = sub_module_dict[sub_module_choice_str]
+            menu_items = list(sub_module_dict.keys())
+            sub_module_choice_str = print_menu(menu_items, module_choice, back_option=True)
 
-            #print(sub_module)
-            method = getattr(sub_module, sub_module_choice_str)
-            utils.print_heading(sub_module_choice_str)
+            if sub_module_choice_str == 'q':
+                break
+
+            if sub_module_choice_str == 'b':
+                continue
+
+            sub_module_key = menu_items[int(sub_module_choice_str)]
+
+            sub_module = sub_module_dict[sub_module_key]
+
+            method = getattr(sub_module, sub_module_key)
+            utils.print_heading(sub_module_key)
             method()
-            utils.input_styled("Hit Enter to return to the main menu.")
-
-        # import the package module
-        # print(control_panel.current_module)
-        # control_panel.current_module = import_module('scripts.'+module_name)
-        # print("current module: {}".format(control_panel.current_module))
 
     except KeyboardInterrupt:
         print("\nGoodbye")
         sys.exit(0)
+    finally:
+        print("\nGoodbye")
 
 
 control_panel.current_module = 'scripts'

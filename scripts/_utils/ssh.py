@@ -319,5 +319,3 @@ class SSH():
             return True
         else:
             return False
-            
-
