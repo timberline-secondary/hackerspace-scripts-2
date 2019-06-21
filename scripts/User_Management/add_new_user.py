@@ -3,15 +3,12 @@ from urllib.parse import urlparse
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
+from getpass import getpass
 
 hostname = 'lannister'
 username = 'hackerspace_admin'
 
-
 def add_new_user():
-    input("Under Construction...[Enter]")
-
-    ssh_connection = SSH(hostname, username)
 
     created = False
     while not created:
@@ -21,19 +18,34 @@ def add_new_user():
 
         create = utils.input_styled("Create account for {} {} {}? y/[n] \n".format(student_number, first_name, last_name))
 
-        if create is 'y':
-            # ssh_connection.send_cmd('pwd', print_stdout=True)
-            # ssh_connection.send_cmd('ls', print_stdout=True)
-            # ssh_connection.send_cmd('cd hs-ldap', print_stdout=True)
-            # ssh_connection.send_cmd('pwd', print_stdout=True)
-            # ssh_connection.send_cmd('ls', print_stdout=True)
-            command = 'bash hs-ldap/hs-ldapadduser.sh "{}" "{}" "{}"'.format(student_number, first_name, last_name)
-            ssh_connection.send_cmd(command, sudo=True, print_stdout=True)
-            created = True
+        if create == 'y':
+            password = getpass("Enter the admin password: ")
+
+            ssh_connection = SSH(hostname, username, password)
+
+            prompt_string = "{}@{}:~$".format(username, hostname)
+            main_command = 'bash hs-ldapadduser.sh "{}" "{}" "{}"'.format(student_number, first_name, last_name)
+
+            command_response_list = [
+                                ("cd hs-ldap/", ":~/hs-ldap$", None),
+                                (main_command, "[sudo] password for hackerspace_admin: ", None),
+                                (password, "Enter LDAP Password: ", None),
+                                (password, "hackerspace_admin@tyrell's password: ", None),
+                                (password, "[sudo] password for hackerspace_admin: ", None),
+                                (password, ":~/hs-ldap$", "Set owner on: /nfshome/{}".format(student_number)),
+            ]
+
+            success = ssh_connection.send_interactive_commands(command_response_list)
+            ssh_connection.close()
+
+            if success:
+                utils.print_success('Successfully created account for {} {} {}'.format(student_number, first_name, last_name))
+                utils.print_success('Their default password will be "wolf"')
+                created = True
+            else:
+                utils.print_error("Something went wrong there, hopefully useful info is printed above...let's try again\n")
 
         else:
             print("Aborted that one, try again. \n")
 
     input("\nHit enter to continue...\n")
-    ssh_connection.close()
-

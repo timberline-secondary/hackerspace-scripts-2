@@ -247,11 +247,11 @@ class SSH():
                     
             elif timeout < elapsed_time:
                 print("Command timed out or unexpected response.")
-                print("Got response: ")
+                print("## Got response: ")
                 print(channel_data)
-                print("Expecetd response: ")
+                print("## Expected response: ")
                 print(response_expected)
-                print("ABORTING...\n")
+                print("\nABORTING...\n")
                 return None 
 
 

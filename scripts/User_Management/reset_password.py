@@ -1,7 +1,6 @@
 import os, socket
 from getpass import getpass
 
-print(os.getcwd())
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
