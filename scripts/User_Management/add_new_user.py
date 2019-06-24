@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
+from scripts.User_Management._utils import get_student_name
 from getpass import getpass
 
 hostname = 'lannister'
@@ -13,10 +14,12 @@ def add_new_user():
     created = False
     while not created:
         student_number = utils.input_styled("Enter Student Number: \n")
+        password = getpass("Enter the admin password: ")
 
-        already_exists = utils.user_exists(student_number)
-        if already_exists:
-            utils.print_warning("An account for {} already exists.  Try resetting their password.".format(student_number))
+        student = get_student_name(student_number, password)
+
+        if student is not None:
+            utils.print_warning("An account for {}, {}, already exists.  Try resetting their password.".format(student_number, student))
         else:
 
             first_name = utils.input_styled("First Name: \n").upper()
@@ -25,11 +28,8 @@ def add_new_user():
             create = utils.input_styled("Create account for {} {} {}? y/[n] \n".format(student_number, first_name, last_name))
 
             if create == 'y':
-                password = getpass("Enter the admin password: ")
-
                 ssh_connection = SSH(hostname, username, password)
 
-                prompt_string = "{}@{}:~$".format(username, hostname)
                 main_command = 'bash hs-ldapadduser.sh "{}" "{}" "{}"'.format(student_number, first_name, last_name)
 
                 command_response_list = [
