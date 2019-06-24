@@ -26,7 +26,7 @@ def get_student_name(student_number, password=None):
     # the ^ is regex for "starting with", and after the username should be a colon :
     # this ensures unique results
     command = "getent passwd | grep ^{}:".format(student_number)
-    result = ssh_connection.send_cmd(command, sudo=True)
+    result = ssh_connection.send_cmd(command, sudo=True, print_stdout=False)
     
     # results example, split on colons
     #  *****
@@ -41,4 +41,20 @@ def get_student_name(student_number, password=None):
     else:
         return user_info_list[5]
 
+def get_and_confirm_user(password=None):
+    student = None
+    while student is None:
+        student_number = utils.input_styled("Enter student number: \n")
+        if password is None:
+            password = getpass("Enter the admin password: ")
+        
+        student = get_student_name(student_number, password)
 
+        if student is not None:
+            confirm = utils.input_styled("Confirm account: {}, {}? [y]/n".format(student_number, student))
+            if confirm == 'n':
+                student = None
+            else:
+                return student_number
+        
+            
