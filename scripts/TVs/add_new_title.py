@@ -35,10 +35,13 @@ def add_new_title():
     if choose_subject == "Custom subject:":
         custom_subject = utils.input_styled("Well then what are they in? \n")
         choose_subject = custom_subject
-    else:
-        pass
 
-    tv = utils.input_styled("Which TV # are you sending this to?: \n")
+    default_tv = '1' if last_name.upper()[0] <= 'M' else '2'
+
+    tv = utils.input_styled("Which TV # are you sending this to (1 for lastname A-M, 2 for N-Z)? [Enter] = {}: \n".format(default_tv))
+
+    if not tv:
+        tv = default_tv
 
     filename = student_number + ".a." + first_name + last_name
     template = "_template.svg"
@@ -77,8 +80,6 @@ def add_new_title():
         add_images = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add images to {}'s new shrine? ([y]/n)\n".format(first_name) )
         if not add_images or add_images.lower()[0] == "y":
             add_new_media.add_new_media(student_number, tv)
-        else:
-            utils.print_error("The title image was not added.")
     else:
-        utils.print_error("{} was not sent to hightower. Is sshpass installed?".format(filename_png))
+        utils.print_error("The title image '{}' was not added. Is sshpass installed?".format(filename_png))
             
