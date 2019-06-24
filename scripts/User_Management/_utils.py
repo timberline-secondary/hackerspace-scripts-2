@@ -4,12 +4,41 @@ from getpass import getpass
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-def check_student_number(student_number, password=None):
+def get_student_name(student_number, password=None):
+    """Get a student's full name from their student number.  Return None if account doesn't exist.
+    
+    Arguments:
+        student_number {str} -- username
+    
+    Keyword Arguments:
+        password {str} -- admin password
+    
+    Returns:
+        str -- student's full name, or None is student doesn't exist.
+    """
+
     hostname = socket.gethostname() # can use the local computer
     username = 'hackerspace_admin'
     if not password:
         password = getpass("Enter the admin password: ")
 
     ssh_connection = SSH(hostname, username, password)
-    command = "getent passwd | grep {}".format(student_number)
-    ssh_connection.send_cmd(command, sudo=True)
+    # the ^ is regex for "starting with", and after the username should be a colon :
+    # this ensures unique results
+    command = "getent passwd | grep ^{}:".format(student_number)
+    result = ssh_connection.send_cmd(command, sudo=True)
+    
+    # results example, split on colons
+    #  *****
+    #  [sudo] password for hackerspace_admin: 
+    #  9912345:x:16000:16000:John Doe:/home/9912345:/bin/bash
+
+    user_info_list = result.split(':')
+
+    # no user info returned, doesn't exist
+    if len(user_info_list) == 2:
+        return None
+    else:
+        return user_info_list[5]
+
+
