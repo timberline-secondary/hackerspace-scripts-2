@@ -28,7 +28,7 @@ def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_i
             fade = fade_in_and_out
         
         #Fade to black:
-        filter_complex += '[{}:v]{},{}:d=1[v{i}]; '.format(i, frame_settings, fade)
+        filter_complex += '[{}:v]{},{}:d=1[v{}]; '.format(i, frame_settings, fade, i)
         #Crossfade:
         #filter_complex += f'[{i}:v]{frame_settings},[{i}]format=yuva444p,{fade}:d=1[v{i}]; '
         
