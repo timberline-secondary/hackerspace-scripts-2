@@ -159,8 +159,9 @@ class SSH():
             stdin.flush()
 
         output = str(stdout.read(), 'utf8') # convert from bytestring for newlines to work
+        output = output.replace(self.password, "*****")
         if print_stdout:
-            print(output.replace(self.password, "*****"))
+            print(output)
         return output
 
     def send_interactive_commands(self, command_response_list):
