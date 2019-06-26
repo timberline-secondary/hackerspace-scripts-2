@@ -83,7 +83,7 @@ def add_new_media(student_number=None, tv=None):
 
 
         filepath = "/home/pi-slideshow/tv{}/".format(tv)
-        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
+        command = "wget -O /home/pi-slideshow/tv{}/{}/{} {} && exit".format(tv, student_number, filename, media_url)
 
         hostname = "hightower"
         username = "pi-slideshow"
