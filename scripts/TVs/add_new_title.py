@@ -63,6 +63,9 @@ def add_new_title():
 
     filepath_pi = "/home/pi-slideshow/tv{}/{}/".format(tv, student_number)
 
+    # make a folder for a new student when title card is made
+    # os.system('sshpass -p "{}" ssh {}@{} && mkdir {}'.format(pi.password, username, hostname, filepath_pi))
+
     #scps into the tv photo directory
     command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(pi.password, temp_filepath_png, username, hostname, filepath_pi)
     os.system(command)

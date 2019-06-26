@@ -4,22 +4,32 @@ from urllib.parse import urlparse
 from scripts._utils import utils
 from scripts._utils import pi
 from scripts._utils.ssh import SSH
-from scripts._utils.movie_maker import movie_maker
+from scripts.TVs.generate_student_video import generate_student_video
+from pathlib import Path
 
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
-mime_types = {
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg":"image/jpeg", 
+mime_type_videos = {
+    ".mkv": "video/x-matroska",
     ".avi": "video/x-msvideo",
     ".mpeg":"video/mpeg",
     ".mp4": "video/mp4",
     ".ogv": "video/ogg",
+}
+
+mime_type_images = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg":"image/jpeg", 
     ".webm":"image/jpeg",
-    ".mkv": "video/x-matroska",
+}
+
+mime_types = {
     ".svg": "image/svg+xml",
 }
+
+mime_types.update(mime_type_images)
+mime_types.update(mime_type_videos)
 
 def get_media_url():
 
@@ -48,14 +58,14 @@ def get_media_url():
         mime_type_good = utils.verify_mimetype(media_url, expected_mime_type)
 
         #returns necessary veriables to continue the code once mime type has been verified
-    return media_url, name_without_ext, extension
+    return media_url, name_without_ext, extension, expected_mime_type
 
 
 def add_new_media(student_number=None, tv=None):
     media_url = True
     while media_url == True:
         #gets and checks the url of the file
-        media_url, name_without_ext, extension = get_media_url()
+        media_url, name_without_ext, extension, expected_mime_type = get_media_url()
         if media_url is None:
             return
 
@@ -109,7 +119,11 @@ def add_new_media(student_number=None, tv=None):
                     else:
                         image_name = name_good
                         filename = student_number + ".z." + image_name + extension
-                        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
+                        if extension in mime_type_images:
+                            file_path = "/home/pi-slideshow/tv{}/{}/".format(tv, student_number)
+                        elif extension in mime_type_videos:
+                            filepath = "/home/pi-slideshow/tv{}/".format(tv)
+                        command = "wget -O {}{} {} && exit".format(file_path, filename, media_url)
                         already_exists = False
                         pass
                 elif should_we_overwrite.lower()[0] == 'y':
@@ -139,7 +153,7 @@ def add_new_media(student_number=None, tv=None):
 
     make_movie = utils.input_styled("Do you want to make a movie? ([y]/n) \n")
     if not make_movie or make_movie.lower()[0] == "y":
-        movie_maker()
+        generate_student_video(tv=tv, student_number=student_number)
     elif make_movie.lower()[0] == "n":
         pass
     else:
