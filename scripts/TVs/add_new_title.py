@@ -38,7 +38,7 @@ def add_new_title():
 
     default_tv = '1' if last_name.upper()[0] <= 'M' else '2'
 
-    tv = utils.input_styled("Which TV # are you sending this to (1 for lastname A-M, 2 for N-Z)? [Enter] = {}: \n".format(default_tv))
+    tv = utils.input_styled("Which TV # are you sending this to (1 for lastname A-M, 2 for N-Z, 3 for Grads)? [Enter] = {}: \n".format(default_tv))
 
     if not tv:
         tv = default_tv
@@ -55,8 +55,11 @@ def add_new_title():
 
     # writes the student information into the copy of the svg template
     os.system('sed -i -e "s/FIRSTNAME LASTNAME/{} {}/g" {}'.format(first_name, last_name, temp_filepath_svg))
+
     os.system('sed -i -e "s/YYYY/{}/g" {}'.format(grad_year, temp_filepath_svg))
-    os.system('sed -i -e "s/SUBJECT/{}/g" {}'.format(choose_subject, temp_filepath_svg))
+
+    # need to escape the ampersand character in "3D Modelling & Animation"
+    os.system('sed -i -e "s/SUBJECT/{}/g" {}'.format(choose_subject.replace('&', '\&amp;'), temp_filepath_svg))
 
     # creates a png image from the svg
     os.system('inkscape -z -e {} -w 1920 -h 1080 {}'.format(temp_filepath_png, temp_filepath_svg))
