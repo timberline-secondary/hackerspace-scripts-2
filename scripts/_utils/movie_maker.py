@@ -1,6 +1,9 @@
-def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_image=3, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow.mp4'):
-    import os
+import os
+import sys
+import argparse
 
+def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_image=3, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow.mp4'):
+    
     #  https://superuser.com/questions/833232/create-video-with-5-images-with-fadein-out-effect-in-ffmpeg/834035#834035
     image_files = os.listdir(images_directory)
     num_images = len(image_files)
@@ -41,3 +44,19 @@ def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_i
     cmd = 'ffmpeg {} {} {}'.format(image_inputs, filter_complex, output_file)
 
     os.system(cmd)
+
+
+if __name__ == "__main__":
+    # execute only if run as a script
+
+    parser = argparse.ArgumentParser(description='Generate a video file from a directory of images.')
+    parser.add_argument('images', type=str, help='directory to find the images ["images"]')
+    parser.add_argument('--resolution', type=str, help='output video resolution ["1920:1080"]')
+    parser.add_argument('--seconds', type=int, help='seconds per image [3]')
+    parser.add_argument('--fade', type=int, help='fade duration between images [1]')
+    parser.add_argument('--output', type=str, help='output file ["/tmp/slideshow.mp4"]')
+
+    args = parser.parse_args()
+
+    movie_maker(images_directory=args.images)
+

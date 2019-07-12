@@ -2,24 +2,12 @@ import os
 from urllib.parse import urlparse
 
 from scripts._utils import utils
-from scripts._utils import pi
 from scripts._utils.ssh import SSH
 from scripts._utils.movie_maker import movie_maker
 
-#this code worked on by Nicholas (Tseilorin) Hopkins
+from scripts.TVs._utils import mime_types, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW
 
-mime_types = {
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg":"image/jpeg", 
-    ".avi": "video/x-msvideo",
-    ".mpeg":"video/mpeg",
-    ".mp4": "video/mp4",
-    ".ogv": "video/ogg",
-    ".webm":"image/jpeg",
-    ".mkv": "video/x-matroska",
-    ".svg": "image/svg+xml",
-}
+#this code worked on by Nicholas (Tseilorin) Hopkins
 
 def get_media_url():
 
@@ -85,11 +73,12 @@ def add_new_media(student_number=None, tv=None):
         filepath = "/home/pi-slideshow/tv{}/".format(tv)
         command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
 
-        hostname = "hightower"
-        username = "pi-slideshow"
+        hostname = TV_FILE_SERVER
+        username = TV_FILE_SERVER_USER
+        password = TV_FILE_SERVER_PW
 
         #connects and checks to see if file with the same name already exisits
-        ssh_connection = SSH(hostname, username, pi.password)
+        ssh_connection = SSH(hostname, username, password)
         already_exists = ssh_connection.file_exists(filepath, filename)
 
 

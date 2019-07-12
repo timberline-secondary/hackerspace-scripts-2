@@ -138,7 +138,7 @@ class SSH():
             print_stdout {bool} -- Print the output of the command (default: {True})
         
         Returns:
-            [type] -- [description]
+            string -- the output from the command
         """
         if not self.is_connected():
             print_error("SSH client not connected")
