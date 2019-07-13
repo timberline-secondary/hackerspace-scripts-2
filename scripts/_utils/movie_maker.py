@@ -2,10 +2,11 @@ import os
 import sys
 import argparse
 
-def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_image=3, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow.mp4'):
+def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_image=7, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow.mp4'):
     
     #  https://superuser.com/questions/833232/create-video-with-5-images-with-fadein-out-effect-in-ffmpeg/834035#834035
-    image_files = os.listdir(images_directory)
+    image_files = os.listdir(images_directory).sort() # want them alphabetical so title imagecomes first!
+
     num_images = len(image_files)
 
     fade_out = "fade=t=out:st={}".format(seconds_per_image - fade_duration)
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     # execute only if run as a script
 
     parser = argparse.ArgumentParser(description='Generate a video file from a directory of images.')
-    parser.add_argument('images', type=str, help='directory to find the images ["images"]')
+    parser.add_argument('--images', type=str, help='directory to find the images ["images"]')
     parser.add_argument('--resolution', type=str, help='output video resolution ["1920:1080"]')
     parser.add_argument('--seconds', type=int, help='seconds per image [3]')
     parser.add_argument('--fade', type=int, help='fade duration between images [1]')
@@ -58,5 +59,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    movie_maker(images_directory=args.images)
+    # If parameters are provided pass them to the function, otherwise defaults will be used.
+    kwargs = {}
+    if args.images:
+        kwargs['images_directory']=args.images
+    if args.resolution:
+        kwargs['resolution']=args.resolution
+    if args.seconds:
+        kwargs['seconds_per_image']=args.seconds
+    if args.fade:
+        kwargs['fade_duration']=args.fade
+    if args.output:
+        kwargs['output_file']=args.output
+
+    movie_maker(**kwargs)
 
