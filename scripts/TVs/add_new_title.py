@@ -64,7 +64,7 @@ def add_new_title():
     # creates a png image from the svg
     os.system('inkscape -z -e {} -w 1920 -h 1080 {}'.format(temp_filepath_png, temp_filepath_svg))
 
-    filepath_pi = "/home/pi-slideshow/tv{}/".format(tv)
+    filepath_pi = "/home/pi-slideshow/tv{}/{}/".format(tv, student_number)
 
     #scps into the tv photo directory
     command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(pi.password, temp_filepath_png, username, hostname, filepath_pi)
