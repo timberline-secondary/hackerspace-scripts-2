@@ -5,7 +5,7 @@ from scripts._utils import utils
 from scripts._utils.ssh import SSH
 from scripts._utils.movie_maker import movie_maker
 
-from scripts.TVs._utils import mime_types, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW
+from scripts.TVs._utils import mime_types, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW, TV_ROOT
 
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
@@ -66,12 +66,11 @@ def add_new_media(student_number=None, tv=None):
             tv = tv_input
 
         filename = student_number + ".z." + image_name + extension
+        filepath = "{}/tv{}/{}/".format(TV_ROOT, tv, student_number)
 
         utils.print_warning("Sending {} to hightower to see if file exists already with that name.".format(filename))
 
-
-        filepath = "/home/pi-slideshow/tv{}/".format(tv)
-        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
+        command = "wget -O {}{} {} && exit".format(filepath, filename, media_url)
 
         hostname = TV_FILE_SERVER
         username = TV_FILE_SERVER_USER
@@ -81,41 +80,44 @@ def add_new_media(student_number=None, tv=None):
         ssh_connection = SSH(hostname, username, password)
         already_exists = ssh_connection.file_exists(filepath, filename)
 
-
         #if it does exist, asks user if they want to overwrite it
-        if already_exists == True:
-            while already_exists == True:
-                should_we_overwrite = utils.input_styled(utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
-                if not should_we_overwrite or should_we_overwrite.lower()[0] == 'n':
-                    #calls the function to run through the name and extension grabbing process again
-                    media_url, name_without_ext, extension = get_media_url()
-                    if media_url is None:
-                        return
-                    #asks user to change name of it
-                    name_good = utils.input_styled(utils.ByteStyle.Y_N, "What is the name of this image? \n")
-                    if not name_good:
-                        image_name = name_without_ext
-                    else:
-                        image_name = name_good
-                        filename = student_number + ".z." + image_name + extension
-                        command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
-                        already_exists = False
-                        pass
-                elif should_we_overwrite.lower()[0] == 'y':
+        while already_exists == True:
+            should_we_overwrite = utils.input_styled(utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
+            if not should_we_overwrite or should_we_overwrite.lower()[0] == 'n':
+                #calls the function to run through the name and extension grabbing process again
+                media_url, name_without_ext, extension = get_media_url()
+                if media_url is None:
+                    return
+                #asks user to change name of it
+                name_good = utils.input_styled(utils.ByteStyle.Y_N, "What is the name of this image? \n")
+                if not name_good:
+                    image_name = name_without_ext
+                else:
+                    image_name = name_good
+                    filename = student_number + ".z." + image_name + extension
+                    command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
                     already_exists = False
                     pass
-                else:
-                    utils.print_styled("(y/n)", utils.ByteStyle.Y_N)
+            elif should_we_overwrite.lower()[0] == 'y':
+                already_exists = False
+                pass
+            else:
+                utils.print_styled("(y/n)", utils.ByteStyle.Y_N)
 
-        #if file does not exist already it wgets it and places it in the correct tv folder
+        # if file does not exist already it wgets it and places it in the correct tv folder
         if already_exists == False:
+
+            # make sure the directory exists, if not create it:
+            if not ssh_connection.file_exists(filepath,''):
+                ssh_connection.send_cmd('mkdir {}'.format(filepath))
+
             ssh_connection.send_cmd(command)
             utils.print_success("{} was succesfully sent over to pi-tv{}".format(filename, tv))
             pass
         else:
             utils.print_error("Something went wrong. Expected true or false but got something else")
 
-        #asks user if they want to add another image
+        # asks user if they want to add another image
         another_image = utils.input_styled("Would you like to add another image? ([y]/n) \n")
         if not another_image or another_image.lower()[0] == "y":
             media_url = True
