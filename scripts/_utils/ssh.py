@@ -312,7 +312,7 @@ class SSH():
             return -1
 
         # link to docs for test -f command
-        command = "test -f {}{}".format(filepath, filename)
+        command = "test -f {}/{}".format(filepath, filename)
         stdin, stdout, stderr = self.client.exec_command(command)
         exit_status = stdout.channel.recv_exit_status()
 

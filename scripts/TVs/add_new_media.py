@@ -5,6 +5,8 @@ from scripts._utils import utils
 from scripts._utils.ssh import SSH
 from scripts._utils.movie_maker import movie_maker
 
+from scripts.TVs.refresh_slideshows import refresh_slideshows
+
 from scripts.TVs._utils import mime_types, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW, TV_ROOT
 
 #this code worked on by Nicholas (Tseilorin) Hopkins
@@ -130,7 +132,7 @@ def add_new_media(student_number=None, tv=None):
 
     make_movie = utils.input_styled("Do you want to make a movie? ([y]/n) \n")
     if not make_movie or make_movie.lower()[0] == "y":
-        movie_maker()
+        refresh_slideshows(student_number=student_number)
     elif make_movie.lower()[0] == "n":
         pass
     else:
