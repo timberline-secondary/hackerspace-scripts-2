@@ -64,25 +64,33 @@ def add_new_title():
     # creates a png image from the svg
     os.system('inkscape -z -e {} -w 1920 -h 1080 {}'.format(temp_filepath_png, temp_filepath_svg))
 
-    filepath_pi = "/home/pi-slideshow/tv{}/{}/".format(tv, student_number)
+    server_filepath = "tv{}/{}/".format(tv, student_number)
 
-    #scps into the tv photo directory
-    command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(pi.password, temp_filepath_png, username, hostname, filepath_pi)
+    # setup a connect so we can makesure the directory exists
+    ssh_connection = SSH(hostname, username, pi.password)
+    # make sure the directory exists, if not create it:
+    if not ssh_connection.file_exists(server_filepath,''):
+                ssh_connection.send_cmd('mkdir {}'.format(server_filepath))
+
+    #move image onto the server with scp
+    command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(pi.password, temp_filepath_png, username, hostname, server_filepath)
     os.system(command)
 
-    #removes all files it created
+    #removes all temp files we created
     os.system('rm {}'.format(temp_filepath_png))
     os.system('rm {}'.format(temp_filepath_svg))
     #os.system('rm {}.png'.format(filename))
 
-    ssh_connection = SSH(hostname, username, pi.password)
-    title_exists = ssh_connection.file_exists(filepath_pi, filename_png)
+    # Check if file now exists on the server
+    title_exists = ssh_connection.file_exists(server_filepath, filename_png)
 
     if title_exists:
         utils.print_success("{} was successfully sent over to TV {}".format(filename_png, tv))
-        add_images = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add images to {}'s new shrine? ([y]/n)\n".format(first_name) )
-        if not add_images or add_images.lower()[0] == "y":
-            add_new_media.add_new_media(student_number, tv)
+        # add_images = utils.input_styled(utils.ByteStyle.Y_N, "Would you like to add images to {}'s new shrine? ([y]/n)\n".format(first_name) )
+        # if not add_images or add_images.lower()[0] == "y":
+        #     add_new_media.add_new_media(student_number, tv)
     else:
         utils.print_error("The title image '{}' was not added. Is sshpass installed?".format(filename_png))
+    
+    input("Enter to continue...")
             
