@@ -22,12 +22,14 @@ def refresh_slideshows(student_number=None):
         command = 'ls {}'.format(filepath)
         dir_contents = ssh_connection.send_cmd(command).split()
         if student_number in dir_contents:
-            print("Found art for {} on TV# {}".format(student_number, tv))
+            utils.print_success("Found art for {} on TV# {}".format(student_number, tv))
 
             # refresh the video
-            print("\nGonna regenerate video slideshow now, THIS MIGHT TAKE A WHILE!")
+            utils.print_warning("\nGonna regenerate video slideshow now, THIS MIGHT TAKE A WHILE!")
             generate_new_movie_file(ssh_connection, student_number, tv)
+            return True
 
+    utils.print_error("\nSorry, I could find art for {}.  Are you sure they have art uploaded to the server?".format(student_number))
     return None
 
 def copy_movie_maker_to_host(ssh_connection):
