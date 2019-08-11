@@ -14,11 +14,11 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
 
     num_images = len(image_files)
 
-    fade_out = "fade=t=out:st={}".format(seconds_per_image - fade_duration)
-    fade_in = "fade=t=in:st=0:d={}".format(fade_duration)
-    fade_in_and_out = '{},{}'.format(fade_in, fade_out)
+    # fade_out = "fade=t=out:st={}".format(seconds_per_image - fade_duration)
+    # fade_in = "fade=t=in:st=0:d={}".format(fade_duration)
+    # fade_in_and_out = '{},{}'.format(fade_in, fade_out)
 
-    # fade_in_cross = 'fade=d=1:t=in:alpha=1'
+    fade_in_cross = 'format=yuva444p,fade=d=1:t=in:alpha=1'
 
     frame_settings = 'scale={}:force_original_aspect_ratio=decrease,pad={}:(ow-iw)/2:(oh-ih)/2,setsar=1'.format(resolution, resolution)
 
