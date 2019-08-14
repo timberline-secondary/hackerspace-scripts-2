@@ -20,7 +20,7 @@ def refresh_slideshows(student_number=None):
     for tv in range(1,5):
         filepath = "{}/tv{}/".format(TV_ROOT, tv)
         command = 'ls {}'.format(filepath)
-        dir_contents = ssh_connection.send_cmd(command).split()
+        dir_contents = ssh_connection.send_cmd(command, print_stdout=False).split()
         if student_number in dir_contents:
             utils.print_success("Found art for {} on TV# {}".format(student_number, tv))
 
@@ -48,5 +48,5 @@ def generate_new_movie_file(ssh_connection, student_number, tv):
 
     # move the file into the proper location
     ssh_connection.send_cmd('mv {} {}/tv{}/{}.a.mp4'.format(output, TV_ROOT, tv, student_number))
-    input("Video created! [Enter]")
+    utils.input_styled("Video created! [Enter]")
     
