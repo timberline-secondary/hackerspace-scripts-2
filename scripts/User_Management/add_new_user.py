@@ -9,25 +9,36 @@ from getpass import getpass
 hostname = 'lannister'
 username = 'hackerspace_admin'
 
-def add_new_user():
+def add_new_user(student_number=None, first_name=None, last_name=None, password=None, skip_existing_users=False):
 
     created = False
     while not created:
-        student_number = utils.input_styled("Enter Student Number: \n")
-        password = getpass("Enter the admin password: ")
+        if not student_number:
+            student_number = utils.input_styled("Enter Student Number: \n")
+        if not password:
+            password = getpass("Enter the admin password: ")
 
         student = get_student_name(student_number, password)
 
         if student is not None:
-            utils.print_warning("An account for {}, {}, already exists.  Try resetting their password.".format(student_number, student))
+            if skip_existing_users:
+                utils.print_success("An account for {}, {}, already exists, skipping... ".format(student_number, student))
+                return
+            else:
+                utils.print_warning("An account for {}, {}, already exists.  Try resetting their password if they can't log in.".format(student_number, student))
         else:
+            
+            if not first_name:
+                first_name = utils.input_styled("First Name: \n")
+            first_name = first_name.upper()
 
-            first_name = utils.input_styled("First Name: \n").upper()
-            last_name = utils.input_styled("Last Name: \n").upper()
+            if not last_name:
+                last_name = utils.input_styled("Last Name: \n")
+            last_name = last_name.upper()
 
             create = utils.input_styled("Create account for {} {} {}? y/[n] \n".format(student_number, first_name, last_name))
 
-            if create == 'y':
+            if create.lower() == 'y':
                 ssh_connection = SSH(hostname, username, password)
 
                 main_command = 'bash hs-ldapadduser.sh "{}" "{}" "{}"'.format(student_number, first_name, last_name)
@@ -54,7 +65,7 @@ def add_new_user():
             else:
                 print("Aborted that one. \n")
 
-        if utils.input_styled("Try again? [y]/n: ") == 'n':
-            return
+                if utils.input_styled("Try again? [y]/n: ") == 'n':
+                    return
 
     input("\nHit enter to continue...\n")

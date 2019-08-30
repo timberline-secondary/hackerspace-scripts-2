@@ -9,18 +9,6 @@ CODE_DIR = 'stormLauncher'
 
 FULL_DIR = STORM_LAUNCHER_LOCATION + os.sep + STORM_LAUNCHER_DIR + os.sep + CODE_DIR
 
-def setup_stormLauncher():
-    utils.print_warning("\nSTORMLAUNCHER has not been installed on this profile yet.  I'm gonna install it for you now...\n")
-    os.chdir(STORM_LAUNCHER_LOCATION)
-    os.mkdir(STORM_LAUNCHER_DIR)
-    os.chdir(STORM_LAUNCHER_DIR)
-    subprocess.run("git clone https://github.com/timberline-secondary/stormLauncher.git", shell=True, check=True)
-    os.chdir(CODE_DIR)
-    print(os.getcwd())
-    # create virtual environment and install dependancies to it so launch script works
-    subprocess.run("bash setup.sh", shell=True, check=True)
-    utils.print_warning("\n...Install complete. LETS DO THIS!\n")
-
 def missile():
 
     # check if everything is already installed.  If not, install it.
@@ -34,3 +22,15 @@ def missile():
     # os.system(command)
     subprocess.run(command, shell=True, check=True)
     # proc = subprocess.Popen(command, shell=True)
+
+def setup_stormLauncher():
+    utils.print_warning("\nSTORMLAUNCHER has not been installed on this profile yet.  I'm gonna install it for you now...\n")
+    os.chdir(STORM_LAUNCHER_LOCATION)
+    os.mkdir(STORM_LAUNCHER_DIR)
+    os.chdir(STORM_LAUNCHER_DIR)
+    subprocess.run("git clone https://github.com/timberline-secondary/stormLauncher.git", shell=True, check=True)
+    os.chdir(CODE_DIR)
+    print(os.getcwd())
+    # create virtual environment and install dependancies to it so launch script works
+    subprocess.run("bash setup.sh", shell=True, check=True)
+    utils.print_warning("\n...Install complete. LETS DO THIS!\n")
