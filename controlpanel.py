@@ -123,7 +123,6 @@ def control_panel():
             method()
 
     except KeyboardInterrupt:
-        print("\nGoodbye")
         sys.exit(0)
     finally:
         print("\nGoodbye")

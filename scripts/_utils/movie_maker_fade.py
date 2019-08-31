@@ -2,7 +2,7 @@ import os
 import sys
 import argparse
 
-def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_per_image=7, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow_fade.mp4'):
+def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_per_image=8, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow_fade.mp4'):
     """Example command with 5 images, per 
     https://superuser.com/questions/1464871/ffmpeg-crossfade-slideshow-image-size-not-decreased
 
@@ -64,7 +64,7 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
                 seconds,
                 i-1
             )
-        seconds += seconds_per_image-fade_duration
+        seconds += seconds_per_image
         
         #Fade to black:
         filter_complex += image_filter

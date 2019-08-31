@@ -1,11 +1,9 @@
-from os import listdir
-
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
 from scripts.TVs._utils import TV_FILE_SERVER, TV_FILE_SERVER_PW, TV_FILE_SERVER_USER, TV_ROOT
 
-def refresh_slideshows(student_number=None):
+def refresh_slideshow(student_number=None):
 
     if not student_number:
         student_number = utils.input_styled("Enter Student Number: \n")
@@ -36,7 +34,7 @@ def copy_movie_maker_to_host(ssh_connection):
     # overwrite if it already exists in case it has been updated.
     ssh_connection.copy_file('scripts/_utils/movie_maker_fade.py', '{}/movie_maker.py'.format(TV_ROOT))
 
-def generate_new_movie_file(ssh_connection, student_number, tv):
+def generate_new_movie_file(ssh_connection, student_number, tv, silent=False):
 
     output = '/tmp/slideshow.mp4'
     #remove existing file
@@ -48,5 +46,7 @@ def generate_new_movie_file(ssh_connection, student_number, tv):
 
     # move the file into the proper location
     ssh_connection.send_cmd('mv {} {}/tv{}/{}.a.mp4'.format(output, TV_ROOT, tv, student_number))
-    utils.input_styled("Video created! [Enter]")
+    
+    if not silent:
+        utils.input_styled("Video created! [Enter]")
     
