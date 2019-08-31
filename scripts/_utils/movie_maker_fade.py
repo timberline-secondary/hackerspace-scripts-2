@@ -2,9 +2,34 @@ import os
 import sys
 import argparse
 
-def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_per_image=7, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow.mp4'):
+def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_per_image=7, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow_fade.mp4'):
+    """Example command with 5 images, per 
+    https://superuser.com/questions/1464871/ffmpeg-crossfade-slideshow-image-size-not-decreased
+
+        ffmpeg \
+        -loop 1 -t 5 -i 1.jpg \
+        -loop 1 -t 5 -i 2.png \
+        -loop 1 -t 5 -i 3.png \
+        -loop 1 -t 5 -i 4.png \
+        -loop 1 -t 5 -i 5.png \
+        -filter_complex \
+        "[0]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1,setsar=1,format=yuva444p[bg]; \
+        [1]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1,setsar=1,format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+4/TB[f0]; \
+        [2]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1,setsar=1,format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+8/TB[f1]; \
+        [3]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1,setsar=1,format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+12/TB[f2]; \
+        [4]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1,setsar=1,format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+16/TB[f3]; \
+        [bg][f0]overlay[bg1];[bg1][f1]overlay[bg2];[bg2][f2]overlay[bg3]; \
+        [bg3][f3]overlay,format=yuv420p[v]" -map "[v]" -movflags +faststart out.mp4
     
-    #  https://superuser.com/questions/833232/create-video-with-5-images-with-fadein-out-effect-in-ffmpeg/834035#834035
+    Keyword Arguments:
+        resolution {str} -- [description] (default: {'1920:1080'})
+        images_directory {str} -- [description] (default: {'images'})
+        seconds_per_image {int} -- [description] (default: {7})
+        fade_duration {int} -- [description] (default: {1})
+        color_space {str} -- [description] (default: {'yuv420p'})
+        output_file {str} -- [description] (default: {'/tmp/slideshow.mp4'})
+    """
+
     image_files = sorted(os.listdir(images_directory)) # want them alphabetical so title image comes first!
 
     if image_files:
@@ -14,13 +39,7 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
 
     num_images = len(image_files)
 
-    # fade_out = "fade=t=out:st={}".format(seconds_per_image - fade_duration)
-    # fade_in = "fade=t=in:st=0:d={}".format(fade_duration)
-    # fade_in_and_out = '{},{}'.format(fade_in, fade_out)
-
-    fade_in_cross = 'format=yuva444p,fade=d=1:t=in:alpha=1'
-
-    frame_settings = 'scale={}:force_original_aspect_ratio=decrease,pad={}:(ow-iw)/2:(oh-ih)/2,setsar=1'.format(resolution, resolution)
+    base_filter = "scale={}:force_original_aspect_ratio=decrease,pad={}:-1:-1,setsar=1,format=yuva444p".format(resolution, resolution)
 
     image_inputs = ''
     for image in image_files:
@@ -29,25 +48,49 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
 
     # Create transition filter
     filter_complex = '-filter_complex "'
-    for i, image in enumerate(image_files):
+    seconds = 0
+    for i in range(num_images):
         # first image only fades out
-        if i is 0:
-            fade = fade_out
+        if i == 0:
+            image_filter = "[{}]{}[bg];".format(
+                i, 
+                base_filter
+            )
         else:
-            fade = fade_in_and_out
+            image_filter = "[{}]{},fade=d={}:t=in:alpha=1,setpts=PTS-STARTPTS+{}/TB[f{}];".format(
+                i,
+                base_filter,
+                fade_duration,
+                seconds,
+                i-1
+            )
+        seconds += seconds_per_image-fade_duration
         
         #Fade to black:
-        filter_complex += '[{}:v]{},{}:d=1[v{}]; '.format(i, frame_settings, fade, i)
-        #Crossfade:
-        #filter_complex += f'[{i}:v]{frame_settings},[{i}]format=yuva444p,{fade}:d=1[v{i}]; '
-        
+        filter_complex += image_filter
+    
+    # overlays
+    for i in range(num_images-1):
+        # [bg][f0]overlay[bg1];[bg1][f1]overlay[bg2];[bg2][f2]overlay[bg3];[bg3][f3]overlay
+        if i == 0:
+            bg = "bg"  
+        else:
+            bg = "bg{}".format(i)
 
-    for i in range(num_images):
-        filter_complex += '[v{}]'.format(i)  # [v0][v1][v2][v3][v4]concat=n=5
+        filter_complex += "[{}][f{}]overlay".format(bg, i)
 
-    filter_complex += 'concat=n={}:v=1:a=0,format={}[v]" -map "[v]" '.format(num_images, color_space)
+        if i != num_images - 2:  # last one is different, if not last one then add this
+            filter_complex += "[bg{}];".format(i+1)
+    
+    filter_complex += ",format={}[v]".format(color_space) # ...overlay,format=yuv420p[v]
+    filter_complex += '"' # close quote for the filter complex
 
-    cmd = 'ffmpeg {} {} {}'.format(image_inputs, filter_complex, output_file)
+    map_flag = '-map "[v]"'
+    mov_flags = '-movflags +faststart'
+
+    cmd = 'ffmpeg {} {} {} {} {}'.format(image_inputs, filter_complex, map_flag, mov_flags, output_file)
+
+    print(cmd)
 
     os.system(cmd)
 
@@ -77,5 +120,5 @@ if __name__ == "__main__":
     if args.output:
         kwargs['output_file']=args.output
 
-    movie_maker(**kwargs)
+    movie_maker_fade(**kwargs)
 
