@@ -11,6 +11,11 @@ from scripts.TVs._utils import mime_types, TV_FILE_SERVER, TV_FILE_SERVER_USER, 
 
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
+def is_video(file_extension):
+    """ file should already have mimetype checked at this point! """
+    video_extensions = [".avi", ".mpeg", ".mp4", ".ogv", ".webm", ".mkv"]
+    return file_extension.lower() in video_extensions
+
 def get_media_url():
 
     mime_type_good = False
@@ -68,7 +73,13 @@ def add_new_media(student_number=None, tv=None):
             tv = tv_input
 
         filename = student_number + ".z." + image_name + extension
-        filepath = "{}/tv{}/{}/".format(TV_ROOT, tv, student_number)
+
+        # Save videos directly in the tv's rtoot directory.
+        if is_video(extension):
+            filepath = "{}/tv{}/".format(TV_ROOT, tv)
+        # Save images into a subfolder, which will be used to generate a slideshow video
+        else:
+            filepath = "{}/tv{}/{}/".format(TV_ROOT, tv, student_number)
 
         utils.print_warning("Sending {} to hightower to see if file exists already with that name.".format(filename))
 
@@ -130,7 +141,7 @@ def add_new_media(student_number=None, tv=None):
 
     ssh_connection.close()
 
-    make_movie = utils.input_styled("Do you want to make a movie? ([y]/n) \n")
+    make_movie = utils.input_styled("Do you want to generate a new video slideshow of this student's art? ([y]/n) \n")
     if not make_movie or make_movie.lower()[0] == "y":
         refresh_slideshows(student_number=student_number)
     elif make_movie.lower()[0] == "n":

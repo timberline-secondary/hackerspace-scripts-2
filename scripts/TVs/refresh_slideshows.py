@@ -34,7 +34,7 @@ def refresh_slideshows(student_number=None):
 
 def copy_movie_maker_to_host(ssh_connection):
     # overwrite if it already exists in case it has been updated.
-    ssh_connection.copy_file('scripts/_utils/movie_maker.py', '{}/movie_maker.py'.format(TV_ROOT))
+    ssh_connection.copy_file('scripts/_utils/movie_maker_fade.py', '{}/movie_maker.py'.format(TV_ROOT))
 
 def generate_new_movie_file(ssh_connection, student_number, tv):
 

@@ -95,6 +95,7 @@ def control_panel():
                 # get scripts from chosen module
                 sub_module_dict = load_scripts(module_choice)
                 menu_items = list(sub_module_dict.keys())
+
                 sub_module_choice_str = print_menu(menu_items, module_choice, back_option=True)
 
                 if sub_module_choice_str == 'q':
@@ -104,6 +105,7 @@ def control_panel():
                     continue
 
                 sub_module_key = menu_items[int(sub_module_choice_str)]
+
             except ValueError:
                 input("\nBleep bloop, sorry, I didn't understand that.  Can you speak slower? I'm just a simple menu...[hit Enter to continue]\n")
 
@@ -115,7 +117,9 @@ def control_panel():
             sub_module = sub_module_dict[sub_module_key]
 
             method = getattr(sub_module, sub_module_key)
-            utils.print_heading(sub_module_key)
+            os.system('clear')
+            title = "{} > {}".format(module_choice, sub_module_key)
+            utils.print_heading(title)
             method()
 
     except KeyboardInterrupt:

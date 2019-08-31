@@ -6,7 +6,7 @@ mime_types = {
     ".mpeg":"video/mpeg",
     ".mp4": "video/mp4",
     ".ogv": "video/ogg",
-    ".webm":"image/jpeg",
+    ".webm":"video/webm",
     ".mkv": "video/x-matroska",
     ".svg": "image/svg+xml",
 }
