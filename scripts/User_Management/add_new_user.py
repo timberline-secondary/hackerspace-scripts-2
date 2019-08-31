@@ -9,7 +9,7 @@ from getpass import getpass
 hostname = 'lannister'
 username = 'hackerspace_admin'
 
-def add_new_user(student_number=None, first_name=None, last_name=None, password=None, skip_existing_users=False):
+def add_new_user(student_number=None, first_name=None, last_name=None, password=None, bulk_creation=False, ssh_connection=None):
 
     created = False
     while not created:
@@ -21,8 +21,8 @@ def add_new_user(student_number=None, first_name=None, last_name=None, password=
         student = get_student_name(student_number, password)
 
         if student is not None:
-            if skip_existing_users:
-                utils.print_success("An account for {}, {}, already exists, skipping... ".format(student_number, student))
+            if bulk_creation:
+                utils.print_warning("An account for {}, {}, already exists, skipping... ".format(student_number, student))
                 return
             else:
                 utils.print_warning("An account for {}, {}, already exists.  Try resetting their password if they can't log in.".format(student_number, student))
@@ -39,7 +39,8 @@ def add_new_user(student_number=None, first_name=None, last_name=None, password=
             create = utils.input_styled("Create account for {} {} {}? y/[n] \n".format(student_number, first_name, last_name))
 
             if create.lower() == 'y':
-                ssh_connection = SSH(hostname, username, password)
+                if not ssh_connection:
+                    ssh_connection = SSH(hostname, username, password)
 
                 main_command = 'bash hs-ldapadduser.sh "{}" "{}" "{}"'.format(student_number, first_name, last_name)
 
@@ -53,7 +54,9 @@ def add_new_user(student_number=None, first_name=None, last_name=None, password=
                 ]
 
                 success = ssh_connection.send_interactive_commands(command_response_list)
-                ssh_connection.close()
+
+                if not bulk_creation:
+                    ssh_connection.close()
 
                 if success:
                     utils.print_success('Successfully created account for {} {} {}'.format(student_number, first_name, last_name))
@@ -65,7 +68,7 @@ def add_new_user(student_number=None, first_name=None, last_name=None, password=
             else:
                 print("Aborted that one. \n")
 
-                if utils.input_styled("Try again? [y]/n: ") == 'n':
+                if bulk_creation or utils.input_styled("Try again? [y]/n: ") == 'n':
                     return
 
     input("\nHit enter to continue...\n")

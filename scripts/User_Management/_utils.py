@@ -22,11 +22,14 @@ def get_student_name(student_number, password=None):
     if not password:
         password = getpass("Enter the admin password: ")
 
-    ssh_connection = SSH(hostname, username, password)
+    ssh_connection = SSH(hostname, username, password, verbose=False)
+
     # the ^ is regex for "starting with", and after the username should be a colon :
     # this ensures unique results
     command = "getent passwd | grep ^{}:".format(student_number)
     result = ssh_connection.send_cmd(command, sudo=True, print_stdout=False)
+
+    ssh_connection.close()
     
     # results example, split on colons
     #  *****

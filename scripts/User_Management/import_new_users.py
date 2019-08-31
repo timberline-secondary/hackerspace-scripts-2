@@ -1,10 +1,8 @@
 import os
 import csv
-from urllib.parse import urlparse
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
-from scripts.User_Management._utils import get_student_name
 from getpass import getpass
 
 from .add_new_user import add_new_user
@@ -40,11 +38,12 @@ def import_new_users():
         if os.path.isfile(student_csv_file):
             break
         else:
-            utils.print_error("I couldn't fin this file: {} ".format(student_csv_file))
-
+            utils.print_error("I couldn't find this file: {} ".format(student_csv_file))
 
 
     password = getpass("Enter the admin password: ")
+
+    ssh_connection = SSH(hostname, username, password, verbose=False)
 
     with open(student_csv_file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -58,8 +57,16 @@ def import_new_users():
             # row[1] = first name
             # row[2] = last name
 
-            print(row[0], row[1], row[2])
-            add_new_user(student_number=row[0], first_name=row[1], last_name=row[2], password=password, skip_existing_users=True)
+            add_new_user(
+                student_number=row[0],
+                first_name=row[1],
+                last_name=row[2],
+                password=password,
+                bulk_creation=True,
+                ssh_connection=ssh_connection
+            )
+    
+    ssh_connection.close()
 
     input("All done! Hit Enter to continue... " )
 

@@ -1,3 +1,5 @@
+import os
+import sys
 import paramiko
 import threading
 from time import time
@@ -44,10 +46,11 @@ class SSH():
     tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
     tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
 
-    def __init__(self, hostname, username, password=None):
-        self.hostname=hostname
-        self.username=username
-        self.password=password
+    def __init__(self, hostname, username, password=None, verbose=True):
+        self.hostname = hostname
+        self.username = username
+        self.password = password
+        self.verbose = verbose
 
         self.client = None # the base connection, also used for simple commands
         self.transport = None # used for complex commands
@@ -71,24 +74,41 @@ class SSH():
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
+ 
+            if not self.verbose:
+                # https://stackoverflow.com/questions/8447185/to-prevent-a-function-from-printing-in-the-batch-console-in-python
+                # sys.stdout = open(os.devnull, "w")
+                pass
+
             self.client.connect(hostname=self.hostname, username=self.username, password=self.password)
 
         except paramiko.ssh_exception.BadAuthenticationType:
+            # sys.stdout = sys.__stdout__
             print_error ("\n\nConnection failed, password may be wrong or server does not allow this connection type.\n\n")
             return False
         except paramiko.ssh_exception.AuthenticationException:
+            # sys.stdout = sys.__stdout__
             print_error ("\n\nConnection failed, credentials may be wrong.\n\n")
             return False
         except paramiko.ssh_exception.BadHostKeyException:
+            # sys.stdout = sys.__stdout__
             print_error ("\n\nThe host key given by the SSH did not match what we were expecting.\n\n")
             return False
         except paramiko.ssh_exception.ChannelException:
+            # sys.stdout = sys.__stdout__
             print_error ("\n\nThe attempt to open a new Channel failed.\n\n")
             return False
         except paramiko.ssh_exception.NoValidConnectionsError:
+            # sys.stdout = sys.__stdout__
             print_error ("\n\nMultiple connection attempts were made and none succeeded.\n\n")
             return False
 
+        finally:
+            # return stdout to normal
+            # sys.stdout = sys.__stdout__
+            pass
+
+        # if self.verbose:
         print_success("{} successful.".format(str(self)))
         return True
 
@@ -164,7 +184,7 @@ class SSH():
             print(output)
         return output
 
-    def send_interactive_commands(self, command_response_list):
+    def send_interactive_commands(self, command_response_list, print_interactions=True):
         """[summary]
         
         Arguments:
@@ -192,7 +212,9 @@ class SSH():
         channel.send(prompt_string + '\n')
         # wait for the prompt
         output = self.read_data(channel, prompt_string)
-        print(prompt_string)
+
+        if print_interactions:
+            print(prompt_string)
 
         if output is not None:
 
@@ -204,7 +226,8 @@ class SSH():
                 
                 if output is None:
                     return False
-                else:
+                
+                if print_interactions:
                     print(output)
 
         return True      
