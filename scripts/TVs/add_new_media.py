@@ -121,7 +121,7 @@ def add_new_media(student_number=None, tv=None):
         if already_exists == False:
 
             # make sure the directory exists, if not create it:
-            if not ssh_connection.file_exists(filepath,''):
+            if not ssh_connection.file_exists(filepath):
                 ssh_connection.send_cmd('mkdir {}'.format(filepath))
 
             ssh_connection.send_cmd(command)

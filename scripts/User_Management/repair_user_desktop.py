@@ -1,7 +1,7 @@
 import os
 from urllib.parse import urlparse
 
-from scripts._utils.utils import input_styled, print_warning, print_success
+from scripts._utils.utils import input_styled, print_warning, print_success, print_error
 from scripts._utils.ssh import SSH
 
 hostname = 'tyrell'
@@ -12,8 +12,21 @@ def repair_user_desktop():
     print_warning("Make sure the student is logged out before running this repair.\n")
     student_number = input_styled("Enter Student Number: \n")
 
-    command = "rm -r /nfshome/{}/.cache".format(student_number)
-    ssh_connection.send_cmd(command, sudo=True)
+    home_dir = "/nfshome/{}".format(student_number)
 
-    print_success("Have the student log in again. Their cache should be cleared now.")
+    # First, make sure their home drive exists.  Sometimes home drive creation fails when
+    # creating new users in bulk!
+    if ssh_connection.dir_exists(home_dir):
+        command = "rm -r {}/.cache".format(home_dir)
+        ssh_connection.send_cmd(command, sudo=True)
+        print("I tried to delete their cache.  That usually solves the problem...")
+        print_success("Have the student try logging in again.")
+    else:
+        # no home drive!  Need to make it
+        print_warning("AH!  It appears they don't have a home drive! I gonna try to create one for them now...")
+        command = "bash /nfshome/makehomedirs.sh {}".format(student_number)
+        ssh_connection.send_cmd(command, sudo=True)
+        print_success("Have the student try logging in again.")
+        
+
     ssh_connection.close()

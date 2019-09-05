@@ -330,16 +330,25 @@ class SSH():
         print ("Copying file {} to {}:/{}".format(source, self.hostname, destination))
         self.sftp.put(source, destination)
 
-    def file_exists(self, filepath, filename):
+    def file_exists(self, filepath, filename=None):
+        """ If a filename is given, checks if a file with that name exists at the filepath
+        If a filename is not given, then check if filepath is a directory that exists
+        """
         if not self.is_connected():
             return -1
 
         # link to docs for test -f command
-        command = "test -f {}/{}".format(filepath, filename)
+        if filename:
+            command = "test -f {}/{}".format(filepath, filename)
+        else: # check for path
+            command = "test -d {}".format(filepath)
         stdin, stdout, stderr = self.client.exec_command(command)
         exit_status = stdout.channel.recv_exit_status()
 
-        if exit_status == 0:
+        if exit_status == 0: 
             return True
         else:
             return False
+
+    def dir_exists(self, filepath):
+        return self.file_exists(filepath)

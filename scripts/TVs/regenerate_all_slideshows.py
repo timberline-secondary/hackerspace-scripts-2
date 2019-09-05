@@ -44,7 +44,7 @@ def regenerate_all_slideshows():
 
         utils.print_success("\nFinished TV #{}\n".format(tv))
 
-    utils.input_styled("Done.  Hit Enter to continue.")
+    utils.print_success("Done!")
 
 
     

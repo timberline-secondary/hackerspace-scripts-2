@@ -68,7 +68,7 @@ def import_new_users():
     
     ssh_connection.close()
 
-    input("All done! Hit Enter to continue... " )
+    print("All done!")
 
 
 

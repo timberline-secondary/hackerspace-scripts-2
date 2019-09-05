@@ -121,6 +121,7 @@ def control_panel():
             title = "{} > {}".format(module_choice, sub_module_key)
             utils.print_heading(title)
             method()
+            input("Hit Enter to continue. ")
 
     except KeyboardInterrupt:
         sys.exit(0)

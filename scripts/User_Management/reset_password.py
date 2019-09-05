@@ -32,5 +32,7 @@ def reset_password():
 
     if success:
         utils.print_success("Password for {} successfully reset to {}".format(student_number, default_pw))
+    else:
+        utils.print_error("Something went wrong...")
 
     ssh_connection.close()

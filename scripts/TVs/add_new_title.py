@@ -69,7 +69,7 @@ def add_new_title():
     # setup a connect so we can makesure the directory exists
     ssh_connection = SSH(hostname, username, pi.password)
     # make sure the directory exists, if not create it:
-    if not ssh_connection.file_exists(server_filepath,''):
+    if not ssh_connection.file_exists(server_filepath):
                 ssh_connection.send_cmd('mkdir {}'.format(server_filepath))
 
     #move image onto the server with scp

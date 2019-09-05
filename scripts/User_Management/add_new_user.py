@@ -26,6 +26,7 @@ def add_new_user(student_number=None, first_name=None, last_name=None, password=
                 return
             else:
                 utils.print_warning("An account for {}, {}, already exists.  Try resetting their password if they can't log in.".format(student_number, student))
+                return
         else:
             
             if not first_name:
@@ -70,5 +71,3 @@ def add_new_user(student_number=None, first_name=None, last_name=None, password=
 
                 if bulk_creation or utils.input_styled("Try again? [y]/n: ") == 'n':
                     return
-
-    input("\nHit enter to continue...\n")
