@@ -2,6 +2,7 @@ import os
 import pwd
 from urllib.error import URLError
 from urllib.request import urlopen
+from subprocess import run
 
 
 class ByteStyle:
@@ -71,6 +72,22 @@ def user_exists(username):
         return True
     except KeyError:
         return False
+
+def host_exists(hostname, verbose=True):
+        ping_cmd = ['ping', '-c 1', '-W 1', hostname] # ping once with 1 second wait/time out
+        if verbose:
+            print_warning("Checking to see if {} is connected to the network.".format(hostname))
+
+        compeleted = run(ping_cmd)
+
+        if compeleted.returncode != 0: # not success
+            if verbose:
+                print_error("{} was not found on the network.  Is there a typo? Is the computer on?".format(hostname))
+            return False
+        else:
+            if verbose:
+                print_success("{} found on the network.".format(hostname))
+            return True
 
 # def check_student_number(student_number):
 #     # this doesn't work, needs sudo to get other users.
