@@ -1,16 +1,14 @@
 import os, socket
 from getpass import getpass
 
-
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
-
 
 puppet_host = 'puppet'
 username = 'hackerspace_admin'
 computer_host = None
 
-def puppet_run():
+def puppet_run(auto_fix_certificates=False):
     password = getpass("Enter the admin password: ")
 
     good_host = False
@@ -23,23 +21,25 @@ def puppet_run():
 
         good_host = utils.host_exists(computer_host)
 
-    
     # now that we know we have a connected computer, ssh into it and try to run puppet
     success = False
+    ssh_connection = SSH(computer_host, username, password)
     while not success:
-        ssh_connection = SSH(computer_host, username, password)
-
+        
         utils.print_warning("Running puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect".format(computer_host))
 
         output = ssh_connection.send_cmd('/opt/puppetlabs/bin/puppet agent -t', sudo=True)
 
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output:
             print(output)
-
+        elif "Notice: Run of Puppet configuration client already in progress" in output:
+            print(output)
+            utils.print_warning("\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
+            break
         else:
             utils.print_success("\n\nSeems like everything worked ok!\n\n")
             ssh_connection.close()
-            return True
+            break
 
         ### Handle certificate problem ###
         # Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key.
@@ -54,11 +54,11 @@ def puppet_run():
         #
         # Exiting; failed to retrieve certificate and waitforcert is disabled
 
-        try_to_fix = utils.input_styled("Looks like there was a certificate problem.  Usually this happens when a computer is re-imaged.  Want me to try to fix it? [y]/n ")
+        if not auto_fix_certificates:
+            try_to_fix = utils.input_styled("Looks like there was a certificate problem.  Usually this happens when a computer is re-imaged.  Want me to try to fix it? [y]/n ")
 
-        if try_to_fix == 'n':
-            ssh_connection.close()
-            return False
+            if try_to_fix == 'n':
+                break
 
         # first, remove certificate from agent:
         remove_agent_cert_cmd = "find /etc/puppetlabs/puppet/ssl -name {}.hackerspace.tbl.pem -delete".format(computer_host)
@@ -80,5 +80,7 @@ def puppet_run():
         #                         ]
         # success = ssh_connection.send_interactive_commands(command_response_list)
 
-        ssh_connection.close()
+
+    ssh_connection.close()
+    
         
