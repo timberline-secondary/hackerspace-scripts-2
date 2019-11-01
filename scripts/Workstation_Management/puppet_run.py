@@ -16,9 +16,9 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
     while not good_host:
 
         if computer_number:
-            computer_host = "tbl-h10-{}-s".format(computer_number)
+            computer_host = "tbl-g122-{}-s".format(computer_number)
         else:
-            computer_host = utils.input_styled("Which computer? (e.g. 'tbl-h10-12-s', or [q]uit) ")
+            computer_host = utils.input_styled("Which computer? (e.g. 'tbl-g122-12-s', or [q]uit) ")
 
         if computer_host == 'q':
             print("Quitting this.")
