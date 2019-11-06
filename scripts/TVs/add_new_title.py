@@ -91,6 +91,3 @@ def add_new_title():
         #     add_new_media.add_new_media(student_number, tv)
     else:
         utils.print_error("The title image '{}' was not added. Is sshpass installed?".format(filename_png))
-    
-    input("Enter to continue...")
-            

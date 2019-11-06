@@ -48,5 +48,4 @@ def generate_new_movie_file(ssh_connection, student_number, tv, silent=False):
     ssh_connection.send_cmd('mv {} {}/tv{}/{}.a.mp4'.format(output, TV_ROOT, tv, student_number))
     
     if not silent:
-        utils.input_styled("Video created! [Enter]")
-    
+        utils.print_success("Video created!")
