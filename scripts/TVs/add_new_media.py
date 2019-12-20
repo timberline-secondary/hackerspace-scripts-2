@@ -34,7 +34,7 @@ def get_media_url():
         # verifies mime type
         expected_mime_type = None # Reset
         try:
-            expected_mime_type = mime_types[extension]
+            expected_mime_type = mime_types[extension.lower()]
         except KeyError:
             # un supported extension
             expected_mime_type = None
@@ -60,22 +60,24 @@ def add_new_media(student_number=None, tv=None):
             pass
         else:
             student_number = student_number_input
-        image_name = None
-        name_good = utils.input_styled("What is the name of this image? (default = {}): \n".format(name_without_ext))
-        if not name_good:
-            image_name = name_without_ext
-        else:
-            image_name = name_good
+
         tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): \n".format(tv))
         if not tv_input:
             pass
         else:
             tv = tv_input
 
+        image_name = None
+        name_good = utils.input_styled("What is the name of this image? (default = {}): \n".format(name_without_ext))
+        if not name_good:
+            image_name = name_without_ext
+        else:
+            image_name = name_good
+
         filename = student_number + ".z." + image_name + extension
 
         # Save videos directly in the tv's rtoot directory.
-        if is_video(extension):
+        if is_video(extension.lower()):
             filepath = "{}/tv{}/".format(TV_ROOT, tv)
         # Save images into a subfolder, which will be used to generate a slideshow video
         else:
