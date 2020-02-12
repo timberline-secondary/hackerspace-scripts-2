@@ -72,15 +72,14 @@ def add_new_title():
     if not ssh_connection.file_exists(server_filepath):
                 ssh_connection.send_cmd('mkdir {}'.format(server_filepath))
 
-    #move image onto the server with scp
+    # move image onto the server with scp (this will fail if they've never connected to hightower before, hence warning at bottom)
     command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(pi.password, temp_filepath_png, username, hostname, server_filepath)
 
     os.system(command)
 
     #removes all temp files we created
-    # os.system('rm {}'.format(temp_filepath_png))
-    # os.system('rm {}'.format(temp_filepath_svg))
-    #os.system('rm {}.png'.format(filename))
+    os.system('rm {}'.format(temp_filepath_png))
+    os.system('rm {}'.format(temp_filepath_svg))
 
     # Check if file now exists on the server
     title_exists = ssh_connection.file_exists(server_filepath, filename_png)
