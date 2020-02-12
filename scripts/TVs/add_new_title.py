@@ -74,11 +74,12 @@ def add_new_title():
 
     #move image onto the server with scp
     command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(pi.password, temp_filepath_png, username, hostname, server_filepath)
+
     os.system(command)
 
     #removes all temp files we created
-    os.system('rm {}'.format(temp_filepath_png))
-    os.system('rm {}'.format(temp_filepath_svg))
+    # os.system('rm {}'.format(temp_filepath_png))
+    # os.system('rm {}'.format(temp_filepath_svg))
     #os.system('rm {}.png'.format(filename))
 
     # Check if file now exists on the server
@@ -90,4 +91,5 @@ def add_new_title():
         # if not add_images or add_images.lower()[0] == "y":
         #     add_new_media.add_new_media(student_number, tv)
     else:
-        utils.print_error("The title image '{}' was not added. Is sshpass installed?".format(filename_png))
+        utils.print_error("The title image '{}' was not added. It's possible you've never connected to this server before. \n\n"  
+        "Try connecting once first by typing `ssh hightower` into a terminal, then answering yes.".format(filename_png))
