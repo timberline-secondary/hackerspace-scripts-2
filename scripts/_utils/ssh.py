@@ -232,7 +232,7 @@ class SSH():
 
         return True      
 
-    def read_data(self, channel, response_expected, response_contains=None, timeout=5.0):
+    def read_data(self, channel, response_expected, response_contains=None, timeout=60.0):
         """Read channel output until expected_reponse is found at the end of the output and, if applicable, the response_contains
         is found within, or timeout, whichever comes first. 
         
@@ -250,9 +250,13 @@ class SSH():
         channel_data = ""
         start_time = time()
         response_found = False
-
+        print("Waiting for response from server...")
         while True:
             elapsed_time = time() - start_time
+            # sys.stdout.write("\033[F") #back to previous line
+            # sys.stdout.write("\033[K") #clear line
+            # print("Waiting for response...", round(elapsed_time, 0))
+
             if channel.recv_ready():  # if there is data ready to receive
                 # Get the data
                 channel_data += str(channel.recv(9999), 'utf8') # receive max # of bytes

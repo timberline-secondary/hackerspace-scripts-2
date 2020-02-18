@@ -5,16 +5,18 @@ from scripts._utils import utils
 from scripts._utils.ssh import SSH
 from getpass import getpass
 
-from .add_new_user import add_new_user
+from .add_new_user import add_new_user_v2
 
 hostname = 'lannister'
 username = 'hackerspace_admin'
 
 default_csv_location = os.path.expanduser("~") + "/Downloads/StudentList.csv"
 
+# TODO FIX ME TO WORK WITH add_new_user_v2!!!
+
 def import_new_users():
 
-    print("\nImporting new users in bulk requires a csv file with data like this(Universal ID is student number):")
+    print("\nImporting new users in bulk requires a csv file with data like this (Universal ID is student number):")
     print("col1, col2, col3,,,etc")
     print("UNIVERSAL ID, FIRST NAME, LAST NAME,,,etc")
     print("9999999, JIMMY, BLOGGINS,,,etc")
@@ -57,8 +59,8 @@ def import_new_users():
             # row[1] = first name
             # row[2] = last name
 
-            add_new_user(
-                student_number=row[0],
+            add_new_user_v2(
+                username=row[0],
                 first_name=row[1],
                 last_name=row[2],
                 password=password,
