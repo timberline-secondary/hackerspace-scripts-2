@@ -8,7 +8,94 @@ from scripts._utils.ssh import SSH
 STUDENT_GID = 5000
 TEACHER_GID = 10004
 
-def generate_ldif(username, firstname, lastname, uid, gid=STUDENT_GID) -> str:
+LDIF_FILENAME = '/home/hackerspace_admin/hs-ldap/tmp.ldif'
+
+AUTH_SERVER_HOSTNAME = 'lannister'
+FILE_SERVER_HOSTNAME = 'tyrell'
+USERNAME = 'hackerspace_admin'
+
+def create_home_dirs(username_list: list, password: str=None):
+    """Sends the list of users to the file server and runs this script 
+    
+    Arguments:
+        username_list {list} -- [description]
+    
+    Keyword Arguments:
+        password {str} -- [description] (default: {None})
+    """
+    username_list_as_string = " ".join(username_list)
+
+    make_home_dirs_cmd = 'ssh -t hackerspace_admin@tyrell "sudo /nfshome/makehomedirs.sh {}"'.format(username_list_as_string)
+
+    command_response_list = [
+                    (make_home_dirs_cmd, "hackerspace_admin@tyrell's password: ", None),
+                    (password, "[sudo] password for hackerspace_admin: ", None),
+                    (password, "$", None),
+    ]
+
+    if not password:
+        password = getpass("Enter the admin password: ")
+
+    ssh_connection = SSH(FILE_SERVER_HOSTNAME, USERNAME, password)
+
+    # why are we doing this through lannister?  ssh direct to tyrell!!!
+    success = ssh_connection.send_interactive_commands(command_response_list)
+
+    if success:
+        utils.print_success("Looks like it worked!  Unless you see some nasty errors above...")
+        return success
+    else:
+        utils.print_error("Something went wrong but I'm not smart enough to know what...")
+        return False
+
+
+def create_users_from_ldif(ldif_content: str, ssh_connection=None, password: str=None):
+    """Save an ldif file on the authenticationserver and run ldapadd command to create new users with it.
+    Use the provided ssh connect if supplied, otherwise create one.
+    
+    Arguments:
+        ldif_content {str} -- string containing all the ldif entry to create the new users via `ldapadd`
+        ssh_connection {[type]} -- [description]
+        password {str} -- if user has already entered PW this prevent re-entering it.
+    """
+
+    # if we were passed an ssh connection, leave it open, otherwise  we need to create it and close it at the end.
+    close_connection = False if ssh_connection else True
+
+    if not ssh_connection:
+        if not password:
+            password = getpass("Enter the admin password: ")
+
+        ssh_connection = SSH(AUTH_SERVER_HOSTNAME, USERNAME, password)
+                
+    # remove old tmp ldif file if it exists
+    ssh_connection.send_cmd('rm {}'.format(LDIF_FILENAME), print_stdout=False) # don't care about error if it doesn't exists
+
+    # save the ldif file to lannister
+    ssh_connection.send_cmd('echo -e "{}" >> {}'.format(ldif_content, LDIF_FILENAME))
+
+
+    # use the ldif file to create the user with `ldapadd`
+    # https://linux.die.net/man/1/ldapadd
+    # -x Use simple authentiction instead of SASL.
+    # -D Use the Distinguished Name binddn to bind to the LDAP directory.
+    # -W Prompt for simple authentication. This is used instead of specifying the password on the command line. 
+    # -f Read the entry modification information from file instead of from standard input. 
+    ldap_add_cmd = "ldapadd -x -D cn=admin,dc=hackerspace,dc=tbl -W -f {}".format(LDIF_FILENAME)
+    command_response_list = [
+                        (ldap_add_cmd, "Enter LDAP Password: ", None),
+                        (password, "$", "adding new entry"),
+    ]
+    success = ssh_connection.send_interactive_commands(command_response_list)
+
+    # if we were passed an ssh connection, leave it open, otherwise close it.
+    if close_connection:
+        ssh_connection.close()
+    
+    return success
+
+
+def generate_ldif_entry(username, firstname, lastname, uid=None, gid=STUDENT_GID) -> str:
 
     if not uid:
         uid = get_next_avail_uid()
@@ -78,14 +165,14 @@ def get_new_username() -> str:
     username = username.lower().strip()
 
     # does user exist already?
-    try:
-        user = pwd.getpwnam(username) # will throw an exception if doesn't exist already
-        utils.print_warning("This user already exists: {}".format(user))
+    if utils.user_exists(username):
+        utils.print_warning("This user already exists: {}".format(username))
         return None
-    except KeyError:  # it's a new username because doesn't exist
+    else:
         return username
 
-def get_new_user_names(username: str = None) -> tuple:
+
+def get_new_users_names(username: str = None) -> tuple:
     """Primpts for a new user's first and last name
     
     Arguments:
@@ -122,104 +209,19 @@ def get_new_user_names(username: str = None) -> tuple:
     return firstname, lastname
 
 
-def get_student_name2(username) -> str:
-    """Iff the user exists, get their first and last name from the gecos field
-    
-    Arguments:
-        username {[type]} -- [description]
-    
-    Returns:
-        str -- The user's first and last name in a single string, else None if user doesn't exist
-    """
-    try:
-        user = pwd.getpwnam(str(username)) # will throw an exception if doesn't exist already
-        return user.pw_gecos
-    except KeyError:  # username doesn't exist
-        return None
-
-
-def get_student_name(student_number, password=None):
-    """Get a student's full name from their student number.  Return None if account doesn't exist.
-
-    # TODO redo this with pwd: https://docs.python.org/3.7/library/pwd.html
-    
-    Arguments:
-        student_number {str} -- username
-    
-    Keyword Arguments:
-        password {str} -- admin password
-    
-    Returns:
-        str -- student's full name, or None is student doesn't exist.
-    """
-
-    hostname = socket.gethostname() # can use the local computer
-    username = 'hackerspace_admin'
-    if not password:
-        password = getpass("Enter the admin password: ")
-
-    ssh_connection = SSH(hostname, username, password, verbose=False)
-
-    # the ^ is regex for "starting with", and after the username should be a colon :
-    # this ensures unique results
-    command = "getent passwd | grep ^{}:".format(student_number)
-    result = ssh_connection.send_cmd(command, sudo=True, print_stdout=False)
-
-    ssh_connection.close()
-    
-    # results example, split on colons
-    #  *****
-    #  [sudo] password for hackerspace_admin: 
-    #  9912345:x:16000:16000:John Doe:/home/9912345:/bin/bash
-
-    user_info_list = result.split(':')
-
-    # no user info returned, doesn't exist
-    if len(user_info_list) == 2:
-        return None
-    else:
-        return user_info_list[5]
-
 def get_and_confirm_user(password=None):
     # TODO redo this with pwd: https://docs.python.org/3.7/library/pwd.html
     student = None
     while student is None:
-        student_number = utils.input_styled("Enter student number: \n")
+        username = utils.input_styled("Enter username: \n")
         if password is None:
             password = getpass("Enter the admin password: ")
         
-        student = get_student_name(student_number, password)
+        student = utils.get_users_name(username)
 
         if student is not None:
-            confirm = utils.input_styled("Confirm account: {}, {}? [y]/n".format(student_number, student))
+            confirm = utils.input_styled("Confirm account: {}, {}? [y]/n".format(username, student))
             if confirm == 'n':
                 student = None
             else:
-                return student_number
-        
-            
-#####################################
-# /nfshome/makehomedirs.sh
-# #!/bin/bash
-# if [ $# -lt 1 ]; then
-#     echo "Syntax: $_ USER[ USER[ ...]]" >&2
-#     exit 1
-# fi
-
-# exit_code=0
-
-# for user in "$@"; do
-#     home="/nfshome/$user"
-    
-#     # Check whether user account exists first
-#     USEREXISTS=$(getent passwd | grep ^$user:)
-#     if [ ! "$USEREXISTS" ]; then
-# 	echo $'\e[31m'"User does not exist: $user"$'\e[m'
-#     elif [ -d "$home" ]; then
-# 	echo $'\e[31m'"Home drive already exists: $home"$'\e[m'
-#     else
-# 	group="students"
-#         cp -R /etc/skel "$home" && echo $'\e[32m'"Copied skeleton to: $home"$'\e[m' || ( exit_code=$?; echo $'\e[31m'"Failed to create: $home"$'\e[m' ) >&2
-#         chown -R "$user:$group" "$home" && echo $'\e[32m'"Set owner on: $home"$'\e[m' || ( exit_code=$?; echo $'\e[31m'"Failed to set owner on: $home"$'\e[m' ) >&2
-#     fi
-# done
+                return username

@@ -73,6 +73,21 @@ def user_exists(username):
     except KeyError:
         return False
 
+def get_users_name(username: str):
+    """Returns the first and last name (per gecos field) for a given username
+    https://docs.python.org/3/library/pwd.html
+    
+    Arguments:
+        username {str} -- ldap username
+    
+    Returns:
+        [str] -- The user's Name (in gecos field) if they exist, else None if username doesn't exist
+    """
+    try:
+        return pwd.getpwnam(username).pw_gecos
+    except KeyError:
+        return None
+
 def host_exists(hostname, verbose=True):
         ping_cmd = ['ping', '-c 1', '-W 1', hostname] # ping once with 1 second wait/time out
         if verbose:
@@ -88,9 +103,3 @@ def host_exists(hostname, verbose=True):
             if verbose:
                 print_success("{} found on the network.".format(hostname))
             return True
-
-# def check_student_number(student_number):
-#     # this doesn't work, needs sudo to get other users.
-#     verify_student = os.system("getent passwd | grep {}".format(student_number))
-#     print(verify_student)
-#     return verify_student

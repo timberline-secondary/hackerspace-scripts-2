@@ -3,7 +3,6 @@ from urllib.parse import urlparse
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
-from scripts.User_Management._utils import get_student_name
 from getpass import getpass
 
 hostname = 'lannister'
@@ -14,7 +13,7 @@ def rename_user ():
     student_number = utils.input_styled("Enter Student Number: \n")
     password = getpass("Enter the admin password: ")
 
-    student = get_student_name(student_number, password)
+    student = utils.get_users_name(student_number)
 
     if student is None:
         utils.print_warning("I couldn't find an account for {}.  Sorry!".format(student_number))
@@ -63,7 +62,7 @@ def rename_user ():
 
         if success:
             utils.print_success("Looks like it worked to me? Here's the new entry:")
-            student = get_student_name(student_number, password)
+            student = utils.get_users_name(student_number)
             utils.print_success("{}: {}".format(student_number, student))
 
         else:
