@@ -32,7 +32,7 @@ def rename_user ():
 
         confirmed = utils.input_styled("Confirm you want to change {} to {} {}? y/[n] ".format(student, new_first, new_last))
 
-        if is_correct_student.lower() != 'y':
+        if confirmed.lower() != 'y':
             print("Bailing...")
             return
 
