@@ -37,3 +37,25 @@ def get_tv_containing_student(student_number):
     ssh_connection.close()
     return None
 
+def guess_tv(username):
+    # First, see if they already have art on a TV
+    tv = get_tv_containing_student(username)
+
+    # If they don't already have one, then guess based on their last name
+    if tv is None:
+        name = utils.get_users_name(username)
+        if name is None:
+            utils.print_error("I don't recognize the username '{}'.  It could be because they don't have an account in the Hackerspace with this username.  You can continue anyway tho.".format(username))
+            return None
+
+        # Last name A-M = 1, N-Z = 2
+        # name variable will be fullname, split on spaces and take last element
+        lastname = name.split()[-1]
+        if lastname[0].lower() <= 'M':
+            utils.print_warning("Suggesting TV 1 because their last name, {}, is A-M".format(lastname))
+            tv = 1
+        else:
+            utils.print_warning("Suggesting TV 2 because their last name, {}, is N-Z".format(lastname))
+            tv = 2
+
+    return tv

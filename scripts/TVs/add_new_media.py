@@ -7,7 +7,7 @@ from scripts._utils.movie_maker import movie_maker
 
 from scripts.TVs.refresh_slideshow import refresh_slideshow
 
-from scripts.TVs._utils import mime_types, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW, TV_ROOT
+from scripts.TVs._utils import mime_types, guess_tv, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW, TV_ROOT
 
 #this code worked on by Nicholas (Tseilorin) Hopkins
 
@@ -46,7 +46,7 @@ def get_media_url():
     return media_url, name_without_ext, extension
 
 
-def add_new_media(student_number=None, tv=None):
+def add_new_media(username=None, tv=None):
     media_url = True
     while media_url == True:
         #gets and checks the url of the file
@@ -55,12 +55,13 @@ def add_new_media(student_number=None, tv=None):
             return
 
         #collects information to name the file, and as to which tv to send it to
-        student_number_input = utils.input_styled("Enter Student Number (default = {}): \n".format(student_number))
-        if not student_number_input:
+        username_input = utils.input_styled("Enter username (default = {}): \n".format(username))
+        if not username_input:
             pass
         else:
-            student_number = student_number_input
+            username = username_input
 
+        tv = guess_tv(username)
         tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): \n".format(tv))
         if not tv_input:
             pass
@@ -74,14 +75,14 @@ def add_new_media(student_number=None, tv=None):
         else:
             image_name = name_good
 
-        filename = student_number + ".z." + image_name + extension
+        filename = username + ".z." + image_name + extension
 
         # Save videos directly in the tv's rtoot directory.
         if is_video(extension.lower()):
             filepath = "{}/tv{}/".format(TV_ROOT, tv)
         # Save images into a subfolder, which will be used to generate a slideshow video
         else:
-            filepath = "{}/tv{}/{}/".format(TV_ROOT, tv, student_number)
+            filepath = "{}/tv{}/{}/".format(TV_ROOT, tv, username)
 
         utils.print_warning("Sending {} to hightower to see if file exists already with that name.".format(filename))
 
@@ -109,7 +110,7 @@ def add_new_media(student_number=None, tv=None):
                     image_name = name_without_ext
                 else:
                     image_name = name_good
-                    filename = student_number + ".z." + image_name + extension
+                    filename = username + ".z." + image_name + extension
                     command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
                     already_exists = False
                     pass
@@ -145,7 +146,7 @@ def add_new_media(student_number=None, tv=None):
 
     make_movie = utils.input_styled("Do you want to generate a new video slideshow of this student's art? ([y]/n) \n")
     if not make_movie or make_movie.lower()[0] == "y":
-        refresh_slideshow(student_number=student_number)
+        refresh_slideshow(student_number=username)
     elif make_movie.lower()[0] == "n":
         pass
     else:
