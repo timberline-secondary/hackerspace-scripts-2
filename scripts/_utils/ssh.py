@@ -334,6 +334,16 @@ class SSH():
         print ("Copying file {} to {}:/{}".format(source, self.hostname, destination))
         self.sftp.put(source, destination)
 
+    def get_file(self, remote_source, local_destination):
+        """Copies a remote file to local
+        
+        Arguments:
+            source {str} -- full or relative path to local file
+            destination {str} -- full path to file on server, must include the destination file name
+        """
+        print ("Copying file {}:/{} to {}".format(self.hostname, remote_source, local_destination))
+        self.sftp.get(remote_source, local_destination)
+
     def file_exists(self, filepath, filename=None):
         """ If a filename is given, checks if a file with that name exists at the filepath
         If a filename is not given, then check if filepath is a directory that exists
