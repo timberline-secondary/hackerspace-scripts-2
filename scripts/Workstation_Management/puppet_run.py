@@ -40,7 +40,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         output = ssh_connection.send_cmd(puppet_command, sudo=True)
         print(output)
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output:
-            
+            break
         elif "Notice: Run of Puppet configuration client already in progress" in output:
             # print(output)
             utils.print_warning("\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
