@@ -32,18 +32,23 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
     # now that we know we have a connected computer, ssh into it and try to run puppet
     success = False
     ssh_connection = SSH(computer_host, username, password)
+    puppet_command = '/opt/puppetlabs/bin/puppet agent -t'
     while not success:
         
         utils.print_warning("Running puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect".format(computer_host))
 
-        output = ssh_connection.send_cmd('/opt/puppetlabs/bin/puppet agent -t', sudo=True)
-
+        output = ssh_connection.send_cmd(puppet_command, sudo=True)
+        print(output)
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output:
-            print(output)
+            
         elif "Notice: Run of Puppet configuration client already in progress" in output:
-            print(output)
+            # print(output)
             utils.print_warning("\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
             break
+        elif "/opt/puppetlabs/bin/puppet: command not found" in output:
+            # print(output)
+            utils.print_warning("\nIs this Ubuntu 20.04? Let me try to find puppet in a different location.\n".format(computer_host)) 
+            puppet_command = 'puppet agent -t'
         else:
             utils.print_success("\n\nSeems like everything worked ok!\n\n")
             ssh_connection.close()
