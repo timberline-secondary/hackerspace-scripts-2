@@ -47,8 +47,8 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
             break
         elif "/opt/puppetlabs/bin/puppet: command not found" in output:
             # print(output)
-            utils.print_warning("\nIs this Ubuntu 20.04? Let me try to find puppet in a different location.\n".format(computer_host)) 
-            puppet_command = 'puppet agent -t'
+            utils.print_warning("\nIs this Ubuntu 20.04? Let me try to find puppet in a different location.\n") 
+            puppet_command = '/usr/bin/puppet agent -t'
         else:
             utils.print_success("\n\nSeems like everything worked ok!\n\n")
             ssh_connection.close()
