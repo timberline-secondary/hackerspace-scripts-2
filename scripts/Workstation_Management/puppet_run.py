@@ -43,7 +43,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         output = ssh_connection.send_cmd(puppet_command, sudo=True)
         print(output)
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output:
-            break
+            pass
         elif "Notice: Run of Puppet configuration client already in progress" in output:
             utils.print_warning("\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
             break
@@ -75,12 +75,18 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
                 break
 
         # first, remove certificate from agent:
-        remove_agent_cert_cmd = "find /etc/puppetlabs/puppet/ssl -name {}.hackerspace.tbl.pem -delete".format(computer_host)
+        if "find /etc/puppetlabs/puppet/ssl" in output:  # old 16.04 installations
+            remove_agent_cert_cmd = "find /etc/puppetlabs/puppet/ssl -name {}.hackerspace.tbl.pem -delete".format(computer_host)
+        else:
+            remove_agent_cert_cmd = "find /var/lib/puppet/ssl -name {}.hackerspace.tbl.pem -delete".format(computer_host)
         output = ssh_connection.send_cmd(remove_agent_cert_cmd, sudo=True)
         ssh_connection.close()
 
         # now remove certificate from puppet server:
-        remove_server_cert_cmd = "/opt/puppetlabs/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
+        if "/opt/puppetlabs/bin/puppet cert clean" in output:
+            remove_server_cert_cmd = "/opt/puppetlabs/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
+        else:
+            remove_server_cert_cmd = "puppet cert clean {}.hackerspace.tbl".format(computer_host)
         ssh_connection = SSH(puppet_host, username, password)
         output = ssh_connection.send_cmd(remove_server_cert_cmd, sudo=True)
 
