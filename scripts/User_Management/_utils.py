@@ -1,4 +1,4 @@
-import os, socket, pwd
+import os, socket, pwd, re
 from getpass import getpass
 from datetime import date
 
@@ -158,15 +158,20 @@ def get_new_username() -> str:
     """Asks for a new username and checks if it already exists or not
     
     Returns:
-        str -- the username if it's new, or {None} if it already exists
+        str -- the username if it's new, or {None} if it already exists or bad username
     """
 
-    username = utils.input_styled("Enter new username (please match with school username, e.g. firstname.lastname or 99#####): ")
+    username = utils.input_styled("What is the new username? (must start with a letter, then any combo of letters, numbers, or _-.) ")
     username = username.lower().strip()
+    # make sure it's valid
+    if not re.match(r'^[a-zA-Z][\w\-._]+$', username):
+        utils.print_error("Invalid username {}".format(username))
+        return None
 
     # does user exist already?
     if utils.user_exists(username):
-        utils.print_warning("This user already exists: {}".format(username))
+        fullname = utils.get_users_name(username)
+        utils.print_warning("The username {} already exists for {}.".format(username, fullname))
         return None
     else:
         return username
@@ -209,19 +214,41 @@ def get_new_users_names(username: str = None) -> tuple:
     return firstname, lastname
 
 
-def get_and_confirm_user(password=None):
-    # TODO redo this with pwd: https://docs.python.org/3.7/library/pwd.html
-    student = None
-    while student is None:
-        username = utils.input_styled("Enter username: \n")
-        if password is None:
-            password = getpass("Enter the admin password: ")
+# def get_and_confirm_user(password=None):
+#     # TODO redo this with pwd: https://docs.python.org/3.7/library/pwd.html
+#     student = None
+#     while student is None:
+#         username = utils.input_styled("Enter username: \n")
+#         if password is None:
+#             password = getpass("Enter the admin password: ")
         
-        student = utils.get_users_name(username)
+#         student = utils.get_users_name(username)
 
-        if student is not None:
-            confirm = utils.input_styled("Confirm account: {}, {}? [y]/n".format(username, student))
-            if confirm == 'n':
-                student = None
-            else:
-                return username
+#         if student is not None:
+#             confirm = utils.input_styled("Confirm account: {}, {}? [y]/n".format(username, student))
+#             if confirm == 'n':
+#                 student = None
+#             else:
+#                 return username
+
+def get_and_confirm_user():
+    """ Ask for a username and cehcks if it exists. If it does, returns a tuple of
+    (username, fullname)
+    """
+    username = utils.input_styled("Enter username: \n")
+    # password = getpass("Enter the admin password: ")
+
+    fullname = utils.get_users_name(username)
+
+    if fullname is None:
+        utils.print_warning("I couldn't find an account for {}.  Sorry!".format(username))
+        return None, None
+    else:
+        utils.print_success("Found {}: {}.".format(username, fullname))
+        is_correct_user = utils.input_styled("Is this the correct student? y/[n] ")
+
+        if is_correct_user.lower() != 'y':
+            print("Bailing...")
+            return None, None
+        else:
+            return username, fullname

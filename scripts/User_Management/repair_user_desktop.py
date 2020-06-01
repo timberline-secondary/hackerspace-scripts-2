@@ -10,7 +10,7 @@ username = 'hackerspace_admin'
 def repair_user_desktop():
     ssh_connection = SSH(hostname, username)
     print_warning("Make sure the student is logged out before running this repair.\n")
-    student_number = input_styled("Enter Student Number: \n")
+    student_number = input_styled("Enter username: \n")
 
     home_dir = "/nfshome/{}".format(student_number)
 

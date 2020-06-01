@@ -17,7 +17,7 @@ def reset_password():
 
     print("Who's password do you want to reset?")
 
-    student_number = get_and_confirm_user(password)
+    student_number, fullname = get_and_confirm_user()
     
     ssh_connection = SSH(hostname, username, password)
 
