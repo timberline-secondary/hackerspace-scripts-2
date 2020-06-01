@@ -18,7 +18,7 @@ def change_username ():
     utils.print_warning("\nMake sure the student is logged out before making this change!\n")
 
     current_username, _fullname = user_utils.get_and_confirm_user() 
-    if not username:
+    if not current_username:
         return False
 
     print("OK, let's do this!")
@@ -38,10 +38,12 @@ def change_username ():
     ssh_connection.send_cmd(command, sudo=True)
     ssh_connection.close()
 
-    utils.print_success("Now gonna change the name of their home directory to match the new username")
+    # Don't need to do this because ldap still has their original home directory info
     
-    ssh_connection = SSH(file_hostname, username, password)
-    command = "mv /nfshome/{} /nfshome/{}".format(current_username, new_username)
-    ssh_connection.send_cmd(command, sudo=True)
-    ssh_connection.close()
-    utils.print_success("Done!")
+    # utils.print_success("Now gonna change the name of their home directory to match the new username")
+    
+    # ssh_connection = SSH(file_hostname, username, password)
+    # command = "mv /nfshome/{} /nfshome/{}".format(current_username, new_username)
+    # ssh_connection.send_cmd(command, sudo=True)
+    # ssh_connection.close()
+    # utils.print_success("Done!")

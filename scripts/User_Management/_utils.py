@@ -211,25 +211,8 @@ def get_new_users_names(username: str = None) -> tuple:
 
     # print(username, firstname or "(No first name provided)", lastname or "(No last name provided)")
 
-    return firstname, lastname
+    return firstname.upper().strip(), lastname.upper().strip()
 
-
-# def get_and_confirm_user(password=None):
-#     # TODO redo this with pwd: https://docs.python.org/3.7/library/pwd.html
-#     student = None
-#     while student is None:
-#         username = utils.input_styled("Enter username: \n")
-#         if password is None:
-#             password = getpass("Enter the admin password: ")
-        
-#         student = utils.get_users_name(username)
-
-#         if student is not None:
-#             confirm = utils.input_styled("Confirm account: {}, {}? [y]/n".format(username, student))
-#             if confirm == 'n':
-#                 student = None
-#             else:
-#                 return username
 
 def get_and_confirm_user():
     """ Ask for a username and cehcks if it exists. If it does, returns a tuple of
