@@ -12,7 +12,7 @@ echo -e "\n### UPDATING ###\n"
 git pull
 
 if grep -q "$string" $FILE; then
-    echo "Already installed\n"
+    echo "Already installed"
 else
     echo -e "\n### INSTALLING COMMAND ###\n"
     echo -e "export PATH=\$PATH:$localdir/" >> $FILE

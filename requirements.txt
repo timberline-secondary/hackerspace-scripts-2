@@ -1,2 +1,2 @@
-paramiko==2.4.
+paramiko==2.7.1
 Pillow==7.1.2
