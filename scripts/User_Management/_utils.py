@@ -215,7 +215,7 @@ def get_new_users_names(username: str = None) -> tuple:
 
 
 def get_and_confirm_user():
-    """ Ask for a username and cehcks if it exists. If it does, returns a tuple of
+    """ Ask for a username and checks if it exists. If it does, returns a tuple of
     (username, fullname)
     """
     username = utils.input_styled("Enter username: \n")
