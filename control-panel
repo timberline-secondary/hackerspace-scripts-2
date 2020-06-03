@@ -7,30 +7,30 @@ string="export PATH=\$PATH:$localdir/"
 
 cd $installdir
 
-echo "### UPDATING ###"
+echo -e "\n### UPDATING ###\n"
 
 git pull
 
 if grep -q "$string" $FILE; then
     echo "Already installed\n"
 else
-    echo "### INSTALLING COMMAND ###"
+    echo -e "\n### INSTALLING COMMAND ###\n"
     echo -e "export PATH=\$PATH:$localdir/" >> $FILE
     echo "Next time you can log out then back in to use 'control-panel' anywhere from the command line.\n"
 fi
 
 if ! test -f "$installdir/env/bin/activate"; then
-    echo "\n### INSTALLING PYTHON ENVIRONMENT ###\n"
+    echo -e "\n### INSTALLING PYTHON ENVIRONMENT ###\n"
     python3 -m venv $installdir/env
 fi
 
 source $installdir/env/bin/activate
 
-echo "\n### UPDATING PYTHON ENVIRONMENT ###\n"
+echo -e "\n### UPDATING PYTHON ENVIRONMENT ###\n"
 pip install -r requirements.txt
 
-echo "\n### CHECKING INSTALLED PACAKGES ###\n"
+echo -e "\n### CHECKING INSTALLED PACAKGES ###\n"
 python $installdir/bootstrap.py
 
-echo "\n### RUNNING CONTROL PANEL ###\n"
+echo -e "\n### RUNNING CONTROL PANEL ###\n"
 python $installdir/controlpanel.py
