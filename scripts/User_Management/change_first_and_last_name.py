@@ -1,8 +1,6 @@
 from scripts._utils import utils
-from scripts._utils.ssh import SSH
 
 from scripts.User_Management import _utils as user_utils
-from getpass import getpass
 
 hostname = 'lannister'
 server_username = 'hackerspace_admin'
@@ -25,10 +23,12 @@ def change_first_and_last_name():
         print("Bailing...")
         return
 
+    new_fullname = f"{new_first} {new_last}"
+
     ldif_changes_dict = {
-        'gecos': f"{new_first} {new_last}",
-        'displayName': f"{new_first} {new_last}",
-        'cn': new_first,
+        'gecos': new_fullname,
+        'displayName': new_fullname,
+        'cn': new_fullname,
         'sn': new_last,
         'givenName': new_first,
     }
