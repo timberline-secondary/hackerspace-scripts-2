@@ -1,7 +1,4 @@
-import os
-import sys
 import paramiko
-import threading
 from time import time
 from getpass import getpass
 from .utils import print_error, print_success, print_warning, input_styled
@@ -11,7 +8,6 @@ from .utils import print_error, print_success, print_warning, input_styled
 
 
 # this code worked on by Nicholas (Tseilorin) Hopkins
-
 class Session():
 
     def __init__(self, transport):
@@ -21,7 +17,6 @@ class Session():
 
     def send_cmd(self, command):
         self.session.exec_command(command)
-
 
 
 class SSH():
@@ -40,7 +35,7 @@ class SSH():
         ssh_connection.open_shell() # open an interactive shell on the host
 
         # need example hot to interact with code! Maybe send a tuple of input/output commands?
-        
+
     """
 
     tv_turnoff_cmd = "echo standby 0 | cec-client -s -d 1"
@@ -52,13 +47,14 @@ class SSH():
         self.password = password
         self.verbose = verbose
 
-        self.client = None # the base connection, also used for simple commands
-        self.transport = None # used for complex commands
-        self.sftp = None  # used for file operations
+        self.client = None     # the base connection, also used for simple commands
+        self.transport = None  # used for complex commands
+        self.sftp = None       # used for file operations
 
-        self.connect()
-        self.connect_transport()
-        self.connect_sftp()
+        success = self.connect()
+        if success:
+            self.connect_transport()
+            self.connect_sftp()
 
     def __del__(self):
         self.close()
@@ -68,13 +64,12 @@ class SSH():
 
     def connect(self):
         if self.password is None:
-            self.password=getpass("password: ")
+            self.password = getpass("password: ")
 
         # connect ssh client
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
- 
             if not self.verbose:
                 # https://stackoverflow.com/questions/8447185/to-prevent-a-function-from-printing-in-the-batch-console-in-python
                 # sys.stdout = open(os.devnull, "w")
@@ -84,23 +79,23 @@ class SSH():
 
         except paramiko.ssh_exception.BadAuthenticationType:
             # sys.stdout = sys.__stdout__
-            print_error ("\n\nConnection failed, password may be wrong or server does not allow this connection type.\n\n")
+            print_error("\n\nConnection failed, password may be wrong or server does not allow this connection type.\n\n")
             return False
         except paramiko.ssh_exception.AuthenticationException:
             # sys.stdout = sys.__stdout__
-            print_error ("\n\nConnection failed, credentials may be wrong.\n\n")
+            print_error("\n\nConnection failed, credentials may be wrong.\n\n")
             return False
         except paramiko.ssh_exception.BadHostKeyException:
             # sys.stdout = sys.__stdout__
-            print_error ("\n\nThe host key given by the SSH did not match what we were expecting.\n\n")
+            print_error("\n\nThe host key given by the SSH did not match what we were expecting.\n\n")
             return False
         except paramiko.ssh_exception.ChannelException:
             # sys.stdout = sys.__stdout__
-            print_error ("\n\nThe attempt to open a new Channel failed.\n\n")
+            print_error("\n\nThe attempt to open a new Channel failed.\n\n")
             return False
         except paramiko.ssh_exception.NoValidConnectionsError:
             # sys.stdout = sys.__stdout__
-            print_error ("\n\nMultiple connection attempts were made and none succeeded.\n\n")
+            print_error("\n\nMultiple connection attempts were made and none succeeded.\n\n")
             return False
 
         finally:
@@ -116,13 +111,16 @@ class SSH():
         # connect transport for interactive shell and complicated commands etc
         # https://daanlenaerts.com/blog/2016/07/01/python-and-ssh-paramiko-shell/
         self.transport = self.client.get_transport()
-    
+
     def connect_sftp(self):
-        self.sftp = paramiko.SFTPClient.from_transport(self.transport)
+        if self.transport:
+            self.sftp = paramiko.SFTPClient.from_transport(self.transport)
+        else:
+            print_error("\n\nCould establish transport, try again?\n\n")
 
     def get_open_session(self):
         """Opens a sessions for sending interactive commands
-        
+
         Returns:
             paramiko.channel.Channel -- the session channel object
         """
@@ -134,29 +132,29 @@ class SSH():
     def send_simple_cmd(self, command):
         """Sends a command to the host using the most basic paramiko method.
         Mostly here for documention to show alternate methods of using paramiko. Just use send_cmd()
-        
+
         Arguments:
             command {str} -- the bash command
-        
+
         Returns:
             str -- stdout of the command
         """
         stdin, stdout, stderr = self.client.exec_command(command)
-        output = str(stdout.read(), 'utf8') # convert from bytestring for newlines to work
-        print (output)
+        output = str(stdout.read(), 'utf8')  # convert from bytestring for newlines to work
+        print(output)
         return output
 
     def send_cmd(self, command, sudo=False, print_stdout=True):
         """Sends a command to the host using a temporary session. Automatically provides the sudo password if needed.
-        
+
         Arguments:
             command {str} -- The command.  To run a sudo command, do not add sudo in front, 
             instead set the sudo parameter to True.
-        
+
         Keyword Arguments:
             sudo {bool} -- run the command as sudo. (default: {False})
             print_stdout {bool} -- Print the output of the command (default: {True})
-        
+
         Returns:
             string -- the output from the command
         """
@@ -178,7 +176,7 @@ class SSH():
             stdin.write(self.password + "\n")
             stdin.flush()
 
-        output = str(stdout.read(), 'utf8') # convert from bytestring for newlines to work
+        output = str(stdout.read(), 'utf8')  # convert from bytestring for newlines to work
         output = output.replace(self.password, "*****")
         if print_stdout:
             print(output)
@@ -186,7 +184,7 @@ class SSH():
 
     def send_interactive_commands(self, command_response_list, print_interactions=True):
         """[summary]
-        
+
         Arguments:
             command_response_list {list} -- a list of string triplets:  [(input, response_expected, response_contains), ], where
                 input {str} -- the keystrokes to provide as input, this could be a command or interactive input.
@@ -223,10 +221,10 @@ class SSH():
                 # print("Sending command: ########  {} ##############".format(cmd))
                 channel.send(cmd + '\n')
                 output = self.read_data(channel, response, contains)
-                
+
                 if output is None:
                     return False
-                
+
                 if print_interactions:
                     print(output)
 
@@ -235,7 +233,7 @@ class SSH():
     def read_data(self, channel, response_expected, response_contains=None, timeout=60.0):
         """Read channel output until expected_reponse is found at the end of the output and, if applicable, the response_contains
         is found within, or timeout, whichever comes first. 
-        
+
         Arguments:
             channel {paramiko.channel.Channel} -- the channel to read data from
             response_expected {str} -- a string to look for at the END of the output data
@@ -259,7 +257,7 @@ class SSH():
 
             if channel.recv_ready():  # if there is data ready to receive
                 # Get the data
-                channel_data += str(channel.recv(9999), 'utf8') # receive max # of bytes
+                channel_data += str(channel.recv(9999), 'utf8')  # receive max # of bytes
 
                 # New data received, check if we got the expected output yet:
                 if response_expected and channel_data.strip().endswith(response_expected.strip()):
@@ -272,7 +270,7 @@ class SSH():
 
                 if response_found:
                     return channel_data
-                    
+
             elif timeout < elapsed_time:
                 print("Command timed out or unexpected response.")
                 print("## Got response: ")
@@ -282,12 +280,12 @@ class SSH():
                 print("\nABORTING...\n")
                 return None 
 
-
     def close(self):
-        if(self.client != None):
+        if self.client:
             self.client.close()
         # self.sftp.close()
-        self.transport.close()
+        if self.transport:
+            self.transport.close()
 
     def is_connected(self):
         error_msg = "Not connected."
@@ -296,7 +294,7 @@ class SSH():
                 transport = self.client.get_transport()
                 transport.send_ignore()
                 return True
-            except EOFError as e:
+            except EOFError:
                 # not connected
                 print_error(error_msg)
                 return False
@@ -326,22 +324,22 @@ class SSH():
 
     def copy_file(self, source, destination):
         """Copies a local file to the host
-        
+
         Arguments:
             source {str} -- full or relative path to local file
             destination {str} -- full path to file on server, must include the destination file name
         """
-        print ("Copying file {} to {}:/{}".format(source, self.hostname, destination))
+        print("Copying file {} to {}:/{}".format(source, self.hostname, destination))
         self.sftp.put(source, destination)
 
     def get_file(self, remote_source, local_destination):
         """Copies a remote file to local
-        
+
         Arguments:
             source {str} -- full or relative path to local file
             destination {str} -- full path to file on server, must include the destination file name
         """
-        print ("Copying file {}:/{} to {}".format(self.hostname, remote_source, local_destination))
+        print("Copying file {}:/{} to {}".format(self.hostname, remote_source, local_destination))
         self.sftp.get(remote_source, local_destination)
 
     def file_exists(self, filepath, filename=None):
@@ -354,7 +352,7 @@ class SSH():
         # link to docs for test -f command
         if filename:
             command = "test -f {}/{}".format(filepath, filename)
-        else: # check for path
+        else:  # check for path
             command = "test -d {}".format(filepath)
         stdin, stdout, stderr = self.client.exec_command(command)
         exit_status = stdout.channel.recv_exit_status()
