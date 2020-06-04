@@ -14,12 +14,13 @@ AUTH_SERVER_HOSTNAME = 'lannister'
 FILE_SERVER_HOSTNAME = 'tyrell'
 USERNAME = 'hackerspace_admin'
 
-def create_home_dirs(username_list: list, password: str=None):
+
+def create_home_dirs(username_list: list, password: str = None):
     """Sends the list of users to the file server and runs this script 
-    
+
     Arguments:
         username_list {list} -- [description]
-    
+
     Keyword Arguments:
         password {str} -- [description] (default: {None})
     """
@@ -28,9 +29,9 @@ def create_home_dirs(username_list: list, password: str=None):
     make_home_dirs_cmd = 'ssh -t hackerspace_admin@tyrell "sudo /nfshome/makehomedirs.sh {}"'.format(username_list_as_string)
 
     command_response_list = [
-                    (make_home_dirs_cmd, "hackerspace_admin@tyrell's password: ", None),
-                    (password, "[sudo] password for hackerspace_admin: ", None),
-                    (password, "$", None),
+        (make_home_dirs_cmd, "hackerspace_admin@tyrell's password: ", None),
+        (password, "[sudo] password for hackerspace_admin: ", None),
+        (password, "$", None),
     ]
 
     if not password:
@@ -49,10 +50,10 @@ def create_home_dirs(username_list: list, password: str=None):
         return False
 
 
-def create_users_from_ldif(ldif_content: str, ssh_connection=None, password: str=None):
+def create_users_from_ldif(ldif_content: str, ssh_connection=None, password=None):
     """Save an ldif file on the authenticationserver and run ldapadd command to create new users with it.
     Use the provided ssh connect if supplied, otherwise create one.
-    
+
     Arguments:
         ldif_content {str} -- string containing all the ldif entry to create the new users via `ldapadd`
         ssh_connection {[type]} -- [description]
@@ -67,7 +68,7 @@ def create_users_from_ldif(ldif_content: str, ssh_connection=None, password: str
             password = getpass("Enter the admin password: ")
 
         ssh_connection = SSH(AUTH_SERVER_HOSTNAME, USERNAME, password)
-                
+
     # remove old tmp ldif file if it exists
     ssh_connection.send_cmd('rm {}'.format(LDIF_FILENAME), print_stdout=False) # don't care about error if it doesn't exists
 
@@ -91,7 +92,7 @@ def create_users_from_ldif(ldif_content: str, ssh_connection=None, password: str
     # if we were passed an ssh connection, leave it open, otherwise close it.
     if close_connection:
         ssh_connection.close()
-    
+
     return success
 
 
@@ -128,9 +129,9 @@ homeDirectory: /home/{username}
 
 def get_next_avail_uid(start: int = None) -> int:
     """Check if {start} is available as a uid, then increase by one untill
-    an available uid is found.  If no {start} is provided, then the first number will 
+    an available uid is found.  If no {start} is provided, then the first number will
     be the two-digit year followed by three zeros.  E.g. in 2022 -> start = 22000
-    
+
     Keyword Arguments:
         start {int} -- The uid to check first (default: {None})
     """
@@ -156,7 +157,7 @@ def get_next_avail_uid(start: int = None) -> int:
 
 def get_new_username() -> str:
     """Asks for a new username and checks if it already exists or not
-    
+
     Returns:
         str -- the username if it's new, or {None} if it already exists or bad username
     """
@@ -179,11 +180,11 @@ def get_new_username() -> str:
 
 def get_new_users_names(username: str = None) -> tuple:
     """Primpts for a new user's first and last name
-    
+
     Arguments:
         username {str} -- the user's username.  If there is a dot, it will provide  default names assuming
         the username is firstname.lastname
-    
+
     Returns:
         tuple -- (firstname, lastname)
     """
@@ -207,7 +208,6 @@ def get_new_users_names(username: str = None) -> tuple:
         lastname = utils.input_styled(lastprompt).upper().strip() or (name_guess[1] if name_guess else "")  # noqa
         if not lastname:
             utils.print_error("They need a last name too buds.")
-
 
     # print(username, firstname or "(No first name provided)", lastname or "(No last name provided)")
 
@@ -236,42 +236,42 @@ def get_and_confirm_user():
         else:
             return username, fullname
 
-# def modify_user(username, changes_dict, password=None):
-#     """[summary]
 
-#     Args:
-#         username: ldap username
-#         changes_dict: a dictionary of ldif keys and their new values, e.g {'sn': 'COUTURE', 'givenName': TYLERE}
-#         password: admin password
-#     """
-#     if not password:
-#         password = getpass("Enter the admin password: ")
+def modify_user(username, ldif_changes_dict, password=None):
+    """[summary]
 
-#     ssh_connection = SSH(AUTH_SERVER_HOSTNAME, USERNAME, password)
-#     main_command = "sudo ldapmodifyuser {}".format(username)
-#     EOF = '\x04'  # Ctrl + D
+    Args:
+        username: ldap username
+        ldif_changes_dict: a dictionary of ldif keys and their new values, e.g {'sn': 'COUTURE', 'givenName': 'TYLERE'}
+        password: admin password
+    """
+    if not password:
+        password = getpass("Enter the admin password: ")
 
-#     command_response_list = [
-#         (main_command, "[sudo] password for hackerspace_admin: ", None),
-#         (password, "dc=tbl", None),
-#     ]
+    ssh_connection = SSH(AUTH_SERVER_HOSTNAME, USERNAME, password)
+    main_command = "sudo ldapmodifyuser {}".format(username)
+    EOF = '\x04'  # Ctrl + D
 
-#     for key, value in changes_dict.items():
-#         change_tuple = (f"replace: {key}\n{key})")
-#         command_response_list.append()
+    command_response_list = []
 
-#     command_response_list = [
-#                         (main_command, "[sudo] password for hackerspace_admin: ", None),
-#                         (password, "dc=tbl", None),
-#                         ("replace: gecos\ngecos: {} {}\n{}".format(new_first, new_last, EOF), '$', None),
-#                         (main_command, "dc=tbl", None),
-#                         ("replace: cn\ncn: {} {}\n{}".format(new_first, new_last, EOF), '$', None),
-#                         (main_command, "dc=tbl", None),
-#                         ("replace: displayName\ndisplayName: {}\n{}".format(new_last, EOF), '$', None),
-#                         (main_command, "dc=tbl", None),
-#                         ("replace: sn\nsn: {}\n{}".format(new_last, EOF), '$', None),
-#                         (main_command, "dc=tbl", None),
-#                         ("replace: givenName\ngivenName: {}\n{}".format(new_first, EOF), '$', None),
-#                         # (password, "[sudo] password for hackerspace_admin: ", None),
-#                         # (password, ":~/hs-ldap$", "Set owner on: /nfshome/{}".format(student_number)),
-#     ]
+    first = True
+    for key, value in ldif_changes_dict.items():
+        if first:
+            command_response_list.append((main_command, "[sudo] password for hackerspace_admin: ", None))
+            command_response_list.append((password, "dc=tbl", None))
+            first = False
+        else:
+            command_response_list.append((main_command, "dc=tbl", None))
+
+        change_tuple = (f"replace: {key}\n{key}: {value}\n{EOF}", '$', None)
+        command_response_list.append(change_tuple)
+
+    success = ssh_connection.send_interactive_commands(command_response_list)
+
+    if success:
+        utils.print_success("Looks like it worked to me?")
+        return True
+
+    else:
+        utils.print_error("Something appears to have gone wrong. Hopefully there's a useful error message somewhere up there.")
+        return False
