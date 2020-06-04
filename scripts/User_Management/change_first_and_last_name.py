@@ -29,23 +29,21 @@ def change_first_and_last_name ():
 
     password = getpass("Enter the admin password: ")
     ssh_connection = SSH(hostname, server_username, password)
-    main_command = "sudo ldapmodifyuser {}".format(username)
+    main_command = f"sudo ldapmodifyuser {username}"
     EOF = '\x04'  # Ctrl + D
 
     command_response_list = [
                         (main_command, "[sudo] password for hackerspace_admin: ", None),
                         (password, "dc=tbl", None),
-                        ("replace: gecos\ngecos: {} {}\n{}".format(new_first, new_last, EOF), '$', None),
+                        (f"replace: gecos\ngecos: {new_first} {new_last}\n{EOF}", '$', None),
                         (main_command, "dc=tbl", None),
-                        ("replace: cn\ncn: {} {}\n{}".format(new_first, new_last, EOF), '$', None),
+                        (f"replace: cn\ncn: {new_first} {new_last}\n{EOF}", '$', None),
                         (main_command, "dc=tbl", None),
-                        ("replace: displayName\ndisplayName: {}\n{}".format(new_last, EOF), '$', None),
+                        (f"replace: displayName\ndisplayName: {new_last}\n{EOF}", '$', None),
                         (main_command, "dc=tbl", None),
-                        ("replace: sn\nsn: {}\n{}".format(new_last, EOF), '$', None),
+                        (f"replace: sn\nsn: {new_last}\n{EOF}", '$', None),
                         (main_command, "dc=tbl", None),
-                        ("replace: givenName\ngivenName: {}\n{}".format(new_first, EOF), '$', None),
-                        # (password, "[sudo] password for hackerspace_admin: ", None),
-                        # (password, ":~/hs-ldap$", "Set owner on: /nfshome/{}".format(student_number)),
+                        (f"replace: givenName\ngivenName: {new_first}\n{EOF}", '$', None),
     ]
 
     success = ssh_connection.send_interactive_commands(command_response_list)

@@ -10,11 +10,6 @@ username = 'hackerspace_admin'
 default_pw = 'wolf'
 
 def reset_password():
-    # student_number = utils.input_styled(
-    #     'Enter the student number of the student whose password you want to reset to "{}": '.format(default_pw))
-
-    password = getpass("Enter the admin password: ")
-
     print("Who's password do you want to reset?")
 
     student_number, fullname = get_and_confirm_user()
@@ -22,6 +17,7 @@ def reset_password():
     if not student_number:
         return
     
+    password = getpass("Enter the admin password: ")
     ssh_connection = SSH(hostname, username, password)
 
     prompt_string = "{}@{}:~$".format(username, hostname)

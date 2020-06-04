@@ -37,13 +37,13 @@ def change_username ():
     command = "sudo ldaprenameuser {} {}".format(current_username, new_username)
     ssh_connection.send_cmd(command, sudo=True)
     ssh_connection.close()
+    
+    utils.print_warning("Now gonna change the name of their home directory to match the new username")
+    
+    ssh_connection = SSH(file_hostname, username, password)
+    command = "mv /nfshome/{} /nfshome/{}".format(current_username, new_username)
+    ssh_connection.send_cmd(command, sudo=True)
+    ssh_connection.close()
+    utils.print_success("Done!")
 
-    # Don't need to do this because ldap still has their original home directory info
-    
-    # utils.print_success("Now gonna change the name of their home directory to match the new username")
-    
-    # ssh_connection = SSH(file_hostname, username, password)
-    # command = "mv /nfshome/{} /nfshome/{}".format(current_username, new_username)
-    # ssh_connection.send_cmd(command, sudo=True)
-    # ssh_connection.close()
-    # utils.print_success("Done!")
+    # utils.print_warning("Now gonna tell LDAP where the new home directory is")

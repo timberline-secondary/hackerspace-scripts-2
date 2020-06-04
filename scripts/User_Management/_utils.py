@@ -235,3 +235,43 @@ def get_and_confirm_user():
             return None, None
         else:
             return username, fullname
+
+# def modify_user(username, changes_dict, password=None):
+#     """[summary]
+
+#     Args:
+#         username: ldap username
+#         changes_dict: a dictionary of ldif keys and their new values, e.g {'sn': 'COUTURE', 'givenName': TYLERE}
+#         password: admin password
+#     """
+#     if not password:
+#         password = getpass("Enter the admin password: ")
+
+#     ssh_connection = SSH(AUTH_SERVER_HOSTNAME, USERNAME, password)
+#     main_command = "sudo ldapmodifyuser {}".format(username)
+#     EOF = '\x04'  # Ctrl + D
+
+#     command_response_list = [
+#         (main_command, "[sudo] password for hackerspace_admin: ", None),
+#         (password, "dc=tbl", None),
+#     ]
+
+#     for key, value in changes_dict.items():
+#         change_tuple = (f"replace: {key}\n{key})")
+#         command_response_list.append()
+
+#     command_response_list = [
+#                         (main_command, "[sudo] password for hackerspace_admin: ", None),
+#                         (password, "dc=tbl", None),
+#                         ("replace: gecos\ngecos: {} {}\n{}".format(new_first, new_last, EOF), '$', None),
+#                         (main_command, "dc=tbl", None),
+#                         ("replace: cn\ncn: {} {}\n{}".format(new_first, new_last, EOF), '$', None),
+#                         (main_command, "dc=tbl", None),
+#                         ("replace: displayName\ndisplayName: {}\n{}".format(new_last, EOF), '$', None),
+#                         (main_command, "dc=tbl", None),
+#                         ("replace: sn\nsn: {}\n{}".format(new_last, EOF), '$', None),
+#                         (main_command, "dc=tbl", None),
+#                         ("replace: givenName\ngivenName: {}\n{}".format(new_first, EOF), '$', None),
+#                         # (password, "[sudo] password for hackerspace_admin: ", None),
+#                         # (password, ":~/hs-ldap$", "Set owner on: /nfshome/{}".format(student_number)),
+#     ]
