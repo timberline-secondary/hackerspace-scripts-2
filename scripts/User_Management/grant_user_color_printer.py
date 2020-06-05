@@ -17,7 +17,7 @@ def grant_user_color_printer():
     if not fullname:
         return False
 
-    if not utils.input_styled(f"Confirm you want to give {fullname} the ability to use the color printer?"):
+    if not utils.confirm(f"Confirm you want to give {fullname} the ability to use the color printer?"):
         return False
 
     password = getpass("Enter the admin password: ")
