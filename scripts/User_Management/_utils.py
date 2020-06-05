@@ -280,3 +280,17 @@ def modify_user(username, ldif_changes_dict, password=None):
     else:
         utils.print_error("Something appears to have gone wrong. Hopefully there's a useful error message somewhere up there.")
         return False
+
+
+def add_user_to_group(username, group, password=None):
+    if not password:
+        password = getpass("Enter the admin password: ")
+    ssh_connection = SSH(AUTH_SERVER_HOSTNAME, USERNAME, password)
+
+    command = f"ldapaddusertogroup {username} {group}"
+
+    success = ssh_connection.send_cmd(command, sudo=True)
+
+    if success:
+        utils.print_warning("The user will probably need to log out and back in again before the changes take effect.")
+    return success
