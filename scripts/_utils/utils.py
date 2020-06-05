@@ -139,7 +139,7 @@ def confirm(prompt, yes_is_default=True):
     else:
         yn_prompt = " y/[n] "
 
-    do_it = input_styled(ByteStyle.Y_N, prompt + yn_prompt)
+    do_it = input_styled(prompt + yn_prompt, color=ByteStyle.Y_N)
 
     if yes_is_default:
         if do_it == "" or do_it[0].lower() != 'n':

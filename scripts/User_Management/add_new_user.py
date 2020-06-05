@@ -16,9 +16,7 @@ def add_new_user():
     if not first_name:
         return False
 
-    create = utils.confirm(f"\nCreate account for {username} {first_name} {last_name}?", yes_is_default=False)
-
-    if create and create[0].lower() != 'y':
+    if not utils.confirm(f"\nCreate account for {username} {first_name} {last_name}?", yes_is_default=False):
         return False
 
     # generate ldif file
