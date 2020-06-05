@@ -224,7 +224,7 @@ def get_and_confirm_user():
     """ Ask for a username and checks if it exists. If it does, returns a tuple of
     (fullname, username), if it does not, will return None, username
     """
-    username = utils.input_styled("Enter username: \n")
+    username = utils.input_styled("Enter username: ")
     # password = getpass("Enter the admin password: ")
 
     fullname = utils.get_users_name(username)
