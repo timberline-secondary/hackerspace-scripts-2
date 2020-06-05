@@ -18,7 +18,7 @@ def add_new_user():
 
     create = utils.input_styled("Create account for {} {} {}? y/[n] \n".format(username, first_name, last_name))
 
-    if create[0].lower() != 'y':
+    if create and create[0].lower() != 'y':
         return False
 
     # generate ldif file
