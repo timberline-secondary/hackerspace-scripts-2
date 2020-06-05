@@ -190,15 +190,15 @@ def get_new_users_names(username: str = None) -> tuple:
         tuple -- (firstname, lastname)
     """
 
-    firstprompt = "First name: "
-    lastprompt = "Last name: "
+    # firstprompt = "First name: "
+    # lastprompt = "Last name: "
     # name_guess = None
     firstname = None
     lastname = None
     if username and '.' in username:
         name_guess = username.split(sep='.')
-        firstname_guess = name_guess[0].upper().strip())
-        lastname_guess = name_guess[1].upper().strip())
+        firstname_guess = name_guess[0].upper().strip()
+        lastname_guess = name_guess[1].upper().strip()
 
     while not firstname:
         firstname = utils.input_plus("First name", firstname_guess)
