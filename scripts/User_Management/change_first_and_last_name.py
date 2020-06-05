@@ -17,9 +17,9 @@ def change_first_and_last_name():
     new_first = utils.input_styled("What would you like to change their FIRST name to? ").upper()
     new_last = utils.input_styled("What would you like to change their LAST name to? ").upper()
 
-    confirmed = utils.input_styled(f"Confirm you want to change {fullname} to {new_first} {new_last}? y/[n] ")
+    confirmed = utils.confirm(f"Confirm you want to change {fullname} to {new_first} {new_last}?", yes_is_default=False)
 
-    if confirmed.lower() != 'y':
+    if not confirmed:
         print("Bailing...")
         return
 
