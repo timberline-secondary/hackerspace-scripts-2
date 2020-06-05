@@ -110,3 +110,18 @@ def host_exists(hostname, verbose=True):
         if verbose:
             print_success("{} found on the network.".format(hostname))
         return True
+
+
+def input_plus(prompt, default=None, validation_method=None):
+    """ Gets styled user input with a defualt value and option to quit """
+    hints_str = "[q]uit"
+
+    if default:
+        hints_str += f" | [Enter] = {default}"
+
+    prompt = prompt + "( " + hints_str + " ): "
+    response = input_styled(prompt).strip()
+    if response == "":  # they just hit enter for default, or None
+        return default
+    else:
+        return response  # could be "q" to quit

@@ -192,23 +192,28 @@ def get_new_users_names(username: str = None) -> tuple:
 
     firstprompt = "First name: "
     lastprompt = "Last name: "
-    if username and '.' in username:
-        name_guess = username.split(sep='.')
-        firstprompt += "[Enter = {}]".format(name_guess[0].upper().strip())
-        lastprompt += "[Enter = {}]".format(name_guess[1].upper().strip())
-    else:
-        name_guess = None
-
+    # name_guess = None
     firstname = None
     lastname = None
+    if username and '.' in username:
+        name_guess = username.split(sep='.')
+        firstname_guess = name_guess[0].upper().strip())
+        lastname_guess = name_guess[1].upper().strip())
+
     while not firstname:
-        firstname = utils.input_styled(firstprompt).upper().strip() or (name_guess[0] if name_guess else "")  # noqa
+        firstname = utils.input_plus("First name", firstname_guess)
+        # firstname = utils.input_styled(firstprompt).upper().strip() or (name_guess[0] if name_guess else "")  # noqa
         if not firstname:
             utils.print_error("Come on, I'm sure they have a name.  I need a name or I can't continue")
+        elif firstname == "q":
+            return
     while not lastname:
-        lastname = utils.input_styled(lastprompt).upper().strip() or (name_guess[1] if name_guess else "")  # noqa
+        lastname = utils.input_plus("Last name", lastname_guess)
+        # lastname = utils.input_styled(lastprompt).upper().strip() or (name_guess[1] if name_guess else "")  # noqa
         if not lastname:
             utils.print_error("They need a last name too buds.")
+        elif lastname == "q":
+            return
 
     # print(username, firstname or "(No first name provided)", lastname or "(No last name provided)")
 
