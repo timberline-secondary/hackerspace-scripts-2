@@ -13,7 +13,8 @@ class ByteStyle:
     BOLD = '\033[1m'  # makes it bold
     UNDERLINE = '\033[4m'  # underlines
     INPUT = '\033[1;33m'  # bold yellow
-    Y_N = '\033[0;33m'  # dark yellow (brown)
+    # Y_N = '\033[0;33m'  # dark yellow (brown)
+    Y_N = '\033[36m'  # cyan
 
 
 def print_styled(text, color):
@@ -138,7 +139,7 @@ def confirm(prompt, yes_is_default=True):
     else:
         yn_prompt = " y/[n] "
 
-    do_it = input_styled(prompt + yn_prompt)
+    do_it = input_styled(ByteStyle.Y_N, prompt + yn_prompt)
 
     if yes_is_default:
         if do_it == "" or do_it[0].lower() != 'n':

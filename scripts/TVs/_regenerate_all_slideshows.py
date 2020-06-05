@@ -7,12 +7,13 @@ from .refresh_slideshow import copy_movie_maker_to_host, generate_new_movie_file
 
 from scripts.TVs._utils import TV_FILE_SERVER, TV_FILE_SERVER_PW, TV_FILE_SERVER_USER, TV_ROOT
 
+
 def regenerate_all_slideshows():
     utils.print_warning("This takes a LONG time, best to start this after school to let it run for few hours!")
 
-    do_it = utils.input_styled("Are you sure you want to recreate all the slideshow videos? y/[n] ")
+    do_it = utils.confirm("Are you sure you want to recreate all the slideshow videos?", yes_is_default=False)
 
-    if do_it != 'y':
+    if not do_it:
         return
 
     # connects and checks to see if file with the same name already exisits
@@ -22,7 +23,7 @@ def regenerate_all_slideshows():
     copy_movie_maker_to_host(ssh_connection)
 
     # Cycle through TV directories
-    for tv in range(1,5):
+    for tv in range(1, 5):
         filepath = "{}/tv{}/".format(TV_ROOT, tv)
         command = 'ls {}'.format(filepath)
         dir_contents = ssh_connection.send_cmd(command, print_stdout=False).split()
@@ -34,7 +35,7 @@ def regenerate_all_slideshows():
             not_a_dir = ssh_connection.send_cmd(test_dir_cmd, print_stdout=False)
             # note this is an empty string if dir exists
             if not_a_dir:
-                continue # skip to next one
+                continue  # skip to next one
 
             utils.print_success("Found art folder for {} on TV# {}".format(student_number, tv))
 
@@ -45,6 +46,3 @@ def regenerate_all_slideshows():
         utils.print_success("\nFinished TV #{}\n".format(tv))
 
     utils.print_success("Done!")
-
-
-    
