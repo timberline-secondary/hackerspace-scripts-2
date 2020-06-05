@@ -24,7 +24,7 @@ def change_username():
     if not new_username:
         return False
 
-    if not utils.confirm(f"Confirm you want to change {current_username} to {new_username}?"):
+    if not utils.confirm(f"Confirm you want to change {current_username} to {new_username}?", yes_is_default=False):
         print("Bailing...")
         return False
 
