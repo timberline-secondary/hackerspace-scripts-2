@@ -128,3 +128,25 @@ def input_plus(prompt, default=None, validation_method=None):
         return response 
     else:
         return response
+
+
+def confirm(prompt, yes_is_default=True):
+    """Ask the use to confirm an action (the prompt) with y or n."""
+
+    if yes_is_default:
+        yn_prompt = " [y]/n "
+    else:
+        yn_prompt = " y/[n] "
+
+    do_it = input_styled(prompt + yn_prompt)
+
+    if yes_is_default:
+        if do_it == "" or do_it[0].lower() != 'n':
+            return True
+        else:
+            return False
+    else:
+        if do_it == "" or do_it[0].lower() != 'y':
+            return False
+        else:
+            return True

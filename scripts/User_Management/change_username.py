@@ -24,10 +24,14 @@ def change_username():
     if not new_username:
         return False
 
-    confirmed = utils.input_styled("Confirm you want to change {} to {}? y/[n] ".format(current_username, new_username))
-    if confirmed.lower() != 'y':
+    if not utils.confirm(f"Confirm you want to change {current_username} to {new_username}?"):
         print("Bailing...")
         return False
+
+    # confirmed = utils.input_styled("Confirm you want to change {} to {}? y/[n] ".format(current_username, new_username))
+    # if confirmed.lower() != 'y':
+    #     print("Bailing...")
+    #     return False
 
     password = getpass("Enter the admin password: ")
     ssh_connection = SSH(auth_hostname, username, password)
