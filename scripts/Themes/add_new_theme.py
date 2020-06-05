@@ -1,12 +1,12 @@
 import os
 from urllib.parse import urlparse
-from urllib.request import urlopen
 from scripts._utils import pi
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
 hostname = "pi-themes"
+
 
 def add_new_theme():
     #gets and checks the url of the file
@@ -66,16 +66,15 @@ def add_new_theme():
 
             # asks user if they want to overwrite https://www.quora.com/I%E2%80%99m-new-to-Python-how-can-I-write-a-yes-no-question
             if already_exists == True:
-                overwrite = utils.input_styled("There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n",
-                    utils.ByteStyle.WARNING, 
-                    )
-                if not overwrite or overwrite.lower()[0] == "n":
+                overwrite = utils.confirm(
+                    "There is a file that already exists with that name. Do you want to overwrite it?", 
+                    yes_is_default=False
+                )
+                if not overwrite:
                     mp3_url = True
-                elif overwrite.lower()[0] == "y":
+                else:
                     already_exists = False
                     pass
-                else:
-                    utils.print_styled("(y/n)", color=utils.ByteStyle.Y_N)
             elif already_exists == False:
                 pass
             else:
@@ -85,13 +84,11 @@ def add_new_theme():
             if already_exists == False:
                 ssh_connection.send_cmd(command)
 
-            another_code = utils.input_styled("Would you like to add another code? ([y]/n) \n", color=utils.ByteStyle.Y_N)
-            if not another_code or another_code.lower()[0] == "y":
+            another_code = utils.confirm("Would you like to add another code?")
+            if another_code:
                 mp3_url = True
                 pass
-            elif another_code.lower()[0] == "n":
-                mp3_url = False
             else:
-                utils.print_styled("(y/n)", utils.ByteStyle.Y_N, )
-            #closes ssh connection
+                mp3_url = False
+
             ssh_connection.close()
