@@ -35,10 +35,4 @@ def change_first_and_last_name():
 
     success = user_utils.modify_user(username, ldif_changes_dict)
 
-    if success:
-        utils.print_success("Looks like it worked to me? Here's the new entry:")
-        users_name = utils.get_users_name(username)
-        utils.print_success(f"{username}: {users_name}")
-
-    else:
-        utils.print_error("Something appears to have gone wrong. Hopefully there's a useful error message somewhere up there.")
+    return success

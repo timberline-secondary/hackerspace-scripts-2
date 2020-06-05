@@ -63,14 +63,14 @@ def add_new_media(username=None, tv=None):
             username = username_input
 
         tv = guess_tv(username)
-        tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): \n".format(tv))
+        tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): ".format(tv))
         if not tv_input:
             pass
         else:
             tv = tv_input
 
         image_name = None
-        name_good = utils.input_styled("What is the name of this image? (default = {}): \n".format(name_without_ext))
+        name_good = utils.input_styled("What is the name of this image? (default = {}): ".format(name_without_ext))
         if not name_good:
             image_name = name_without_ext
         else:
@@ -95,15 +95,17 @@ def add_new_media(username=None, tv=None):
 
         # if it does exist, asks user if they want to overwrite it
         while already_exists:
-            should_we_overwrite = utils.input_styled(
-                utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
-            if not should_we_overwrite or should_we_overwrite.lower()[0] == 'n':
+            should_we_overwrite = utils.confirm(
+                "There is a file that already exists with that name. Do you want to overwrite it?",
+                yes_is_default=False
+            )
+            if should_we_overwrite:
                 # calls the function to run through the name and extension grabbing process again
                 media_url, name_without_ext, extension = get_media_url()
                 if media_url is None:
                     return
                 # asks user to change name of it
-                name_good = utils.input_styled(utils.ByteStyle.Y_N, "What is the name of this image? \n")
+                name_good = utils.input_styled("What is the name of this image? \n")
                 if not name_good:
                     image_name = name_without_ext
                 else:
@@ -112,13 +114,11 @@ def add_new_media(username=None, tv=None):
                     command = "wget -O /home/pi-slideshow/tv{}/{} {} && exit".format(tv, filename, media_url)
                     already_exists = False
                     pass
-            elif should_we_overwrite.lower()[0] == 'y':
+            else:
                 already_exists = False
                 pass
-            else:
-                utils.print_styled("(y/n)", utils.ByteStyle.Y_N)
 
-        # if file does not exist already, it wgets it and places it in the correct tv folder
+        #  if file does not exist already, it wgets it and places it in the correct tv folder
         if already_exists:
 
             # make sure the directory exists, if not create it:
@@ -132,14 +132,12 @@ def add_new_media(username=None, tv=None):
             utils.print_error("Something went wrong. Expected true or false but got something else")
 
         # asks user if they want to add another image
-        another_image = utils.input_styled("Would you like to add another image? ([y]/n) \n")
-        if another_image.lower()[0] == "n":
-            break
-        else:
+        if utils.confirm("Would you like to add another image?"):
             media_url = True
+        else:
+            break
 
     ssh_connection.close()
 
-    make_movie = utils.input_styled("Do you want to generate a new video slideshow of this student's art? ([y]/n) \n")
-    if not make_movie or make_movie.lower()[0] != "n":
+    if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
         refresh_slideshow(student_number=username)
