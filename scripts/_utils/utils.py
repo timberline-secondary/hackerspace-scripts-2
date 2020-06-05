@@ -123,5 +123,8 @@ def input_plus(prompt, default=None, validation_method=None):
     response = input_styled(prompt).strip()
     if response == "":  # they just hit enter for default, or None
         return default
+    elif response == "q":
+        print("quitting...")
+        return response 
     else:
-        return response  # could be "q" to quit
+        return response
