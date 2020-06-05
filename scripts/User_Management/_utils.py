@@ -236,10 +236,10 @@ def get_and_confirm_user():
         utils.print_success("Found {}: {}.".format(username, fullname))
         is_correct_user = utils.confirm("Is this the correct student?", yes_is_default=False)
 
-        if is_correct_user.lower() != 'y':
-            return None, username
-        else:
+        if is_correct_user:
             return fullname, username
+        else:
+            return None, username
 
 
 def modify_user(username, ldif_changes_dict, password=None):
