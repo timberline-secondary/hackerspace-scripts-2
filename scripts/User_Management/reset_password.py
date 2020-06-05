@@ -23,6 +23,7 @@ def reset_password():
     prompt_string = "{}@{}:~$".format(username, hostname)
     command_response_list = [
         ("sudo passwd {}".format(student_number), "[sudo] password for {}:".format(username), None),
+        (password, "LDAP administrator password: ", None),
         (password, "New password: ", None),
         ("wolf", "Re-enter new password: ", None),
         ("wolf", prompt_string, "password updated successfully"),
