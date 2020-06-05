@@ -25,7 +25,7 @@ def reset_password():
         ("sudo passwd {}".format(student_number), "[sudo] password for {}:".format(username), None),
         (password, "LDAP administrator password: ", None),
         (password, "New password: ", None),
-        ("wolf", "Re-enter new password: ", None),
+        ("wolf", "Retype new password: ", None),
         ("wolf", prompt_string, "password updated successfully"),
     ]
     success = ssh_connection.send_interactive_commands(command_response_list)
