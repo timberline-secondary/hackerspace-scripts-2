@@ -9,6 +9,7 @@ CODE_DIR = 'stormLauncher'
 
 FULL_DIR = STORM_LAUNCHER_LOCATION + os.sep + STORM_LAUNCHER_DIR + os.sep + CODE_DIR
 
+
 def missile():
 
     # check if everything is already installed.  If not, install it.
@@ -22,6 +23,7 @@ def missile():
     # os.system(command)
     subprocess.run(command, shell=True, check=True)
     # proc = subprocess.Popen(command, shell=True)
+
 
 def setup_stormLauncher():
     utils.print_warning("\nSTORMLAUNCHER has not been installed on this profile yet.  I'm gonna install it for you now...\n")
