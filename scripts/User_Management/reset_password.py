@@ -12,9 +12,8 @@ default_pw = 'wolf'
 def reset_password():
     print("Who's password do you want to reset?")
 
-    student_number, fullname = get_and_confirm_user()
-
-    if not student_number:
+    fullname, student_number = get_and_confirm_user()
+    if not fullname:
         return
     
     password = getpass("Enter the admin password: ")

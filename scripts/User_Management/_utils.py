@@ -1,4 +1,5 @@
-import os, socket, pwd, re
+import pwd
+import re
 from getpass import getpass
 from datetime import date
 
@@ -16,13 +17,13 @@ USERNAME = 'hackerspace_admin'
 
 
 def create_home_dirs(username_list: list, password: str = None):
-    """Sends the list of users to the file server and runs this script 
+    """Sends the list of users to the file server and runs a script on that server to generate new home directories
 
     Arguments:
-        username_list {list} -- [description]
+        username_list {list} -- list of usernames to generate home directories for
 
     Keyword Arguments:
-        password {str} -- [description] (default: {None})
+        password {str} -- file server password (default: {None})
     """
     username_list_as_string = " ".join(username_list)
 
@@ -70,11 +71,10 @@ def create_users_from_ldif(ldif_content: str, ssh_connection=None, password=None
         ssh_connection = SSH(AUTH_SERVER_HOSTNAME, USERNAME, password)
 
     # remove old tmp ldif file if it exists
-    ssh_connection.send_cmd('rm {}'.format(LDIF_FILENAME), print_stdout=False) # don't care about error if it doesn't exists
+    ssh_connection.send_cmd('rm {}'.format(LDIF_FILENAME), print_stdout=False)  # don't care about error if it doesn't exists
 
     # save the ldif file to lannister
     ssh_connection.send_cmd('echo -e "{}" >> {}'.format(ldif_content, LDIF_FILENAME))
-
 
     # use the ldif file to create the user with `ldapadd`
     # https://linux.die.net/man/1/ldapadd
@@ -84,8 +84,8 @@ def create_users_from_ldif(ldif_content: str, ssh_connection=None, password=None
     # -f Read the entry modification information from file instead of from standard input. 
     ldap_add_cmd = "ldapadd -x -D cn=admin,dc=hackerspace,dc=tbl -W -f {}".format(LDIF_FILENAME)
     command_response_list = [
-                        (ldap_add_cmd, "Enter LDAP Password: ", None),
-                        (password, "$", "adding new entry"),
+        (ldap_add_cmd, "Enter LDAP Password: ", None),
+        (password, "$", "adding new entry"),
     ]
     success = ssh_connection.send_interactive_commands(command_response_list)
 
@@ -162,7 +162,8 @@ def get_new_username() -> str:
         str -- the username if it's new, or {None} if it already exists or bad username
     """
 
-    username = utils.input_styled("What is the new username? (must start with a letter, then any combo of letters, numbers, or _-.) ")
+    username = utils.input_styled(
+        "What is the new username? (must start with a letter, then any combo of letters, numbers, or _-.) ")
     username = username.lower().strip()
     # make sure it's valid
     if not re.match(r'^[a-zA-Z][\w\-._]+$', username):
@@ -216,7 +217,7 @@ def get_new_users_names(username: str = None) -> tuple:
 
 def get_and_confirm_user():
     """ Ask for a username and checks if it exists. If it does, returns a tuple of
-    (username, fullname)
+    (fullname, username), if it does not, will return None, username
     """
     username = utils.input_styled("Enter username: \n")
     # password = getpass("Enter the admin password: ")
@@ -224,17 +225,16 @@ def get_and_confirm_user():
     fullname = utils.get_users_name(username)
 
     if fullname is None:
-        utils.print_warning("I couldn't find an account for {}.  Sorry!".format(username))
-        return None, None
+        utils.print_warning("I couldn't find an account for user {}.".format(username))
+        return None, username
     else:
         utils.print_success("Found {}: {}.".format(username, fullname))
         is_correct_user = utils.input_styled("Is this the correct student? y/[n] ")
 
         if is_correct_user.lower() != 'y':
-            print("Bailing...")
-            return None, None
+            return None, username
         else:
-            return username, fullname
+            return fullname, username
 
 
 def modify_user(username, ldif_changes_dict, password=None):

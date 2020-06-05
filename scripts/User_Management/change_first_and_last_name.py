@@ -8,8 +8,8 @@ server_username = 'hackerspace_admin'
 
 def change_first_and_last_name():
 
-    username, fullname = user_utils.get_and_confirm_user()
-    if not username:
+    fullname, username = user_utils.get_and_confirm_user()
+    if not fullname:
         return False
 
     print("OK, let's do this! Please enter first and last names seperately. They will be converted to all upper case.")

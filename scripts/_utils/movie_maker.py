@@ -1,9 +1,9 @@
 import os
-import sys
 import argparse
 
+
 def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_image=7, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow.mp4'):
-    
+  
     #  https://superuser.com/questions/833232/create-video-with-5-images-with-fadein-out-effect-in-ffmpeg/834035#834035
     image_files = sorted(os.listdir(images_directory)) # want them alphabetical so title image comes first!
 

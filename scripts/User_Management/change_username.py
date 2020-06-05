@@ -14,8 +14,8 @@ def change_username():
 
     utils.print_warning("\nMake sure the student is logged out before making this change!\n")
 
-    current_username, _fullname = user_utils.get_and_confirm_user() 
-    if not current_username:
+    fullname, current_username = user_utils.get_and_confirm_user() 
+    if not fullname:
         return False
 
     print("OK, let's do this!")

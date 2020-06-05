@@ -77,5 +77,3 @@ def remove_media(student_number=None, tv=None):
             ssh_connection.close()
             utils.print_warning("\nDon't forget to refresh the user's video slideshow!\n")
             return True
-    
-    # keep going...

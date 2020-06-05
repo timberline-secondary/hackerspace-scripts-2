@@ -3,36 +3,37 @@ from urllib.parse import urlparse
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
-from scripts._utils.movie_maker import movie_maker
 
 from scripts.TVs.refresh_slideshow import refresh_slideshow
 
 from scripts.TVs._utils import mime_types, guess_tv, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW, TV_ROOT
 
-#this code worked on by Nicholas (Tseilorin) Hopkins
+# this code worked on by Nicholas (Tseilorin) Hopkins
+
 
 def is_video(file_extension):
     """ file should already have mimetype checked at this point! """
     video_extensions = [".avi", ".mpeg", ".mp4", ".ogv", ".webm", ".mkv"]
     return file_extension.lower() in video_extensions
 
+
 def get_media_url():
 
     mime_type_good = False
-    #creates a loop so it alwasy goes back to the start instead of exiting the code
+    # creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
         media_url = utils.input_styled("Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url: \n")
 
         if media_url == "q":
             return None, None, None
 
-        #takes url and breaks it into name with no extension, and the extension into variables
+        # takes url and breaks it into name with no extension, and the extension into variables
         parsed_url_tuple = urlparse(media_url)
         name_with_ext = os.path.basename(parsed_url_tuple.path)
         name_without_ext, extension = os.path.splitext(name_with_ext)
 
         # verifies mime type
-        expected_mime_type = None # Reset
+        expected_mime_type = None  # Reset
         try:
             expected_mime_type = mime_types[extension.lower()]
         except KeyError:
@@ -42,19 +43,19 @@ def get_media_url():
         # checks if file is what it really says it is
         mime_type_good = utils.verify_mimetype(media_url, expected_mime_type)
 
-        #returns necessary veriables to continue the code once mime type has been verified
+        # returns necessary veriables to continue the code once mime type has been verified
     return media_url, name_without_ext, extension
 
 
 def add_new_media(username=None, tv=None):
     media_url = True
-    while media_url == True:
-        #gets and checks the url of the file
+    while media_url:
+        # gets and checks the url of the file
         media_url, name_without_ext, extension = get_media_url()
         if media_url is None:
             return
 
-        #collects information to name the file, and as to which tv to send it to
+        # collects information to name the file, and as to which tv to send it to
         username_input = utils.input_styled("Enter username (default = {}): \n".format(username))
         if not username_input:
             pass
@@ -88,23 +89,20 @@ def add_new_media(username=None, tv=None):
 
         command = "wget -O {}{} {} && exit".format(filepath, filename, media_url)
 
-        hostname = TV_FILE_SERVER
-        username = TV_FILE_SERVER_USER
-        password = TV_FILE_SERVER_PW
-
-        #connects and checks to see if file with the same name already exisits
-        ssh_connection = SSH(hostname, username, password)
+        # connects and checks to see if file with the same name already exisits
+        ssh_connection = SSH(TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW)
         already_exists = ssh_connection.file_exists(filepath, filename)
 
-        #if it does exist, asks user if they want to overwrite it
-        while already_exists == True:
-            should_we_overwrite = utils.input_styled(utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
+        # if it does exist, asks user if they want to overwrite it
+        while already_exists:
+            should_we_overwrite = utils.input_styled(
+                utils.ByteStyle.WARNING, "There is a file that already exists with that name. Do you want to overwrite it? (y/[n]) \n")
             if not should_we_overwrite or should_we_overwrite.lower()[0] == 'n':
-                #calls the function to run through the name and extension grabbing process again
+                # calls the function to run through the name and extension grabbing process again
                 media_url, name_without_ext, extension = get_media_url()
                 if media_url is None:
                     return
-                #asks user to change name of it
+                # asks user to change name of it
                 name_good = utils.input_styled(utils.ByteStyle.Y_N, "What is the name of this image? \n")
                 if not name_good:
                     image_name = name_without_ext
@@ -120,8 +118,8 @@ def add_new_media(username=None, tv=None):
             else:
                 utils.print_styled("(y/n)", utils.ByteStyle.Y_N)
 
-        # if file does not exist already it wgets it and places it in the correct tv folder
-        if already_exists == False:
+        # if file does not exist already, it wgets it and places it in the correct tv folder
+        if already_exists:
 
             # make sure the directory exists, if not create it:
             if not ssh_connection.file_exists(filepath):
@@ -135,19 +133,13 @@ def add_new_media(username=None, tv=None):
 
         # asks user if they want to add another image
         another_image = utils.input_styled("Would you like to add another image? ([y]/n) \n")
-        if not another_image or another_image.lower()[0] == "y":
-            media_url = True
-        elif another_image.lower()[0] == "n":
-            pass
+        if another_image.lower()[0] == "n":
+            break
         else:
-            utils.print_styled( "(y/n)", utils.ByteStyle.Y_N)
+            media_url = True
 
     ssh_connection.close()
 
     make_movie = utils.input_styled("Do you want to generate a new video slideshow of this student's art? ([y]/n) \n")
-    if not make_movie or make_movie.lower()[0] == "y":
+    if not make_movie or make_movie.lower()[0] != "n":
         refresh_slideshow(student_number=username)
-    elif make_movie.lower()[0] == "n":
-        pass
-    else:
-        utils.print_styled("(y/n)", utils.ByteStyle.Y_N)

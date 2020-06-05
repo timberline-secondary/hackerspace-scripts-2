@@ -1,4 +1,3 @@
-import os
 import pwd
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -20,14 +19,18 @@ class ByteStyle:
 def print_styled(text, color):
     print(color + text + ByteStyle.ENDC)
 
+
 def print_success(text):
     print_styled(text, color=ByteStyle.SUCCESS)
+
 
 def print_warning(text):
     print_styled(text, color=ByteStyle.WARNING)
 
+
 def print_error(text):
     print_styled(text, color=ByteStyle.ERROR)
+
 
 def input_styled(text, color=ByteStyle.INPUT):
     return input(color + text + ByteStyle.ENDC).strip()
@@ -36,10 +39,10 @@ def input_styled(text, color=ByteStyle.INPUT):
 def print_heading(title):
     width = 60
     title = title.upper()
-    if len(title) > width-4:
-        title = title[:width-7] + "..."
+    if len(title) > width - 4:
+        title = title[:width - 7] + "..."
     print_styled("#" * width, color=ByteStyle.HEADER)
-    print_styled("#" + title.center(width-2, " ") + "#", color=ByteStyle.HEADER)
+    print_styled("#" + title.center(width - 2, " ") + "#", color=ByteStyle.HEADER)
     print_styled("#" * width, color=ByteStyle.HEADER)
     print()
 
@@ -48,13 +51,13 @@ def verify_mimetype(file_url, mimetype_string):
     if mimetype_string is None:
         print_error(" This media type is not supported.")
         return False
-        
+
     file_url = file_url.strip()
     try:
         with urlopen(file_url) as response:
             ct = response.info().get_content_type()
             if ct == mimetype_string:
-                print_success( "File looks good.")
+                print_success("File looks good.")
                 return True
             else:
                 print_error("Something is funky about this file. I expected type '{}' but got '{}'.".format(mimetype_string, ct))
@@ -66,6 +69,7 @@ def verify_mimetype(file_url, mimetype_string):
 
     return False
 
+
 def user_exists(username):
     try:
         pwd.getpwnam(username)
@@ -73,33 +77,36 @@ def user_exists(username):
     except KeyError:
         return False
 
+
 def get_users_name(username: str):
     """Returns the first and last name (per gecos field) for a given username
     https://docs.python.org/3/library/pwd.html
-    
+
     Arguments:
         username {str} -- ldap username
-    
+
     Returns:
         [str] -- The user's Name (in gecos field) if they exist, else None if username doesn't exist
     """
     try:
         return pwd.getpwnam(username).pw_gecos
     except KeyError:
+        print(f"Can't find that username: {username}")
         return None
 
+
 def host_exists(hostname, verbose=True):
-        ping_cmd = ['ping', '-c 1', '-W 1', hostname] # ping once with 1 second wait/time out
+    ping_cmd = ['ping', '-c 1', '-W 1', hostname]  # ping once with 1 second wait/time out
+    if verbose:
+        print_warning("Checking to see if {} is connected to the network.".format(hostname))
+
+    compeleted = run(ping_cmd)
+
+    if compeleted.returncode != 0:  # not success
         if verbose:
-            print_warning("Checking to see if {} is connected to the network.".format(hostname))
-
-        compeleted = run(ping_cmd)
-
-        if compeleted.returncode != 0: # not success
-            if verbose:
-                print_error("{} was not found on the network.  Is there a typo? Is the computer on?".format(hostname))
-            return False
-        else:
-            if verbose:
-                print_success("{} found on the network.".format(hostname))
-            return True
+            print_error("{} was not found on the network.  Is there a typo? Is the computer on?".format(hostname))
+        return False
+    else:
+        if verbose:
+            print_success("{} found on the network.".format(hostname))
+        return True
