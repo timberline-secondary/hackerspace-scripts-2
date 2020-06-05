@@ -119,7 +119,7 @@ def input_plus(prompt, default=None, validation_method=None):
     if default:
         hints_str += f" | [Enter] = {default}"
 
-    prompt = prompt + "( " + hints_str + " ): "
+    prompt = prompt + " (" + hints_str + "): "
     response = input_styled(prompt).strip()
     if response == "":  # they just hit enter for default, or None
         return default

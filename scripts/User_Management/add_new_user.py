@@ -13,6 +13,8 @@ def add_new_user():
         return False
 
     first_name, last_name = user_utils.get_new_users_names(username)
+    if not first_name:
+        return False
 
     create = utils.input_styled("Create account for {} {} {}? y/[n] \n".format(username, first_name, last_name))
 

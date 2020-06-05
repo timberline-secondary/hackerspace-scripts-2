@@ -206,14 +206,14 @@ def get_new_users_names(username: str = None) -> tuple:
         if not firstname:
             utils.print_error("Come on, I'm sure they have a name.  I need a name or I can't continue")
         elif firstname == "q":
-            return
+            return None, None
     while not lastname:
         lastname = utils.input_plus("Last name", lastname_guess)
         # lastname = utils.input_styled(lastprompt).upper().strip() or (name_guess[1] if name_guess else "")  # noqa
         if not lastname:
             utils.print_error("They need a last name too buds.")
         elif lastname == "q":
-            return
+            return None, None
 
     # print(username, firstname or "(No first name provided)", lastname or "(No last name provided)")
 
