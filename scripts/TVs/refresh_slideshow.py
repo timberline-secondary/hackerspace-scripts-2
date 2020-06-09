@@ -7,7 +7,7 @@ from scripts.TVs._utils import TV_FILE_SERVER, TV_FILE_SERVER_PW, TV_FILE_SERVER
 def refresh_slideshow(username=None):
 
     if not username:
-        username = utils.input_styled("Enter Student Number: \n")
+        username = utils.input_styled("Enter username: \n")
 
     # connects and checks to see if file with the same name already exisits
     ssh_connection = SSH(TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW)
@@ -48,7 +48,21 @@ def generate_new_movie_file(ssh_connection, username, tv, silent=False):
     ssh_connection.send_cmd(cmd)
 
     # move the file into the proper location
-    ssh_connection.send_cmd('mv {} {}/tv{}/{}.a.mp4'.format(output, TV_ROOT, tv, username))
+    success = ssh_connection.send_cmd('cp {} {}/tv{}/{}.a.mp4'.format(output, TV_ROOT, tv, username))
 
-    if not silent:
-        utils.print_success("Video created!")
+    if success == '':
+        if not silent:
+            # copy so still avail for tv 4 move
+            utils.print_success(f"Video created and placed on tv {tv}.")
+
+        # also place on tv4
+        if tv != 4:
+            success = ssh_connection.send_cmd('cp {} {}/tv4/{}.a.mp4'.format(output, TV_ROOT, username))
+            if success == '':
+                if not silent:
+                    utils.print_success("Also placed on tv 4.")
+            else:
+                utils.print_error(f"Something went wrong sending to tv4.")
+
+    else:
+        utils.print_error(f"Something went wrong sending to tv {tv}.")

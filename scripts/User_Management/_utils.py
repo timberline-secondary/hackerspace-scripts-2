@@ -222,12 +222,12 @@ def get_new_users_names(username: str = None) -> tuple:
     return firstname.upper().strip(), lastname.upper().strip()
 
 
-def get_and_confirm_user():
-    """ Ask for a username and checks if it exists. If it does, returns a tuple of
+def get_and_confirm_user(username=None):
+    """ Ask for a username (if not provided) and checks if it exists. If it does, returns a tuple of
     (fullname, username), if it does not, will return None, username
     """
-    username = utils.input_styled("Enter username: ")
-    # password = getpass("Enter the admin password: ")
+    if not username:
+        username = utils.input_styled("Enter username: ")
 
     fullname = utils.get_users_name(username)
 
