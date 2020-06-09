@@ -49,8 +49,8 @@ def rename_all_users():
                 utils.print_warning("This user doesn't exist, skipping {}".format(student_number))
                 continue  # go to next user
 
-            new_username = user_utils.parse_username_from_email(row[5])
-            print(new_username)
+            new_username = user_utils.parse_username_from_email(row[4])
+            print(student_number, new_username)
 
             # Check if user already exists or not
             user_list.append((student_number, new_username))
