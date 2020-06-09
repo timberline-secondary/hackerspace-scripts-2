@@ -2,7 +2,7 @@
 import os
 import sys
 from collections import OrderedDict
-from importlib import import_module
+# from importlib import import_module
 from pip._internal import main as pipmain
 
 from scripts._utils import utils
@@ -65,6 +65,7 @@ def print_menu(menu_items, title, quit_option=True, back_option=False):
 
     return choice
 
+
 def pip_install():
     utils.print_warning("Checking to see if all necassary pip modules are installed. \n")
     pipmain(['install', 'paramiko'])
@@ -72,13 +73,14 @@ def pip_install():
     utils.print_success("Everything is installed!")
     os.system('clear')
 
+
 def control_panel():
 
     try:
         # get modules
         module_dict = load_modules()
 
-        pip_install()
+        # pip_install()  # use requirements.txt
 
         while True:
             menu_items = list(module_dict.keys())
@@ -86,7 +88,7 @@ def control_panel():
 
             if menu_choice == 'q':
                 break
-            
+
             try:
                 module_choice = menu_items[int(menu_choice)]
 
@@ -107,7 +109,8 @@ def control_panel():
                 sub_module_key = menu_items[int(sub_module_choice_str)]
 
             except ValueError:
-                input("\nBleep bloop, sorry, I didn't understand that.  Can you speak slower? I'm just a simple menu...[hit Enter to continue]\n")
+                input(
+                    "\nBleep bloop, sorry, I didn't understand that.  Can you speak slower? I'm just a simple menu...[hit Enter to continue]\n")
 
                 continue
             except IndexError:

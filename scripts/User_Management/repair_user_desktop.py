@@ -7,6 +7,7 @@ from scripts._utils.ssh import SSH
 hostname = 'tyrell'
 username = 'hackerspace_admin'
 
+
 def repair_user_desktop():
     ssh_connection = SSH(hostname, username)
     print_warning("Make sure the student is logged out before running this repair.\n")
