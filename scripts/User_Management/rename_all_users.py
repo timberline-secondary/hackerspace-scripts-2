@@ -56,6 +56,6 @@ def rename_all_users():
             user_list.append((student_number, new_username))
 
     for sn, new_username in user_list:
-        change_username(current_username=sn, new_username=new_username, auto=False, password=password)
+        change_username(current_username=sn, new_username=new_username, auto=True, password=password)
 
     print("All done!")
