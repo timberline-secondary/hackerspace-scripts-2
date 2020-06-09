@@ -296,3 +296,10 @@ def add_user_to_group(username, group, password=None):
     if success:
         utils.print_warning("The user will probably need to log out and back in again before the changes take effect.")
     return success
+
+
+def parse_username_from_email(username: str) -> str:
+    """ Takes a username in the format firstname.lastname or 
+    firstname.lastname@stu.sd72.bc.ca and returns only firstname.lastname 
+    """
+    return username.split("@")[0]

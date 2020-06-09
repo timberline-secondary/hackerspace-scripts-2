@@ -2,7 +2,7 @@ import os
 import csv
 
 from scripts._utils import utils
-from scripts._utils.ssh import SSH
+
 from getpass import getpass
 from scripts.User_Management._utils import generate_ldif_entry, get_next_avail_uid, create_users_from_ldif, create_home_dirs
 
@@ -94,7 +94,7 @@ def import_new_users():
     print("All done!")
 
 
-def parse_username(username: str) -> str:
+def parse_username_from_email(username: str) -> str:
     """ Takes a username in the format firstname.lastname or 
     firstname.lastname@stu.sd72.bc.ca and returns only firstname.lastname 
     """
