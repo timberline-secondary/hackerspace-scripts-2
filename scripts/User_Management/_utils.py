@@ -180,7 +180,7 @@ def get_new_username() -> str:
 
 
 def get_new_users_names(username: str = None) -> tuple:
-    """Primpts for a new user's first and last name
+    """Prompts for a new user's first and last name
 
     Arguments:
         username {str} -- the user's username.  If there is a dot, it will provide  default names assuming
@@ -193,6 +193,8 @@ def get_new_users_names(username: str = None) -> tuple:
     # firstprompt = "First name: "
     # lastprompt = "Last name: "
     # name_guess = None
+    firstname_guess = None
+    lastname_guess = None
     firstname = None
     lastname = None
     if username and '.' in username:
