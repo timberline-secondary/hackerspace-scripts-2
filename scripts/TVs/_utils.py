@@ -1,5 +1,5 @@
 from scripts._utils import utils
-from scripts.User_Management import utils as user_utils
+from scripts.User_Management import _utils as user_utils
 from scripts._utils.ssh import SSH
 
 mime_types = {
