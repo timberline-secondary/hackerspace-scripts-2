@@ -12,5 +12,3 @@ def quick_puppet_run(auto_fix_certificates=False, computer_number=None):
     for num in num_list:
         utils.print_warning("Trying computer #{}...".format(num))
         puppet_run(num, password, auto_fix_certificates=True)
-    
-    return

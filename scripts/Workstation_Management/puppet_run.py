@@ -32,10 +32,10 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
     # now that we know we have a connected computer, ssh into it and try to run puppet
     success = False
     ssh_connection = SSH(computer_host, username, password)
-    if "2004" in computer_host:
-        puppet_command = '/usr/bin/puppet agent -t'
-    else:
+    if "-s" in computer_host:
         puppet_command = '/opt/puppetlabs/bin/puppet agent -t'
+    else:
+        puppet_command = '/usr/bin/puppet agent -t'
 
     while not success:
         utils.print_warning(
