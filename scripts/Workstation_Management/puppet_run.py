@@ -1,4 +1,3 @@
-import os, socket
 from getpass import getpass
 
 from scripts._utils import utils
@@ -7,6 +6,7 @@ from scripts._utils.ssh import SSH
 puppet_host = 'puppet'
 username = 'hackerspace_admin'
 computer_host = None
+
 
 def puppet_run(computer_number=None, password=None, auto_fix_certificates=False):
     if password == None:
@@ -26,7 +26,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
 
         good_host = utils.host_exists(computer_host)
 
-        if computer_number and not good_host: # this computer # doesn't exist or can't connect
+        if computer_number and not good_host:  # this computer # doesn't exist or can't connect
             return
 
     # now that we know we have a connected computer, ssh into it and try to run puppet
@@ -38,13 +38,15 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         puppet_command = '/opt/puppetlabs/bin/puppet agent -t'
 
     while not success:
-        utils.print_warning("Running puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect".format(computer_host))
+        utils.print_warning(
+            "Running puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect".format(computer_host))
 
         output_puppet_run = ssh_connection.send_cmd(puppet_command, sudo=True)
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output_puppet_run:
             pass
         elif "Notice: Run of Puppet configuration client already in progress" in output_puppet_run:
-            utils.print_warning("\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
+            utils.print_warning(
+                "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
             break
         elif "command not found" in output_puppet_run:
             utils.print_warning("\nCouldn't find puppet.... why not?") 
@@ -68,7 +70,8 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         # Exiting; failed to retrieve certificate and waitforcert is disabled
 
         if not auto_fix_certificates:
-            try_to_fix = utils.input_styled("Looks like there was a certificate problem.  Usually this happens when a computer is re-imaged.  Want me to try to fix it? [y]/n ")
+            try_to_fix = utils.input_styled(
+                "Looks like there was a certificate problem.  Usually this happens when a computer is re-imaged.  Want me to try to fix it? [y]/n ")
 
             if try_to_fix == 'n':
                 break
@@ -99,7 +102,4 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         #                         ]
         # success = ssh_connection.send_interactive_commands(command_response_list)
 
-
     ssh_connection.close()
-    
-        

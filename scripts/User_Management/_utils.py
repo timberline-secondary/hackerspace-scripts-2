@@ -6,6 +6,8 @@ from datetime import date
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
+from scripts.User_Management import utils as user_utils
+
 STUDENT_GID = 5000
 TEACHER_GID = 10004
 
@@ -172,7 +174,7 @@ def get_new_username() -> str:
 
     # does user exist already?
     if utils.user_exists(username):
-        fullname = utils.get_users_name(username)
+        fullname = user_utils.get_users_name(username)
         utils.print_warning("The username {} already exists for {}.".format(username, fullname))
         return None
     else:
@@ -229,7 +231,7 @@ def get_and_confirm_user(username=None):
     if not username:
         username = utils.input_styled("Enter username: ")
 
-    fullname = utils.get_users_name(username)
+    fullname = user_utils.get_users_name(username)
 
     if fullname is None:
         utils.print_warning("I couldn't find an account for user {}.".format(username))

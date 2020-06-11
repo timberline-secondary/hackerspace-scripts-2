@@ -1,6 +1,6 @@
 import os
-import sys
 import argparse
+
 
 def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_per_image=8, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow_fade.mp4'):
     """Example command with 5 images, per 
@@ -20,7 +20,7 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
         [4]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1,setsar=1,format=yuva444p,fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+16/TB[f3]; \
         [bg][f0]overlay[bg1];[bg1][f1]overlay[bg2];[bg2][f2]overlay[bg3]; \
         [bg3][f3]overlay,format=yuv420p[v]" -map "[v]" -movflags +faststart out.mp4
-    
+
     Keyword Arguments:
         resolution {str} -- [description] (default: {'1920:1080'})
         images_directory {str} -- [description] (default: {'images'})
@@ -30,7 +30,7 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
         output_file {str} -- [description] (default: {'/tmp/slideshow.mp4'})
     """
 
-    image_files = sorted(os.listdir(images_directory)) # want them alphabetical so title image comes first!
+    image_files = sorted(os.listdir(images_directory))  # want them alphabetical so title image comes first!
 
     if image_files:
         print("\nFound images: {}\n".format(image_files))
@@ -39,7 +39,8 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
 
     num_images = len(image_files)
 
-    base_filter = "scale={}:force_original_aspect_ratio=decrease,pad={}:-1:-1,setsar=1,format=yuva444p".format(resolution, resolution)
+    base_filter = "scale={}:force_original_aspect_ratio=decrease,pad={}:-1:-1,setsar=1,format=yuva444p".format(
+        resolution, resolution)
 
     image_inputs = ''
     for image in image_files:
@@ -62,15 +63,15 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
                 base_filter,
                 fade_duration,
                 seconds,
-                i-1
+                i - 1
             )
         seconds += seconds_per_image
-        
-        #Fade to black:
+
+        # Fade to black:
         filter_complex += image_filter
-    
+
     # overlays
-    for i in range(num_images-1):
+    for i in range(num_images - 1):
         # [bg][f0]overlay[bg1];[bg1][f1]overlay[bg2];[bg2][f2]overlay[bg3];[bg3][f3]overlay
         if i == 0:
             bg = "bg"  
@@ -80,10 +81,10 @@ def movie_maker_fade(resolution='1920:1080', images_directory='images', seconds_
         filter_complex += "[{}][f{}]overlay".format(bg, i)
 
         if i != num_images - 2:  # last one is different, if not last one then add this
-            filter_complex += "[bg{}];".format(i+1)
-    
-    filter_complex += ",format={}[v]".format(color_space) # ...overlay,format=yuv420p[v]
-    filter_complex += '"' # close quote for the filter complex
+            filter_complex += "[bg{}];".format(i + 1)
+
+    filter_complex += ",format={}[v]".format(color_space)  # ...overlay,format=yuv420p[v]
+    filter_complex += '"'  # close quote for the filter complex
 
     map_flag = '-map "[v]"'
     mov_flags = '-movflags +faststart'
@@ -110,15 +111,14 @@ if __name__ == "__main__":
     # If parameters are provided pass them to the function, otherwise defaults will be used.
     kwargs = {}
     if args.images:
-        kwargs['images_directory']=args.images
+        kwargs['images_directory'] = args.images
     if args.resolution:
-        kwargs['resolution']=args.resolution
+        kwargs['resolution'] = args.resolution
     if args.seconds:
-        kwargs['seconds_per_image']=args.seconds
+        kwargs['seconds_per_image'] = args.seconds
     if args.fade:
-        kwargs['fade_duration']=args.fade
+        kwargs['fade_duration'] = args.fade
     if args.output:
-        kwargs['output_file']=args.output
+        kwargs['output_file'] = args.output
 
     movie_maker_fade(**kwargs)
-

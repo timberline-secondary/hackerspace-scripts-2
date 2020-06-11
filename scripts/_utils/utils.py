@@ -1,7 +1,9 @@
 import pwd
 from urllib.error import URLError
 from urllib.request import urlopen
-from subprocess import run
+import subprocess
+
+from getpass import getpass
 
 
 class ByteStyle:
@@ -79,23 +81,6 @@ def user_exists(username):
         return False
 
 
-def get_users_name(username: str):
-    """Returns the first and last name (per gecos field) for a given username
-    https://docs.python.org/3/library/pwd.html
-
-    Arguments:
-        username {str} -- ldap username
-
-    Returns:
-        [str] -- The user's Name (in gecos field) if they exist, else None if username doesn't exist
-    """
-    try:
-        return pwd.getpwnam(username).pw_gecos
-    except KeyError:
-        print(f"Can't find that username: {username}")
-        return None
-
-
 def host_exists(hostname, verbose=True):
     ping_cmd = ['ping', '-c 1', '-W 1', hostname]  # ping once with 1 second wait/time out
     if verbose:
@@ -151,3 +136,17 @@ def confirm(prompt, yes_is_default=True):
             return False
         else:
             return True
+
+
+def get_admin_pw():
+    # ask for admin password
+    while True:
+        password = getpass("Enter admin password: ")
+        b_password = bytes(password, 'utf-8')
+        completed_process = subprocess.run(["su", "hackerspace_admin", "/dev/null"], input=b_password)
+        if completed_process.returncode == 0:
+            # it's good
+            return password
+        else:
+            # bad password
+            print_error("Incorrect Password. Try again.")

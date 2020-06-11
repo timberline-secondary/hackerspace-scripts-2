@@ -17,7 +17,7 @@ def missile():
         setup_stormLauncher()
 
     os.chdir(FULL_DIR)
-    pw = getpass("\nEnter admin password: ")
+    pw = utils.get_admin_pw()
     # don't wait for this to finish before continuing, i.e. run in background
     command = 'su -c "echo {} | sudo -S /bin/bash launch.sh" -m hackerspace_admin'.format(pw)
     # os.system(command)
