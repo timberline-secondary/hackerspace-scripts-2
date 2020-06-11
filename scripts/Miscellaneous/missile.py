@@ -17,12 +17,17 @@ def missile():
         setup_stormLauncher()
 
     os.chdir(FULL_DIR)
-    pw = utils.get_admin_pw()
+    # pw = utils.get_admin_pw()
+    pw = getpass("Enter admin password: ")
     # don't wait for this to finish before continuing, i.e. run in background
     command = 'su -c "echo {} | sudo -S /bin/bash launch.sh" -m hackerspace_admin'.format(pw)
     # os.system(command)
-    subprocess.run(command, shell=True, check=True)
-    # proc = subprocess.Popen(command, shell=True)
+    subprocess.run([command, "/dev/null"], shell=True, check=True, text=True, input=pw)
+    # proc = subprocess.Popen(command, shell=True, text=True)
+    # proc.communicate(pw)
+
+    # doesn't go back to control panel gracefully... prolly because virtualenv is still active for launcher
+    quit()
 
 
 def setup_stormLauncher():

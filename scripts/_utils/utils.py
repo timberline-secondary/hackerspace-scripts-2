@@ -3,7 +3,7 @@ from urllib.error import URLError
 from urllib.request import urlopen
 import subprocess
 
-from getpass import getpass
+# from getpass import getpass
 
 
 class ByteStyle:
@@ -86,7 +86,7 @@ def host_exists(hostname, verbose=True):
     if verbose:
         print_warning("Checking to see if {} is connected to the network.".format(hostname))
 
-    compeleted = run(ping_cmd)
+    compeleted = subprocess.run(ping_cmd)
 
     if compeleted.returncode != 0:  # not success
         if verbose:
@@ -138,15 +138,19 @@ def confirm(prompt, yes_is_default=True):
             return True
 
 
-def get_admin_pw():
-    # ask for admin password
-    while True:
-        password = getpass("Enter admin password: ")
-        b_password = bytes(password, 'utf-8')
-        completed_process = subprocess.run(["su", "hackerspace_admin", "/dev/null"], input=b_password)
-        if completed_process.returncode == 0:
-            # it's good
-            return password
-        else:
-            # bad password
-            print_error("Incorrect Password. Try again.")
+# def get_admin_pw():
+#     # ask for admin password
+#     while True:
+#         password = getpass("Enter admin password: ")
+#         print("Give me a moment to check the password...")
+#         completed_process = subprocess.run(
+#             ["su", "hackerspace_admin", ">", "/dev/null"], 
+#             text=True,
+#             input=password,
+#             capture_output=False)
+#         if completed_process.returncode == 0:
+#             # it's good
+#             return password
+#         else:
+#             # bad password
+#             print_error("Incorrect Password. Try again.")
