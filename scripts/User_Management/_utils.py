@@ -6,8 +6,6 @@ from datetime import date
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-from scripts.User_Management import _utils as user_utils
-
 STUDENT_GID = 5000
 TEACHER_GID = 10004
 
@@ -157,6 +155,23 @@ def get_next_avail_uid(start: int = None) -> int:
     return next_uid
 
 
+def get_users_name(username: str):
+    """Returns the first and last name (per gecos field) for a given username
+    https://docs.python.org/3/library/pwd.html
+
+    Arguments:
+        username {str} -- ldap username
+
+    Returns:
+        [str] -- The user's Name (in gecos field) if they exist, else None if username doesn't exist
+    """
+    try:
+        return pwd.getpwnam(username).pw_gecos
+    except KeyError:
+        print(f"Can't find that username: {username}")
+        return None
+
+
 def get_new_username() -> str:
     """Asks for a new username and checks if it already exists or not
 
@@ -174,7 +189,7 @@ def get_new_username() -> str:
 
     # does user exist already?
     if utils.user_exists(username):
-        fullname = user_utils.get_users_name(username)
+        fullname = get_users_name(username)
         utils.print_warning("The username {} already exists for {}.".format(username, fullname))
         return None
     else:
@@ -231,7 +246,7 @@ def get_and_confirm_user(username=None):
     if not username:
         username = utils.input_styled("Enter username: ")
 
-    fullname = user_utils.get_users_name(username)
+    fullname = get_users_name(username)
 
     if fullname is None:
         utils.print_warning("I couldn't find an account for user {}.".format(username))
