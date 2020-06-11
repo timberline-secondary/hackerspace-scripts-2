@@ -9,16 +9,16 @@ computer_host = None
 
 
 def puppet_run(computer_number=None, password=None, auto_fix_certificates=False):
-    if password == None:
+    if password is None:
         password = getpass("Enter the admin password: ")
 
     good_host = False
     while not good_host:
 
         if computer_number:
-            computer_host = "tbl-h10-{}-s".format(computer_number)
+            computer_host = "tbl-h10-{}".format(computer_number)
         else:
-            computer_host = utils.input_styled("Which computer? (e.g. 'tbl-h10-12-s', or [q]uit) ")
+            computer_host = utils.input_styled("Which computer? (e.g. 'tbl-h10-12', or [q]uit) ")
 
         if computer_host == 'q':
             print("Quitting this.")
