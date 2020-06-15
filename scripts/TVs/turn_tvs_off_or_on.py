@@ -6,7 +6,7 @@ from scripts._utils import pi
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-valid_tvs = ['1','2','3','4']
+valid_tvs = ['1', '2','3','4']
 
 TV_OFF_CMD = "echo standby 0 | cec-client -s -d 1"
 TV_ON_CMD = "echo on 0 | cec-client -s -d 1"
