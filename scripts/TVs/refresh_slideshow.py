@@ -62,7 +62,7 @@ def generate_new_movie_file(ssh_connection, username, tv, silent=False):
                 if not silent:
                     utils.print_success("Also placed on tv 4.")
             else:
-                utils.print_error(f"Something went wrong sending to tv4.")
+                utils.print_error("Something went wrong sending to tv 4.")
 
     else:
         utils.print_error(f"Something went wrong sending to tv {tv}.")

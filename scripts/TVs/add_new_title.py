@@ -3,7 +3,7 @@ import inquirer
 from scripts._utils import utils, pi
 from scripts._utils.ssh import SSH
 from scripts.User_Management import _utils as user_utils
-from scripts.TVs.add_new_media import add_new_media
+from scripts.TVs.add_new_media import add_new_media, refresh_slideshow
 
 temp_dir = "/tmp/"
 hostname = "hightower"
@@ -15,7 +15,7 @@ def add_new_title():
     fullname, username = user_utils.get_and_confirm_user()
 
     # gets info of the student who made the art
-    fullname_entered = utils.input_styled("Full name: [Enter = {}] \n".format(fullname.title()))
+    fullname_entered = utils.input_plus("Full name", fullname)
     if fullname_entered:
         fullname = fullname_entered
     else:
@@ -42,8 +42,7 @@ def add_new_title():
 
     default_tv = '1' if last_name.upper()[0] <= 'M' else '2'
 
-    tv = utils.input_styled(
-        "Which TV # are you sending this to (1 for lastname A-M, 2 for N-Z, 3 for Grads)? [Enter] = {}: \n".format(default_tv))
+    tv = utils.input_plus("Which TV # are you sending this to (1 for lastname A-M, 2 for N-Z, 3 for Grads)?", default_tv)
 
     if not tv:
         tv = default_tv
@@ -91,10 +90,14 @@ def add_new_title():
     title_exists = ssh_connection.file_exists(server_filepath, filename_png)
 
     if title_exists:
-        utils.print_success("{} was successfully sent over to TV {}".format(filename_png, tv))
-        add_images = utils.input_styled(utils.ByteStyle.Y_N, f"Would you like to add images to {fullname}'s new shrine? ([y]/n)\n")
-        if not add_images or add_images.lower()[0] != "n":
+        utils.print_success(f"{filename_png} was successfully sent over to TV {tv}")
+        add_images = utils.confirm(f"Would you like to add images to {fullname}'s new shrine?")
+        if add_images:
             add_new_media(username, tv)
+        else:
+            gen_video = utils.confirm("Would you like to regenerate the video file?")
+            if gen_video:
+                refresh_slideshow(username=username)
     else:
-        utils.print_error("The title image '{}' was not added. Maybe inkscape isn't installed? Or it's possible you've never connected to this server before. \n\n"  
-                          "Try connecting once first by typing `ssh hightower` into a terminal, then answering yes.".format(filename_png))
+        utils.print_error(f"The title image '{filename_png}' was not added. Maybe inkscape isn't installed? Or it's possible you've never connected to this server before. \n\n"  
+                          "Try connecting once first by typing `ssh hightower` into a terminal, then answering yes.")
