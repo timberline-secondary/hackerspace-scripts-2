@@ -99,7 +99,9 @@ def host_exists(hostname, verbose=True):
 
 
 def input_plus(prompt, default=None, validation_method=None):
-    """ Gets styled user input with a defualt value and option to quit """
+    """ Gets styled user input with a defualt value and option to quit.  Returns 'q' if quitting.
+    Validation_method is not yet implemented.
+    """
     hints_str = "[q]uit"
 
     if default:
