@@ -37,7 +37,7 @@ def clean_user_files():
     ssh_connection.send_cmd("df -h | grep nfshome")
 
     # empty Downloads directory
-    location = f"{search_root}/Downloads"
+    location = f"{search_root}/Downloads/*"
     num = count_files(location, ssh_connection)
     if num > 0:
         utils.print_warning(f"Emptying Downloads directory: {location}")
@@ -45,7 +45,7 @@ def clean_user_files():
         delete_files(location, ssh_connection)
 
     # remove .cache directory and contents
-    location = f"{search_root}/.cache"
+    location = f"{search_root}/.cache/*"
     num = count_files(location, ssh_connection)
     if num > 0:
         utils.print_warning(f"Emptying .cache directory: {location}")
@@ -53,35 +53,38 @@ def clean_user_files():
         delete_files(location, ssh_connection)
 
     # empty trash
-    location = f"{search_root}/.local/share/Trash/files"
+    location = f"{search_root}/.local/share/Trash/files/*"
     num = count_files(location, ssh_connection)
     if num > 0:
         utils.print_warning(f"Emptying Trash: {location}")
         utils.input_styled("Enter to continue...")
         delete_files(location, ssh_connection)
 
+    # CR2 Files (raw images...massive sizes)
+    location = f"{search_root}"
+    file_glob = '*.CR2'  # all files
+    num = count_files(location, ssh_connection, file_glob)
+    if num > 0:
+        print("Finding and deleting all CR2 files (raw images that are massive)...")
+        # delete_files(location, file_glob, ssh_connection)
+
+    # # delete any tmp directory contents
+    # location = f"{search_root}"
+    # num = count_files(location, ssh_connection)
+    # if num > 0:
+    #     utils.print_warning(f"Emptying .cache directory: {location}")
+    #     utils.input_styled("Enter to continue...")
+    #     delete_files(location, ssh_connection)
+
     # large files
     location = f"{search_root}"
     size = '2G'
+    utils.print_warning("This search can take a while, please be patient...")
     num = count_files(location, ssh_connection, size=size)
     if num > 0:
         utils.print_warning(f"Removing files larger than: {size}")
         utils.input_styled("Enter to continue...")
         delete_files(location, ssh_connection, size=size)
-
-    # # CR2 Files (raw images...massive sizes)
-    # location = f"{search_root}"
-    # file_glob = '*.CR2'  # all files
-    # num = count_files(location, file_glob, ssh_connection)
-    # if num > 0:
-    #     print("Finding and deleting all CR2 files (raw images that are massive)...")
-    #     # delete_files(location, file_glob, ssh_connection)
-
-    # # delete any tmp directories
-    # Actually, probabyl just want to delete contents of these directories?
-    # print("Finding and emptying tmp and temp directories...")
-    # ssh_connection.send_cmd(f"find {search_root}/ -type d -name 'tmp' -delete", sudo=True)
-    # ssh_connection.send_cmd(f"find {search_root}/ -type d -name 'temp' -delete", sudo=True)
 
     print("Available space on the file server AFTER:")
     print("Filesystem                   Size  Used Avail Use% Mounted on")
@@ -94,7 +97,8 @@ def count_files(location, ssh_connection, name_glob=None, size=None):
     command = generate_find_command(location, name_glob, size)
     command += " | wc -l"
     utils.print_warning(f"Searching for files with: {command}")
-    result = ssh_connection.send_cmd(command, sudo=True)
+    # use double quotes as command may have single quotes within
+    result = ssh_connection.send_cmd(f'bash -c "{command}"', sudo=True)
     # strip newlines from end of resulting output
     num = re.search(r'\d+$', result.strip()).group()  # get the number at the end of the output
 
@@ -108,7 +112,8 @@ def count_files(location, ssh_connection, name_glob=None, size=None):
 def delete_files(location, ssh_connection, name_glob=None, size=None):
     command = generate_find_command(location, name_glob, size)
     command += " -delete"  
-    result = ssh_connection.send_cmd(command, sudo=True)
+    # run bash as sudo so wildcards are expanded as sudo and will have permissions to expand into all directories
+    result = ssh_connection.send_cmd(f"bash -c '{command}'", sudo=True)
     if "No such file or directory" in result:
         utils.print_warning("Nothing found to delete.")
         return False
@@ -118,7 +123,7 @@ def delete_files(location, ssh_connection, name_glob=None, size=None):
 
 
 def generate_find_command(location, name_glob=None, size=None):
-    command = f"find {location}/*"  # the /* excludes the location itself and only returns the contents
+    command = f"find {location}"
     if name_glob:
         command += f" -name '{name_glob}'"
     if size:
