@@ -32,10 +32,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
     # now that we know we have a connected computer, ssh into it and try to run puppet
     success = False
     ssh_connection = SSH(computer_host, username, password)
-    if "-s" in computer_host:
-        puppet_command = '/opt/puppetlabs/bin/puppet agent -t'
-    else:
-        puppet_command = '/usr/bin/puppet agent -t'
+    puppet_command = '/usr/bin/puppet agent -t'
 
     while not success:
         utils.print_warning(
@@ -49,7 +46,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
                 "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
             break
         elif "command not found" in output_puppet_run:
-            utils.print_warning("\nCouldn't find puppet.... why not?") 
+            utils.print_warning("\nCouldn't find puppet.... why not? Try the other spot...") 
             break
         else:
             utils.print_success("\n\nSeems like everything worked ok!\n\n")
