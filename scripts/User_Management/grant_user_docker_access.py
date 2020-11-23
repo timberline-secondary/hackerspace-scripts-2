@@ -4,7 +4,7 @@ from scripts.User_Management import _utils as user_utils
 GROUP = "docker"
 
 
-def grant_user_advanced_usb_access():
+def grant_user_docker_access():
 
     fullname, username = user_utils.get_and_confirm_user()
     if not fullname:
