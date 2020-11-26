@@ -3,6 +3,8 @@ from getpass import getpass
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
+from scripts.Workstation_Management._remove_puppet_lock import remove_puppet_lock
+
 puppet_host = 'puppet'
 username = 'hackerspace_admin'
 computer_host = None
@@ -39,18 +41,19 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
             "Running puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect".format(computer_host))
 
         output_puppet_run = ssh_connection.send_cmd(puppet_command, sudo=True)
+        
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output_puppet_run:
             pass
         elif "Notice: Run of Puppet configuration client already in progress" in output_puppet_run:
-            utils.print_warning(
-                "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
-            break
+            if not remove_puppet_lock(ssh_connection, password):
+                utils.print_warning(
+                    "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
+                break
         elif "command not found" in output_puppet_run:
             utils.print_warning("\nCouldn't find puppet.... why not? Try the other spot...") 
             break
         else:
             utils.print_success("\n\nSeems like everything worked ok!\n\n")
-            ssh_connection.close()
             break
 
         ### Handle certificate problem ###
