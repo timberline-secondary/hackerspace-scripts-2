@@ -11,7 +11,7 @@ def remove_puppet_lock(ssh_connection, password=None, ):
 
     pattern = r"Last run: (.*)$"
 
-    time_str = re.search(pattern, motd).group()
+    time_str = re.search(pattern, motd)
 
     print("MOTD: ", time_str)
 
