@@ -36,7 +36,7 @@ def remove_puppet_lock(ssh_connection, password=None, ):
 
     print("FOUND LOCK FILE, REMOVING IT")
 
-    ssh_connection.send_cmd(f"rm {LOCK_PATH}{LOCK_FILE}")
+    ssh_connection.send_cmd(f"rm {LOCK_PATH}{LOCK_FILE}", sudo=True)
 
     if not ssh_connection.file_exists(LOCK_PATH, LOCK_FILE):
         print("***REMOVED***")
