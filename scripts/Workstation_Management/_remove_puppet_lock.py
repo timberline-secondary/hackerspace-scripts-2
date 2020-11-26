@@ -1,8 +1,10 @@
 import re
+from datetime import datetime
 # from getpass import getpass
 # from scripts._utils import utils
 # from scripts.Workstation_Management.puppet_run import puppet_run
-
+LOCK_PATH = "/var/cache/puppet/state/"
+LOCK_FILE = "agent_catalog_run.lock"
 
 def remove_puppet_lock(ssh_connection, password=None, ):
 
@@ -11,10 +13,27 @@ def remove_puppet_lock(ssh_connection, password=None, ):
 
     print(motd)
 
-    pattern = r"Last run: (.*)$"
+    pattern = r"Last run: (.*)"
 
-    time_str = re.search(pattern, motd)
+    time_str = re.search(pattern, motd.strip())
 
-    print("MOTD: ", time_str)
+    if time_str is None:
+        print("Not sure what's going on, I didn't find a time stamp in /etc/motd.")
+        return False
 
-    return False
+    time_str = time_str.group(1)
+    dt = datetime.strptime(time_str, "%a %d %b %Y %I:%M:%S %p %Z")
+
+    print("Time of last puppet run: ", dt)
+
+    time_since_last_puppet_run = datetime.now() - dt
+
+    # should run every 30 minutes, but give 2 hours to be safe
+    if time_since_last_puppet_run.seconds() < 7200:
+        return False
+
+    print("Been more than 2 hours, so checking if puppet is locked...")
+    if not ssh_connection.file_exists(LOCK_PATH, LOCK_FILE):
+        return False
+
+    print("FOUND LOCK FILE, REMOVE IT")
