@@ -11,8 +11,6 @@ def remove_puppet_lock(ssh_connection, password=None, ):
     # check when last puppet run was by reading motd
     motd = ssh_connection.send_cmd('cat /etc/motd')
 
-    print(motd)
-
     pattern = r"Last run: (.*)"
 
     time_str = re.search(pattern, motd.strip())
@@ -36,4 +34,13 @@ def remove_puppet_lock(ssh_connection, password=None, ):
     if not ssh_connection.file_exists(LOCK_PATH, LOCK_FILE):
         return False
 
-    print("FOUND LOCK FILE, REMOVE IT")
+    print("FOUND LOCK FILE, REMOVING IT")
+
+    ssh_connection.send_cmd(f"rm {LOCK_PATH}{LOCK_FILE}")
+
+    if not ssh_connection.file_exists(LOCK_PATH, LOCK_FILE):
+        print("***REMOVED***")
+        return True
+    else:
+        print("***FAILED TO REMOVE***")
+        return False
