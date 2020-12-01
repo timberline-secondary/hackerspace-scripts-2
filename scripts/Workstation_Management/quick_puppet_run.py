@@ -13,7 +13,7 @@ def quick_puppet_run(auto_fix_certificates=False, computer_number=None):
     num_list = numbers.split()
 
     if num_list[0] == "all":
-        num_list = range(0, 32)
+        num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
 
     for num in num_list:
         utils.print_warning("Trying computer #{}...".format(num))
