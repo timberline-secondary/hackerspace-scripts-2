@@ -24,7 +24,7 @@ def check_for_disconnected_computers(password=None):
         host = f'tbl-h10-{i}'
         if host not in output:
             utils.print_warning(f"Computer {host} was not found on the network.")
-            found_at_least_one = Trueexit
+            found_at_least_one = True
 
     if not found_at_least_one:
         utils.print_success(f"All computers from tbl-h10-{FIRST} to tbl-h10-{LAST} were found on the network.")
