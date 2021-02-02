@@ -3,6 +3,18 @@ from scripts._utils import ssh
 username = "pi"
 password = "hackerberry"
 
+PI_TV_LIST = [
+    "pi-tv1",
+    "pi-tv2",
+    "pi-tv3",
+    "pi-tv4",
+]
+
+PI_LIST = PI_TV_LIST + [
+    "pi-themes",
+    "pi-projector"
+]
+
 
 def reboot_pi(hostname):
     ssh_connection = ssh.SSH(hostname, username, password)
