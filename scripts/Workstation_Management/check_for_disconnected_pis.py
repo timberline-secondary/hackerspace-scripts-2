@@ -17,7 +17,7 @@ def check_for_disconnected_pis(password=None):
     found_at_least_one = False
     for pi in PI_LIST:
         if pi not in output:
-            utils.print_warning(f"Pi named '{host}' was not found connected to the network.")
+            utils.print_warning(f"Pi named '{pi}' was not found connected to the network.")
             found_at_least_one = True
 
     if not found_at_least_one:
