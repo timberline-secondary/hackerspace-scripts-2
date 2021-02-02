@@ -20,8 +20,7 @@ def add_new_title():
     fullname_entered = utils.input_plus("Full name", fullname)
     if fullname_entered:
         fullname = fullname_entered
-    else:
-        fullname = fullname.title()
+
     grad_year = utils.input_styled("Grad Year: \n")
 
     last_name = username.split(".")[-1].title()  # get the last word if the username tyere.couture will get couture
