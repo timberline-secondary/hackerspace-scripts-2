@@ -14,6 +14,8 @@ def add_new_title():
 
     fullname, username = user_utils.get_and_confirm_user()
 
+    fullname = fullname.title()
+
     # gets info of the student who made the art
     fullname_entered = utils.input_plus("Full name", fullname)
     if fullname_entered:
