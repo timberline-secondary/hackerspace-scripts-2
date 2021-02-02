@@ -1,6 +1,6 @@
 import os
 
-required_packages = ['sshpass', ]
+required_packages = ['sshpass', 'nmap']
 
 def package_is_installed(pkg_name):
     """ Returns true if the package is installed"""

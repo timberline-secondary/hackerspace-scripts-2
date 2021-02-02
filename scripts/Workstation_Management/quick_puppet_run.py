@@ -1,4 +1,3 @@
-import os, socket
 from getpass import getpass
 from scripts._utils import utils
 from scripts.Workstation_Management.puppet_run import puppet_run
