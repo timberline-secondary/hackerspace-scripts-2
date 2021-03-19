@@ -44,6 +44,8 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output_puppet_run:
             pass
+        if "alert certificate unknown" in output_puppet_run:
+            pass
         elif "Notice: Run of Puppet configuration client already in progress" in output_puppet_run:
             # if not remove_puppet_lock(ssh_connection, password):
             utils.print_warning(
