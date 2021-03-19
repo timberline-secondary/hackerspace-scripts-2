@@ -47,9 +47,10 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         if "alert certificate unknown" in output_puppet_run:
             pass
         elif "Notice: Run of Puppet configuration client already in progress" in output_puppet_run:
-            # if not remove_puppet_lock(ssh_connection, password):
-            utils.print_warning(
-                "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
+            if not remove_puppet_lock(ssh_connection, password):
+                utils.print_warning(
+                    "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)
+                ) 
             break
         elif "command not found" in output_puppet_run:
             utils.print_warning("\nCouldn't find puppet.... why not? Try the other spot...") 

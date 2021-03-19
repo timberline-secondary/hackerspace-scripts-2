@@ -6,6 +6,7 @@ from datetime import datetime
 LOCK_PATH = "/var/cache/puppet/state/"
 LOCK_FILE = "agent_catalog_run.lock"
 
+
 def remove_puppet_lock(ssh_connection, password=None, ):
 
     # check when last puppet run was by reading motd
@@ -20,14 +21,14 @@ def remove_puppet_lock(ssh_connection, password=None, ):
         return False
 
     time_str = time_str.group(1)
-    dt = datetime.strptime(time_str, "%a %d %b %Y %I:%M:%S %p %Z")
+    dt = datetime.strptime(time_str, "%a %d %b %Y %H:%M:%S %p %Z")
 
     print("Time of last puppet run: ", dt)
 
-    time_since_last_puppet_run = datetime.now() - dt
+    time_since_last_puppet_run = datetime.now() - dt  # timedelta
 
     # should run every 30 minutes, but give 2 hours to be safe
-    if time_since_last_puppet_run == 0 and time_since_last_puppet_run.seconds < 7200:
+    if time_since_last_puppet_run.seconds < 7200:
         return False
 
     print("Been more than 2 hours, so checking if puppet is locked...")
