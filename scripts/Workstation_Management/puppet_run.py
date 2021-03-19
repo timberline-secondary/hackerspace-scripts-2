@@ -45,10 +45,10 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output_puppet_run:
             pass
         elif "Notice: Run of Puppet configuration client already in progress" in output_puppet_run:
-            if not remove_puppet_lock(ssh_connection, password):
-                utils.print_warning(
-                    "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
-                break
+            # if not remove_puppet_lock(ssh_connection, password):
+            utils.print_warning(
+                "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
+            break
         elif "command not found" in output_puppet_run:
             utils.print_warning("\nCouldn't find puppet.... why not? Try the other spot...") 
             break
@@ -80,14 +80,17 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         if "find /etc/puppetlabs/puppet/ssl" in output_puppet_run:  # old 16.04 installations
             remove_agent_cert_cmd = "find /etc/puppetlabs/puppet/ssl -name {}.hackerspace.tbl.pem -delete".format(computer_host)
         else:
-            remove_agent_cert_cmd = "find /var/lib/puppet/ssl -name {}.hackerspace.tbl.pem -delete".format(computer_host)
+            remove_agent_cert_cmd = "rm -rf /var/lib/puppet/ssl"  # just delete them all
         ssh_connection.send_cmd(remove_agent_cert_cmd, sudo=True)
 
         # now remove certificate from puppet server:
         # if "/opt/puppetlabs/bin/puppet cert clean" in output_puppet_run:
-        remove_server_cert_cmd = "/opt/puppetlabs/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
+        #remove_server_cert_cmd = "/opt/puppetlabs/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
         # else:
         #     remove_server_cert_cmd = "/usr/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
+
+        remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(computer_host)
+
         ssh_connection_puppet = SSH(puppet_host, username, password)
         ssh_connection_puppet.send_cmd(remove_server_cert_cmd, sudo=True)
         ssh_connection_puppet.close()
