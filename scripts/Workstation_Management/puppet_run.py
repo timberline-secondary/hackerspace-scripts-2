@@ -38,7 +38,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
 
     while not success:
         utils.print_warning(
-            "Running puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect".format(computer_host))
+            "\nRunning puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect...\n".format(computer_host))
 
         output_puppet_run = ssh_connection.send_cmd(puppet_command, sudo=True)
 
