@@ -41,10 +41,12 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
             "Running puppet on {}.  This may take a while.  The ouput will appear when it's done for you to inspect".format(computer_host))
 
         output_puppet_run = ssh_connection.send_cmd(puppet_command, sudo=True)
-        
+
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output_puppet_run:
             pass
         if "alert certificate unknown" in output_puppet_run:
+            pass
+        if "unable to get local issuer certificate" in output_puppet_run:
             pass
         elif "Notice: Run of Puppet configuration client already in progress" in output_puppet_run:
             if not remove_puppet_lock(ssh_connection, password):
@@ -57,7 +59,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
             break
         else:
             utils.print_success("\n\nSeems like everything worked ok!\n\n")
-            break
+            break  # out of the while loop, all done
 
         ### Handle certificate problem ###
         # Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key.
