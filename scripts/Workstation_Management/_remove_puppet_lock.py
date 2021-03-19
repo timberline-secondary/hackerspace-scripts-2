@@ -21,7 +21,7 @@ def remove_puppet_lock(ssh_connection, password=None, ):
         return False
 
     time_str = time_str.group(1)
-    dt = datetime.strptime(time_str, "%a %d %b %Y %H:%M:%S %p %Z")
+    dt = datetime.strptime(time_str, "%a %d %b %Y %I:%M:%S %p %Z")
 
     print("Time of last puppet run: ", dt)
 
