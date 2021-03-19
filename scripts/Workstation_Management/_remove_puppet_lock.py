@@ -30,7 +30,7 @@ def remove_puppet_lock(ssh_connection, password=None, ):
     print(f"That's {str(time_since_last_puppet_run)} ago.")
 
     # should run every 30 minutes, but give 2 hours to be safe
-    if time_since_last_puppet_run.total_seconds < 3600 * 2:
+    if time_since_last_puppet_run.total_seconds() < 3600 * 2:
         return False
 
     print("Been more than 2 hours, so checking if puppet is locked...")
