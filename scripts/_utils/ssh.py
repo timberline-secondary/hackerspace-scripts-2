@@ -1,7 +1,7 @@
 import paramiko
 from time import time
 from getpass import getpass
-from .utils import print_error, print_success, print_warning, input_styled
+from .utils import print_error, print_success, get_fqdn
 
 # Paramiko Demos:
 # https://github.com/paramiko/paramiko/tree/master/demos
@@ -42,7 +42,7 @@ class SSH():
     tv_turnon_cmd = "echo standby 1 | cec-client -s -d 1"
 
     def __init__(self, hostname, username, password=None, verbose=True):
-        self.hostname = hostname
+        self.hostname = get_fqdn(hostname)
         self.username = username
         self.password = password
         self.verbose = verbose

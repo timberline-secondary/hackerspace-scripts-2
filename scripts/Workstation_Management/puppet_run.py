@@ -61,7 +61,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
             utils.print_success("\n\nSeems like everything worked ok!\n\n")
             break  # out of the while loop, all done
 
-        ### Handle certificate problem ###
+        # ## Handle certificate problem ###
         # Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key.
         # Certificate fingerprint: 26:DD:EC:AC:15:95:7C:4B:7C:DB:0C:C6:30:C8:1A:7D:FF:C1:7B:C8:A5:56:53:77:94:2A:C3:F2:98:B7:D6:6A
         # To fix this, remove the certificate from both the master and the agent and then start a puppet run, which will automatically regenerate a certificate.

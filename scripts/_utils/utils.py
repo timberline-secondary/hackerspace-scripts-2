@@ -5,6 +5,8 @@ import subprocess
 
 # from getpass import getpass
 
+LOCALDOMAIN = "hackerspace.tbl"
+
 
 class ByteStyle:
     HEADER = '\033[95m'  # intense purple
@@ -82,6 +84,7 @@ def user_exists(username):
 
 
 def host_exists(hostname, verbose=True):
+    hostname = get_fqdn(hostname)
     ping_cmd = ['ping', '-c 1', '-W 1', hostname]  # ping once with 1 second wait/time out
     if verbose:
         print_warning("Checking to see if {} is connected to the network.".format(hostname))
@@ -96,6 +99,13 @@ def host_exists(hostname, verbose=True):
         if verbose:
             print_success("{} found on the network.".format(hostname))
         return True
+
+
+def get_fqdn(hostname):
+    """ Appends the local domain "hackerspace.tbl" if it isn't already there """
+    if LOCALDOMAIN not in hostname:
+        hostname = f"{hostname}.{LOCALDOMAIN}"
+    return hostname
 
 
 def input_plus(prompt, default=None, validation_method=None):
