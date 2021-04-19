@@ -49,11 +49,11 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         if "unable to get local issuer certificate" in output_puppet_run:
             pass
         elif "Notice: Run of Puppet configuration client already in progress" in output_puppet_run:
-            if not remove_puppet_lock(ssh_connection, password):
-                utils.print_warning(
-                    "\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)
-                ) 
-            break
+            if remove_puppet_lock(ssh_connection, password):
+                pass
+            else:
+                utils.print_warning("\nIt appears that puppet is already running on {}.  Give it a few minutes and try again.\n".format(computer_host)) 
+                break
         elif "command not found" in output_puppet_run:
             utils.print_warning("\nCouldn't find puppet.... why not? Try the other spot...") 
             break
@@ -90,7 +90,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
 
         # now remove certificate from puppet server:
         # if "/opt/puppetlabs/bin/puppet cert clean" in output_puppet_run:
-        #remove_server_cert_cmd = "/opt/puppetlabs/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
+        #remove_server_cert_cmd = "/opt/puppetlabs/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)  # noqa
         # else:
         #     remove_server_cert_cmd = "/usr/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
 
