@@ -86,6 +86,9 @@ def user_exists(username):
 def host_exists(hostname, verbose=True, use_fqdn=True):
     if use_fqdn:
         hostname_2 = get_fqdn(hostname)
+    else:
+        hostname_2 = hostname
+
     ping_cmd = ['ping', '-c 1', '-W 1', hostname_2]  # ping once with 1 second wait/time out
     if verbose:
         print_warning("Checking to see if {} is connected to the network.".format(hostname_2))
