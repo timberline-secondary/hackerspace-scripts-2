@@ -83,15 +83,20 @@ def user_exists(username):
         return False
 
 
-def host_exists(hostname, verbose=True):
-    hostname = get_fqdn(hostname)
-    ping_cmd = ['ping', '-c 1', '-W 1', hostname]  # ping once with 1 second wait/time out
+def host_exists(hostname, verbose=True, use_fqdn=True):
+    if use_fqdn:
+        hostname_2 = get_fqdn(hostname)
+    ping_cmd = ['ping', '-c 1', '-W 1', hostname_2]  # ping once with 1 second wait/time out
     if verbose:
-        print_warning("Checking to see if {} is connected to the network.".format(hostname))
+        print_warning("Checking to see if {} is connected to the network.".format(hostname_2))
 
     compeleted = subprocess.run(ping_cmd)
 
     if compeleted.returncode != 0:  # not success
+        # Try again without fqdn, just in case
+        if use_fqdn:
+            return host_exists(hostname, verbose=True, use_fqdn=False)
+
         if verbose:
             print_error("{} was not found on the network.  Is there a typo? Is the computer on?".format(hostname))
         return False
