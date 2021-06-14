@@ -1,4 +1,5 @@
 from getpass import getpass
+from scripts.Workstation_Management.puppet_clear_certificates import puppet_clear_certificates
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
@@ -77,18 +78,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         ssh_connection.send_cmd(remove_agent_cert_cmd, sudo=True)
 
         # now remove certificate from puppet server:
-        # if "/opt/puppetlabs/bin/puppet cert clean" in output_puppet_run:
-        #remove_server_cert_cmd = "/opt/puppetlabs/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)  # noqa
-        # else:
-        #     remove_server_cert_cmd = "/usr/bin/puppet cert clean {}.hackerspace.tbl".format(computer_host)
-
-        remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(computer_host)
-
-        ssh_connection_puppet = SSH(puppet_host, username, password)
-        ssh_connection_puppet.send_cmd(remove_server_cert_cmd, sudo=True)
-        ssh_connection_puppet.close()
-
-        utils.print_warning("Ok, I tried to fix the certificate mumbo jumbo, let's try to run puppet again.")
+        puppet_clear_certificates()
 
         # command_response_list = [
         #                             ("sudo passwd {}".format(student_number), "[sudo] password for {}:".format(username), None),
