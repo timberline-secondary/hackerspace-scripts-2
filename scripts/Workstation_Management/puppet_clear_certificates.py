@@ -13,12 +13,13 @@ def puppet_clear_certificates(hostname=None, password=None):
         password = getpass("Enter the admin password: ")
 
     if hostname is None:
-        hostname = utils.get_valid_hostname(hostname)
+        hostname = utils.input_styled("Which computer? (e.g. 'tbl-h10-12', or '192.168.3.125' or [q]uit) ")
 
-    if hostname is None:
-        return
+        if hostname == 'q':
+            print("Quitting this.")
+            return None
 
-    remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(computer_host)
+    remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(hostname)
 
     ssh_connection_puppet = SSH(puppet_host, username, password)
     ssh_connection_puppet.send_cmd(remove_server_cert_cmd, sudo=True)
