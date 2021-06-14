@@ -83,6 +83,27 @@ def user_exists(username):
         return False
 
 
+def get_valid_hostname(computer_number=None):
+    good_host = False
+    while not good_host:
+        if computer_number:
+            computer_host = "tbl-h10-{}".format(computer_number)
+        else:
+            computer_host = input_styled("Which computer? (e.g. 'tbl-h10-12', or '192.168.3.125' or [q]uit) ")
+
+        if computer_host == 'q':
+            print("Quitting this.")
+            return None
+
+        good_host = host_exists(computer_host)
+
+        if computer_number and not good_host:  # this computer # doesn't exist or can't connect
+            return None
+
+        if good_host:
+            return computer_host
+
+
 def host_exists(hostname, verbose=True, use_fqdn=True):
     if use_fqdn:
         hostname_2 = get_fqdn(hostname)

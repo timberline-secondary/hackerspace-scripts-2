@@ -14,22 +14,10 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
     if password is None:
         password = getpass("Enter the admin password: ")
 
-    good_host = False
-    while not good_host:
+    computer_host = utils.get_valid_hostname(computer_number)
 
-        if computer_number:
-            computer_host = "tbl-h10-{}".format(computer_number)
-        else:
-            computer_host = utils.input_styled("Which computer? (e.g. 'tbl-h10-12', or '192.168.3.125' or [q]uit) ")
-
-        if computer_host == 'q':
-            print("Quitting this.")
-            return
-
-        good_host = utils.host_exists(computer_host)
-
-        if computer_number and not good_host:  # this computer # doesn't exist or can't connect
-            return
+    if computer_host is None:
+        return
 
     # now that we know we have a connected computer, ssh into it and try to run puppet
     success = False
