@@ -15,9 +15,11 @@ Unfortunately you can't reimage a computer from here, but here are the steps!
    2.8 If it is not already entered, enter the admin password twice, then continue
    2.9 Wait for the install process to finish (don't "Cancel update and reboot")
    2.10 When it's finished it should only say "Reboot" at the bottom, hit Enter to reboot.
-3. After it reboots, force a puppet run: `rm /etc/puppetlabs/puppet/ssl/
+3. After it reboots, force a puppet run: 
     3.1 Run this command on the newly imaged workstation: `sudo puppet agent -t`. if you get certificate errors, you will need to clean them:
-         3.1.1 Copy and paste the command it gives you for "On the agent: 1a." but add `sudo` before the `find ...`
-         3.1.2 In this control panel, run the "puppet clear certificates" menu option to clear the certificate ont the puppet master.
+         3.1.1 Copy and paste the command it gives you for "On the agent: 1a." but add `sudo` before the `find ...` 
+                or, use this nuclear option: `sudo rm /etc/puppetlabs/puppet/ssl/`
+         3.1.2 In this control panel, run the "puppet clear certificates" script and enter the hostname: tbl-h10-#
+    3.2 After cleaning certificate errors, try again on the newly imaged workstation: `sudo puppet agent -t`
 4. The computer should reboot on its own, and when the login screen appears, you should no longer see the Hackerspace Admin user there.  Then you know it's complete.
 """)
