@@ -1,3 +1,3 @@
 paramiko==2.7.0
-Pillow==8.2.2
+Pillow==8.2.0
 inquirer==2.7.0
