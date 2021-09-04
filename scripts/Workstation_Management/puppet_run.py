@@ -78,7 +78,7 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
         ssh_connection.send_cmd(remove_agent_cert_cmd, sudo=True)
 
         # now remove certificate from puppet server:
-        puppet_clear_certificates()
+        puppet_clear_certificates(computer_host, password)
 
         # command_response_list = [
         #                             ("sudo passwd {}".format(student_number), "[sudo] password for {}:".format(username), None),
