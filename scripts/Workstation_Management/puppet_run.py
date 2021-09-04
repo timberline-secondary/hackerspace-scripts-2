@@ -31,7 +31,10 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
 
         output_puppet_run = ssh_connection.send_cmd(puppet_command, sudo=True)
 
+        print("OUTPUT PUPPET RUN = 8888888888888888888888 \n\n", output_puppet_run, "\n\n")
+
         if "Error: Could not request certificate: The certificate retrieved from the master does not match the agent's private key." in output_puppet_run:
+            print("Certificate problem found...")
             pass
         elif "alert certificate unknown" in output_puppet_run:
             pass
