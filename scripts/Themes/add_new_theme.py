@@ -56,8 +56,8 @@ def add_new_theme():
 
             print("Sending {} to pi-themes to see if file exists already with that name.".format(filename))
 
-            command = "wget -O /media/THEMES/{} {} && exit".format(filename, mp3_url)
-            filepath = "/media/THEMES/"
+            filepath = "/mnt/usb0/"
+            command = "wget -O {}{} {} && exit".format(filepath, filename, mp3_url)
 
             ssh_connection = SSH(hostname, pi.username, pi.password)
 
@@ -65,7 +65,7 @@ def add_new_theme():
             already_exists = ssh_connection.file_exists(filepath, filename)
 
             # asks user if they want to overwrite https://www.quora.com/I%E2%80%99m-new-to-Python-how-can-I-write-a-yes-no-question
-            if already_exists == True:
+            if already_exists:
                 overwrite = utils.confirm(
                     "There is a file that already exists with that name. Do you want to overwrite it?", 
                     yes_is_default=False
@@ -75,13 +75,13 @@ def add_new_theme():
                 else:
                     already_exists = False
                     pass
-            elif already_exists == False:
+            elif not already_exists:
                 pass
             else:
                 utils.print_error("Something went wrong. Expected true or false but got something else")
 
             #sends the command
-            if already_exists == False:
+            if not already_exists:
                 ssh_connection.send_cmd(command)
 
             another_code = utils.confirm("Would you like to add another code?")

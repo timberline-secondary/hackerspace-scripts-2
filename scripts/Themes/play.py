@@ -12,7 +12,8 @@ def play():
     ssh_connection = SSH(hostname, pi.username, pi.password)
     session = ssh_connection.get_open_session()
 
-    session.exec_command("sudo bash startthemes.sh")
+    # player is now run automatically when you start an ssh session
+    # session.exec_command("sudo bash startthemes.sh")
     stdin = session.makefile("wb", -1)
     quitting = False
     while not quitting:
