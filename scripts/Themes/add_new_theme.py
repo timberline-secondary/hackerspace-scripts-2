@@ -6,12 +6,13 @@ from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
 hostname = "pi-themes"
+THEMES_PATH = "/mnt/usb0/"
 
 
 def add_new_theme():
-    #gets and checks the url of the file
+    # gets and checks the url of the file
     mp3_url = True
-    while mp3_url == True:
+    while mp3_url is True:
         have_good_input = False
         mp3_url = ""
         while not have_good_input:
@@ -20,18 +21,18 @@ def add_new_theme():
             if mp3_url == 'q':
                 break
 
-                    #check content to ensure proper mp3 type
+            # check content to ensure proper mp3 type
             mime_type_good = utils.verify_mimetype(mp3_url, "audio/mpeg")
 
             have_good_input = mime_type_good
 
-        if have_good_input: #then get file number
+        if have_good_input:  # then get file number
 
             have_good_input = False
             while not have_good_input:
                 filename = os.path.basename(urlparse(mp3_url).path)
                 name, ext = os.path.splitext(filename)
-                #check if filename is already a number, and offer to use it
+                # check if filename is already a number, and offer to use it
                 try:
                     name = int(name)
                     good_name_already = True
@@ -56,13 +57,12 @@ def add_new_theme():
 
             print("Sending {} to pi-themes to see if file exists already with that name.".format(filename))
 
-            filepath = "/mnt/usb0/"
-            command = "wget -O {}{} {} && exit".format(filepath, filename, mp3_url)
+            command = "wget -O {}{} {} && exit".format(THEMES_PATH, filename, mp3_url)
 
             ssh_connection = SSH(hostname, pi.username, pi.password)
 
-            #checks if file exists, and if user wants to overwrite it
-            already_exists = ssh_connection.file_exists(filepath, filename)
+            # checks if file exists, and if user wants to overwrite it
+            already_exists = ssh_connection.file_exists(THEMES_PATH, filename)
 
             # asks user if they want to overwrite https://www.quora.com/I%E2%80%99m-new-to-Python-how-can-I-write-a-yes-no-question
             if already_exists:
@@ -80,7 +80,7 @@ def add_new_theme():
             else:
                 utils.print_error("Something went wrong. Expected true or false but got something else")
 
-            #sends the command
+            # sends the command
             if not already_exists:
                 ssh_connection.send_cmd(command)
 
