@@ -24,7 +24,7 @@ def speak():
             dialogue_new = "\"{}\"".format(dialogue_old)
 
             #puts new dialogue into the command: https://www.dexterindustries.com/howto/make-your-raspberry-pi-speak/
-            command = "sudo espeak -a 200 {} 2>/dev/null".format(dialogue_new)
+            command = "espeak -a 200 {} 2>/dev/null".format(dialogue_new)
 
             #connects then sends command
 
