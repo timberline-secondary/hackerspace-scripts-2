@@ -5,19 +5,18 @@ from scripts._utils import utils
 
 
 hostname = "pi-themes"
-#this code worked on by Nicholas (Tseilorin) Hopkins
+# this code worked on by Nicholas (Tseilorin) Hopkins
 
 def play():
     # connect to pi-themes
     ssh_connection = SSH(hostname, pi.username, pi.password)
     session = ssh_connection.get_open_session()
 
-    # player is now run automatically when you start an ssh session
-    # session.exec_command("sudo bash startthemes.sh")
+    session.exec_command("cd /home/pi/themes && sh startup.sh")
     stdin = session.makefile("wb", -1)
     quitting = False
     while not quitting:
-        #gets user input for whatever song they want to play
+        # gets user input for whatever song they want to play
         song_number = utils.input_styled("Give me a song number. (q to quit): \n")
         if song_number == 'q':
             quitting = True
