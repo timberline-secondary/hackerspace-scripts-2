@@ -39,19 +39,19 @@ def add_new_theme():
                 except ValueError:
                     good_name_already = False
 
-                prompt = "What number (integers only) do you want to give it?" + (" [Enter] = {}".format(name) if good_name_already else "") + "\n"
-                mp3_number = utils.input_styled(prompt)
+                prompt = "What code do you want to give it?" + (" [Enter] = {}".format(name) if good_name_already else "") + "\n"
+                mp3_code = utils.input_styled(prompt)
 
-                try:
-                    if good_name_already and not mp3_number:
-                        mp3_number = name
-                    else:
-                        mp3_number = int(mp3_number)
-                    have_good_input = True
-                except ValueError:
-                    utils.print_error("Dude, that wasn't an integer! ")
-                    have_good_input = False
-            filename = "{}.mp3".format(mp3_number)
+                # try:
+                if good_name_already and not mp3_code:
+                    mp3_code = name
+                # else:
+                #     mp3_number = int(mp3_number)
+                have_good_input = True
+                # except ValueError:
+                #     utils.print_error("Dude, that wasn't an integer! ")
+                #     have_good_input = False
+            filename = "{}.mp3".format(mp3_code)
 
             # print("test: {}".format(filename))
 
