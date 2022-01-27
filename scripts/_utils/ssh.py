@@ -288,7 +288,8 @@ class SSH():
             self.transport.close()
 
     def is_connected(self):
-        error_msg = "Not connected."
+        print(self.client)
+        print(self.client.get_transport())
         if self.client and self.client.get_transport() is not None and self.client.get_transport().is_active():
             try:
                 transport = self.client.get_transport()
@@ -296,10 +297,9 @@ class SSH():
                 return True
             except EOFError:
                 # not connected
-                print_error(error_msg)
-                return False
+                pass
 
-        print_error(error_msg)
+        print_error("Not connected.")
         return False
 
     # https://daanlenaerts.com/blog/2016/07/01/python-and-ssh-paramiko-shell/
