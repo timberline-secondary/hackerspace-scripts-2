@@ -23,6 +23,10 @@ def puppet_run(computer_number=None, password=None, auto_fix_certificates=False)
     # now that we know we have a connected computer, ssh into it and try to run puppet
     success = False
     ssh_connection = SSH(computer_host, username, password)
+
+    if not ssh_connection.is_connected():
+        utils.print_warning("\nComputer is online, but cant' connect. Maybe it's mining?\n") 
+
     puppet_command = '/usr/bin/puppet agent -t'
 
     while not success:
