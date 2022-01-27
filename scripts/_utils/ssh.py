@@ -51,8 +51,8 @@ class SSH():
         self.transport = None  # used for complex commands
         self.sftp = None       # used for file operations
 
-        success = self.connect()
-        if success:
+        self.client_is_connected = self.connect()
+        if self.client_is_connected:
             self.connect_transport()
             self.connect_sftp()
 
@@ -288,9 +288,7 @@ class SSH():
             self.transport.close()
 
     def is_connected(self):
-        print(self.client)
-        print(self.client.get_transport())
-        if self.client and self.client.get_transport() is not None and self.client.get_transport().is_active():
+        if self.client and self.client_is_connected and self.client.get_transport() is not None and self.client.get_transport().is_active():
             try:
                 transport = self.client.get_transport()
                 transport.send_ignore()
