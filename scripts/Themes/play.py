@@ -12,7 +12,7 @@ def play():
     ssh_connection = SSH(hostname, pi.username, pi.password)
     session = ssh_connection.get_open_session()
 
-    session.exec_command("cd /home/pi/themes && python themes.py")
+    session.exec_command("cd /home/pi/themes && python themes.py slient)
     stdin = session.makefile("wb", -1)
     quitting = False
     while not quitting:
