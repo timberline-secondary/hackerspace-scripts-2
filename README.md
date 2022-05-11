@@ -12,4 +12,4 @@ Install Instructions:
 1. Move into the git repo: `mv hackerspace-scripts-2`
 1. Run the setup script: `./control-panel` or `bash control-panel`
 
-Once install is complete, log out and back in again. You should  now be able to run the control-panel from anywhere by typing `controlpanel` in a terminal.  You can also autocomplete by typing `cont` + <kbd>Tab</kbd>
+Once install is complete, log out and back in again. You should  now be able to run the control-panel from anywhere by typing `control-panel` in a terminal.  You can also autocomplete by typing `cont` + <kbd>Tab</kbd>
