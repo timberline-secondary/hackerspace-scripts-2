@@ -7,9 +7,9 @@ Install Instructions:
 
 1. Open a Terminal (Ctrl + Alt + T)
 1. Create a bin directory in your home: `mkdir ~/bin`
-1. Go into the bin dir:  `mv ~/bin`
-1. Clone the git repository into thebin dir: `git clone https://github.com/timberline-secondary/hackerspace-scripts-2.git`
-1. Move into the git repo: `mv hackerspace-scripts-2`
+1. Go into the bin dir:  `cd ~/bin`
+1. Clone the git repository into the bin dir: `git clone https://github.com/timberline-secondary/hackerspace-scripts-2.git`
+1. Move into the git repo: `cd hackerspace-scripts-2`
 1. Run the setup script: `./control-panel` or `bash control-panel`
 
 Once install is complete, log out and back in again. You should  now be able to run the control-panel from anywhere by typing `control-panel` in a terminal.  You can also autocomplete by typing `cont` + <kbd>Tab</kbd>
