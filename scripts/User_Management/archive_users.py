@@ -27,9 +27,13 @@ def archive_users():
             confirmation = utils.input_styled("Are you sure you wish it proceed? [y/N] (q to quit): \n")
             if confirmation[0].lower() == "y":
                 ssh_connection.send_cmd(f"rm -rf {home_root}{username}/", sudo=True)
-                utils.print_success(f'deleted {home_root}{username}/')
+                utils.print_warning(f'deleted {home_root}{username}/')
                 ssh_connection.send_cmd(f"cp -R /etc/skel {home_root}{username}", sudo=True)
-                utils.print_success(f'place skeleton to {home_root}{username}/')
+                utils.print_warning(f'place skeleton to {home_root}{username}/')
+                if ssh_connection.dir_exists(f"{home_root}{username}"):
+                    utils.print_success("User was successfully archived, skeleton placed.")
+                else:
+                    utils.print_error("FATAL: Unable to archive user (no home_dir)")
             elif confirmation == "q":
                 break
             else:

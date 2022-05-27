@@ -37,9 +37,17 @@ def refresh_user():
         ssh_connection.send_cmd(copy, sudo=True)
         for dir in dirs:
             transfer_files(home_dir, dir, ssh_connection)
-        remove_backup = f"rm -rf {home_dir}.bu"
-        ssh_connection.send_cmd(remove_backup, sudo=True)
-        utils.print_success("Operation complete, please have the user log back in.")
+        if ssh_connection.dir_exists(home_dir):
+            remove_backup = f"rm -rf {home_dir}.bu"
+            ssh_connection.send_cmd(remove_backup, sudo=True)
+            utils.print_success("Operation complete, please have the user log back in.")
+        else:
+            revert_to_backup = f"mv {home_dir}.bu {home_dir}"
+            ssh_connection.send_cmd(revert_to_backup, sudo=True)
+            if ssh_connection.dir_exists(home_dir):
+                utils.print_error("Could not create new home_dir, reverting to backup (No changes).")
+            else:
+                utils.print_error("FATAL (PANIC): Error while creating home_dir, could not revert to backup.")
     else:
         # no home drive!  Need to make it
         utils.print_warning("No home drive detected, creating new home drive...")
