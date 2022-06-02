@@ -7,7 +7,8 @@ SERVER_USERNAME = 'hackerspace_admin'
 
 
 def repair_user_desktop():
-    ssh_connection = SSH(hostname, SERVER_USERNAME)
+    password = getpass("Enter the admin password: ")
+    ssh_connection = SSH(hostname, SERVER_USERNAME, password)
     utils.print_warning("Make sure the student is logged out before running this repair.\n")
     fullname, username = user_utils.get_and_confirm_user()
 
