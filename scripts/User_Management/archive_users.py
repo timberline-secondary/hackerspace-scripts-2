@@ -28,7 +28,8 @@ def archive_users():
             if confirmation[0].lower() == "y":
                 ssh_connection.send_cmd(f"rm -rf {home_root}{username}/", sudo=True)
                 utils.print_warning(f'deleted {home_root}{username}/')
-                ssh_connection.send_cmd(f"cp -R /etc/skel {home_root}{username}", sudo=True)
+                skeleton = f"bash /nfshome/makehomedirs.sh {username}"
+                ssh_connection.send_cmd(skeleton, sudo=True)
                 utils.print_warning(f'place skeleton to {home_root}{username}/')
                 if ssh_connection.dir_exists(f"{home_root}{username}"):
                     utils.print_success("User was successfully archived, skeleton placed.")
