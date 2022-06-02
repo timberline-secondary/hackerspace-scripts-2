@@ -19,7 +19,10 @@ def transfer_files(home_dir, dir, connection):
 
 def refresh_user():
     utils.print_warning("This will refresh a user's account by removing all their customizations and settings. However their files/documents will remain. This can be used if the user is experiences UI issues or having other weird problems with their account.")
-    ssh_connection = SSH(hostname, SERVER_USERNAME)
+    password = getpass("Enter the admin password: ")
+    ssh_connection = SSH(hostname, SERVER_USERNAME, password)
+    if not ssh_connection.is_connected():
+        return False
     utils.print_error("ENSURE THE USER IS LOGGED OUT BEFORE PERFORMING THIS ACTION!\n")
     fullname, username = user_utils.get_and_confirm_user()
 
