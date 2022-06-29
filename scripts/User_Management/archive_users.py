@@ -25,7 +25,8 @@ def archive_users():
         if is_not_system_user and is_older_than_five_years:
             utils.print_error(f"Wiping home drive of user {user_id}: {username}\n")
             confirmation = utils.input_styled("Are you sure you wish it proceed? [y/N] (q to quit): \n")
-            if confirmation[0].lower() == "y":
+
+            if confirmation and confirmation[0].lower() == "y":
                 ssh_connection.send_cmd(f"rm -rf {home_root}{username}/", sudo=True)
                 utils.print_warning(f'deleted {home_root}{username}/')
                 skeleton = f"bash /nfshome/makehomedirs.sh {username}"
