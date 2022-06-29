@@ -26,7 +26,7 @@ def archive_users():
         is_older_than_five_years = current_year - account_creation_year >= 5
 
         if is_not_system_user and is_older_than_five_years and username not in PROTECTED_USERS:
-            utils.print_error(f"Wiping home drive of user {user_id}: {username}, account created in {account_creation_year}\n")
+            utils.print_error(f"Wiping home drive of user {user_id}: {username}, account created in 20{account_creation_year}\n")
             confirmation = utils.input_styled("Are you sure you wish it proceed? [y/N] (q to quit): \n")
 
             if confirmation and confirmation[0].lower() == "y":
