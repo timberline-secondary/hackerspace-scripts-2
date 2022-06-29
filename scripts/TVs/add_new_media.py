@@ -27,8 +27,12 @@ def get_media_url():
         if media_url == "q":
             return None, None, None
 
+        # if file was pasted in, it may be surrounded in single quotes, remove them:
+        if media_url[0] == "'" and media_url[-1] == "'":
+            media_url = media_url[1:-1]  # remove first and last characters
+
         filepath = media_url
-        local = True
+        local = True  # assume local by default
 
         # if starts with a slash then local file
         if media_url[0] != '/':  # not local
@@ -117,12 +121,12 @@ def add_new_media(username=None, tv=None):
         if local:
             # transfer local file
             # TODO combine this into method with add_new_title() identical code
-            local_command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(
+            local_command = 'sshpass -p "{}" scp {} {}@{}:{}{}'.format(
                 TV_FILE_SERVER_PW, 
                 media_url, 
                 TV_FILE_SERVER_USER, 
                 TV_FILE_SERVER, 
-                filepath
+                filepath, filename
             )
 
             status = os.system(local_command)

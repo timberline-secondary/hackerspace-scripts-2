@@ -165,6 +165,10 @@ def get_users_name(username: str):
     Returns:
         [str] -- The user's Name (in gecos field) if they exist, else None if username doesn't exist
     """
+    if not username:
+        print("No username entered.")
+        return None
+
     try:
         return pwd.getpwnam(username).pw_gecos
     except KeyError:
