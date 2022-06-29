@@ -13,6 +13,9 @@ current_year = int(datetime.date.today().strftime(
     "%Y")[-2:])
 
 
+PROTECTED_USERS = ['tylere.couture', 'hackerspace_admin']
+
+
 def archive_users():
     ssh_connection = SSH(hostname, SERVER_USERNAME)
     for p in pwd.getpwall():
@@ -22,7 +25,7 @@ def archive_users():
         is_not_system_user = 1000 < user_id < 60000
         is_older_than_five_years = current_year - account_creation_year >= 5
 
-        if is_not_system_user and is_older_than_five_years:
+        if is_not_system_user and is_older_than_five_years and username not in PROTECTED_USERS:
             utils.print_error(f"Wiping home drive of user {user_id}: {username}, account created in {account_creation_year}\n")
             confirmation = utils.input_styled("Are you sure you wish it proceed? [y/N] (q to quit): \n")
 
