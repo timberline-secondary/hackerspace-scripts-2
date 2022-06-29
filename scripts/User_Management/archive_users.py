@@ -39,4 +39,4 @@ def archive_users():
             elif confirmation == "q":
                 break
             else:
-                pass
+                print("Skipping...")
