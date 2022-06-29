@@ -1,5 +1,6 @@
 import os
 import argparse
+from PIL import Image
 
 
 def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_image=7, fade_duration=1, color_space='yuv420p', output_file='/tmp/slideshow.mp4'):
@@ -31,16 +32,15 @@ def movie_maker(resolution='1920:1080', images_directory='images', seconds_per_i
     filter_complex = '-filter_complex "'
     for i, image in enumerate(image_files):
         # first image only fades out
-        if i is 0:
+        if i == 0:
             fade = fade_out
         else:
             fade = fade_in_and_out
-        
-        #Fade to black:
+
+        # Fade to black:
         filter_complex += '[{}:v]{},{}:d=1[v{}]; '.format(i, frame_settings, fade, i)
-        #Crossfade:
-        #filter_complex += f'[{i}:v]{frame_settings},[{i}]format=yuva444p,{fade}:d=1[v{i}]; '
-        
+        # Crossfade:
+        # filter_complex += f'[{i}:v]{frame_settings},[{i}]format=yuva444p,{fade}:d=1[v{i}]; '
 
     for i in range(num_images):
         filter_complex += '[v{}]'.format(i)  # [v0][v1][v2][v3][v4]concat=n=5
@@ -79,3 +79,25 @@ if __name__ == "__main__":
 
     movie_maker(**kwargs)
 
+
+def gif2mp4(path_to_gif):
+    """ 
+    Convert an animated gif to mp4 via ffmpeg.  
+    Return False if the conversion fails, otherwise returns the path to the new mp4
+    """
+
+    im = Image.open(path_to_gif)
+    if not im.is_animated:
+        print(f"GIF to MP4 conversion failed. This is not an animated gif: {path_to_gif}")
+        return False
+
+    # https://unix.stackexchange.com/questions/40638/how-to-do-i-convert-an-animated-gif-to-an-mp4-or-mv4-on-the-command-line
+    mp4_filepath = path_to_gif + ".mp4"
+    cmd = f'ffmpeg -i {path_to_gif} -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" {mp4_filepath}'
+
+    exit_status = os.system(cmd)
+
+    if exit_status == 0:
+        return mp4_filepath
+    else:
+        return False

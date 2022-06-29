@@ -1,4 +1,5 @@
 import pwd
+import magic
 from urllib.error import URLError
 from urllib.request import urlopen
 import subprocess
@@ -52,27 +53,35 @@ def print_heading(title):
     print()
 
 
-def verify_mimetype(file_url, mimetype_string):
+def verify_mimetype(file_url, mimetype_string, local=False):
     if mimetype_string is None:
         print_error(" This media type is not supported.")
         return False
 
     file_url = file_url.strip()
-    try:
-        with urlopen(file_url) as response:
-            ct = response.info().get_content_type()
-            if ct == mimetype_string:
-                print_success("File looks good.")
-                return True
-            else:
-                print_error("Something is funky about this file. I expected type '{}' but got '{}'.".format(mimetype_string, ct))
-    except ValueError as e:
-        print_error(str(e))
-    except URLError as e:
-        print('That is a bad URL.')
-        print_error(str(e))
 
-    return False
+    if local:
+        try: 
+            mt = magic.from_file(file_url, mime=True)
+        except FileNotFoundError as e:
+            print("Can't find this file.")
+            print_error(str(e))          
+    else:  # web url
+        try:
+            with urlopen(file_url) as response:
+                mt = response.info().get_content_type()
+        except ValueError as e:
+            print_error(str(e))
+        except URLError as e:
+            print("That is a bad URL.")
+            print_error(str(e))
+
+    if mt == mimetype_string:
+        print_success(f"File looks good: {mt}")
+        return True
+    else:
+        print_error(f"Something is funky about this file. I expected type '{mimetype_string}' but got '{ct}'.")
+        return False
 
 
 def user_exists(username):

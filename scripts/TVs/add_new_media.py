@@ -22,14 +22,22 @@ def get_media_url():
     mime_type_good = False
     # creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
-        media_url = utils.input_styled("Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url: \n")
+        media_url = utils.input_styled("Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url, \nor drag and drop a local file into the terminal: \n")
 
         if media_url == "q":
             return None, None, None
 
-        # takes url and breaks it into name with no extension, and the extension into variables
-        parsed_url_tuple = urlparse(media_url)
-        name_with_ext = os.path.basename(parsed_url_tuple.path)
+        filepath = media_url
+        local = True
+
+        # if starts with a slash then local file
+        if media_url[0] != '/':  # not local
+            local = False
+            # takes url and breaks it into name with no extension, and the extension into variables
+            parsed_url_tuple = urlparse(media_url)
+            filepath = parsed_url_tuple.path
+
+        name_with_ext = os.path.basename(filepath)
         name_without_ext, extension = os.path.splitext(name_with_ext)
 
         # verifies mime type
@@ -41,17 +49,17 @@ def get_media_url():
             expected_mime_type = None
 
         # checks if file is what it really says it is
-        mime_type_good = utils.verify_mimetype(media_url, expected_mime_type)
+        mime_type_good = utils.verify_mimetype(media_url, expected_mime_type, local)
 
         # returns necessary veriables to continue the code once mime type has been verified
-    return media_url, name_without_ext, extension
+    return media_url, name_without_ext, extension, local
 
 
 def add_new_media(username=None, tv=None):
     media_url = True
     while media_url:
         # gets and checks the url of the file
-        media_url, name_without_ext, extension = get_media_url()
+        media_url, name_without_ext, extension, local = get_media_url()
         if media_url is None:
             return
 
@@ -70,7 +78,7 @@ def add_new_media(username=None, tv=None):
             tv = tv_input
 
         image_name = None
-        name_good = utils.input_styled("What is the name of this image? (default = {}): ".format(name_without_ext))
+        name_good = utils.input_styled("What is the name of this media? (default = {}): ".format(name_without_ext))
         if not name_good:
             image_name = name_without_ext
         else:
@@ -78,7 +86,7 @@ def add_new_media(username=None, tv=None):
 
         filename = username + ".z." + image_name + extension
 
-        # Save videos directly in the tv's rtoot directory.
+        # Save videos directly in the tv's root directory.
         if is_video(extension.lower()):
             filepath = "{}/tv{}/".format(TV_ROOT, tv)
         # Save images into a subfolder, which will be used to generate a slideshow video
@@ -97,25 +105,42 @@ def add_new_media(username=None, tv=None):
                 yes_is_default=False
         ):
             # don't want to overwrite, so get a new name:
-            image_name = utils.input_styled("Provide a different name for the image: ")
+            image_name = utils.input_styled("Provide a different name for the media: ")
             filename = username + ".z." + image_name + extension
             # check again
             already_exists = ssh_connection.file_exists(filepath, filename)
-
-        command = "wget -O {}{} '{}' && exit".format(filepath, filename, media_url)
 
         # make sure the directory exists, if not create it:
         if not ssh_connection.file_exists(filepath):
             ssh_connection.send_cmd('mkdir {}'.format(filepath))
 
-        success = ssh_connection.send_cmd(command)
+        if local:
+            # transfer local file
+            # TODO combine this into method with add_new_title() identical code
+            local_command = 'sshpass -p "{}" scp {} {}@{}:{}'.format(
+                TV_FILE_SERVER_PW, 
+                media_url, 
+                TV_FILE_SERVER_USER, 
+                TV_FILE_SERVER, 
+                filepath
+            )
+
+            status = os.system(local_command)
+            #  https://docs.python.org/3/library/os.html#os.WEXITSTATUS
+            success = os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0
+
+        else:
+            # download from web
+            command = "wget -O {}{} '{}' && exit".format(filepath, filename, media_url)
+            success = ssh_connection.send_cmd(command)
+
         if success:
             utils.print_success("{} was succesfully sent over to pi-tv{}".format(filename, tv))
         else:
             utils.print_error("Something went wrong.  Check the filename, is it wonky with weird characters?")
 
         # asks user if they want to add another image
-        if utils.confirm("Would you like to add another image?"):
+        if utils.confirm("Would you like to add another image or video?"):
             media_url = True
         else:
             break
