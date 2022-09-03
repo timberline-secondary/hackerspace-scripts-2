@@ -72,7 +72,7 @@ Usernames can include @stu.sd72.bc.ca or not.  If it is included, it will be rem
                     name_column = row.index(name_heading)
                     email_column = row.index(email_heading)
                 except ValueError:  # column doesn't exist
-                    utils.print_warning("Expected csv columns '{name_heading}' and '{email_heading}' not found:")
+                    utils.print_warning(f"Expected csv columns '{name_heading}' and '{email_heading}' not found:")
                     print(row)
                     print("-" * 30)
                     traceback.print_exc(file=sys.stdout)
