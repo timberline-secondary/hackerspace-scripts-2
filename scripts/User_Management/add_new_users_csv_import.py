@@ -1,5 +1,7 @@
 import os
 import csv
+import sys
+import traceback
 
 from scripts._utils import utils, ssh
 
@@ -22,7 +24,6 @@ Name, Email1
 "Bloggins, Jimmy", "jimmy.bloggins@stu.sd72.bc.ca"
 ...etc
 
-There should be no headings row, just students.
 Usernames can include @stu.sd72.bc.ca or not.  If it is included, it will be removed and only firstname.lastname will be used for their username
 """)
     print("""To get this list from MyEd:
@@ -71,6 +72,10 @@ Usernames can include @stu.sd72.bc.ca or not.  If it is included, it will be rem
                     name_column = row.index(name_heading)
                     email_column = row.index(email_heading)
                 except ValueError:  # column doesn't exist
+                    utils.print_warning("Expected csv column not found.")
+                    print("-" * 30)
+                    traceback.print_exc(file=sys.stdout)
+                    print("-" * 30)
                     ssh_connection.close()
                     return False
             else:
