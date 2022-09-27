@@ -97,10 +97,21 @@ def is_ffmpeg_compatible(file_url) -> bool:
     return err == b''
 
 
+def process_gif(im, file_url) -> Tuple[bool, Union[str, None], bool]:
+    if not im.is_animated:  # gif with 1 frame -> png
+        im.seek(1)  # go to 1st frame
+        im.save('/tmp/verified.png', **im.info)  # save the first frame to a png img
+        return True, '/tmp/verified.png', True
+    else:  # animated gif -> mp4
+        clip = mp.VideoFileClip(file_url)
+        clip.write_videofile("/tmp/verified.mp4")
+        return True, '/tmp/verified.mp4', True
+
+
 def verify_media_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None], bool]:
     """
-    Verifies and fixes media
-    :returns: status and file path and local
+    Verifies image media integrity (i.e. png, jpg, gif, etc.)
+    :returns: success, media_url, and local (if media_url is local path)
     """
     try:  # test if input is image
         im = Image.open(file_url)
@@ -108,14 +119,7 @@ def verify_media_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None
         return True, file_url, local
 
     if mime == 'image/gif':
-        if not im.is_animated:  # gif with 1 frame -> png
-            im.seek(1)  # go to 1st frame
-            im.save('/tmp/verified.png', **im.info)  # save the first frame to a png img
-            return True, '/tmp/verified.png', True
-        else:  # animated gif -> mp4
-            clip = mp.VideoFileClip(file_url)
-            clip.write_videofile("/tmp/verified.mp4")
-            return True, '/tmp/verified.mp4', True
+        return process_gif(im, file_url)
     else:  # if image is not a gif
         try:
             if not is_ffmpeg_compatible(file_url):  # Check if not compatible
