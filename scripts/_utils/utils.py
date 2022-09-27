@@ -1,8 +1,13 @@
 import pwd
+from typing import Union, Tuple
+
+import PIL
 import magic
 from urllib.error import URLError
 from urllib.request import urlopen
 import subprocess
+from PIL import Image
+import moviepy.editor as mp
 
 # from getpass import getpass
 
@@ -54,6 +59,8 @@ def print_heading(title):
 
 
 def verify_mimetype(file_url, mimetype_string, local=False):
+    mt = ''
+
     if mimetype_string is None:
         print_error(" This media type is not supported.")
         return False
@@ -61,11 +68,11 @@ def verify_mimetype(file_url, mimetype_string, local=False):
     file_url = file_url.strip()
 
     if local:
-        try: 
+        try:
             mt = magic.from_file(file_url, mime=True)
         except FileNotFoundError as e:
             print("Can't find this file.")
-            print_error(str(e))          
+            print_error(str(e))
     else:  # web url
         try:
             with urlopen(file_url) as response:
@@ -82,6 +89,50 @@ def verify_mimetype(file_url, mimetype_string, local=False):
     else:
         print_error(f"Something is funky about this file. I expected type '{mimetype_string}' but got '{ct}'.")
         return False
+
+
+def is_ffmpeg_compatible(file_url) -> bool:
+    command = "ffmpeg -y -v error -i " + file_url + " /tmp/verify-ffmpeg.mp4"
+    err = subprocess.run(command.split(" "), capture_output=True).stderr
+    return err == b''
+
+
+def verify_media_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None], bool]:
+    """
+    Verifies and fixes media
+    :returns: status and file path and local
+    """
+    try:  # test if input is image
+        im = Image.open(file_url)
+    except PIL.UnidentifiedImageError:  # input is not image
+        return True, file_url, local
+
+    if mime == 'image/gif':
+        if not im.is_animated:  # gif with 1 frame -> png
+            im.seek(1)  # go to 1st frame
+            im.save('/tmp/verified.png', **im.info)  # save the first frame to a png img
+            return True, '/tmp/verified.png', True
+        else:  # animated gif -> mp4
+            clip = mp.VideoFileClip(file_url)
+            clip.write_videofile("/tmp/verified.mp4")
+            return True, '/tmp/verified.mp4', True
+    else:  # if image is not a gif
+        try:
+            if not is_ffmpeg_compatible(file_url):  # Check if not compatible
+                im.save("/tmp/verified-ffmpeg.png")  # If not compatible re-save image
+                if is_ffmpeg_compatible("/tmp/verified-ffmpeg.png"):  # Check compatibility again
+                    # File converted to compatible image format
+                    return True, '/tmp/verified-ffmpeg.png', True
+                else:
+                    print_error("Image cannot be verified nor converted.")  # File is corrupt
+                    return False, None, local
+            else:
+                # file is already ffmpeg compatible
+                return True, file_url, local
+        except Exception as e:
+            # subprocess error, or pillow saving error; file could not be verified
+            print_error(f'File could not be verified with mime: {mime}; {e}')
+            return False, None, local
 
 
 def user_exists(username):
@@ -161,7 +212,7 @@ def input_plus(prompt, default=None, validation_method=None):
         return default
     elif response == "q":
         print("quitting...")
-        return response 
+        return response
     else:
         return response
 
@@ -186,7 +237,6 @@ def confirm(prompt, yes_is_default=True):
             return False
         else:
             return True
-
 
 # def get_admin_pw():
 #     # ask for admin password
