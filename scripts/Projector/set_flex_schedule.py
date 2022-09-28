@@ -49,6 +49,9 @@ def set_flex_schedule():
         confirmation = utils.input_styled("\nIs this the correct schedule? [y/N] (q to quit): \n")
         if confirmation and confirmation[0].lower() == "y":  # update clock file & exit loop
             ssh_connection.send_cmd("touch /home/pi/clock/public/flex-index >> echo '1' > /home/pi/clock/public/flex-index")
+            # prompt reboot
+            if utils.confirm("Clock requires a reboot to update; would you like to reboot now?"):
+                pi.reboot_pi(hostname)
             return True
         elif confirmation == "q":  # Quit loop
             return True
