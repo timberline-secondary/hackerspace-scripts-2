@@ -3,3 +3,4 @@ Pillow==9.0.1
 inquirer==2.7.0
 python-magic==0.4.27
 moviepy==1.0.3
+sty==1.0.4
