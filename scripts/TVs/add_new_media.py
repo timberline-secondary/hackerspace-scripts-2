@@ -57,7 +57,7 @@ def get_media_url():
 
         # If correct mime type verify integrity of media file
         if mime_type_good:
-            success, media_url, local = utils.verify_media_integrity(media_url, expected_mime_type, local)
+            success, media_url, local = utils.verify_image_integrity(media_url, expected_mime_type, local)
             if not success:
                 return None, None, None
 

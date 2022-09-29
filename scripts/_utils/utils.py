@@ -92,12 +92,20 @@ def verify_mimetype(file_url, mimetype_string, local=False):
 
 
 def is_ffmpeg_compatible(file_url) -> bool:
+    """
+    Checks to see if the file (local and non-local) is compatible with ffmpeg.
+    :returns: success
+    """
     command = "ffmpeg -y -v error -i " + file_url + " /tmp/verify-ffmpeg.mp4"
     err = subprocess.run(command.split(" "), capture_output=True).stderr
     return err == b''
 
 
 def process_gif(im, file_url) -> Tuple[bool, Union[str, None], bool]:
+    """
+    Processes gif to static image or mp4
+    :returns: success, media_url, and local (if media_url is local path)
+    """
     if not im.is_animated:  # gif with 1 frame -> png
         im.seek(1)  # go to 1st frame
         im.save('/tmp/verified.png', **im.info)  # save the first frame to a png img
@@ -108,7 +116,7 @@ def process_gif(im, file_url) -> Tuple[bool, Union[str, None], bool]:
         return True, '/tmp/verified.mp4', True
 
 
-def verify_media_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None], bool]:
+def verify_image_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None], bool]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
     :returns: success, media_url, and local (if media_url is local path)
