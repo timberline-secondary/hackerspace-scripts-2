@@ -1,3 +1,5 @@
+from getpass import getpass
+
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 from scripts.User_Management import _utils as user_utils
