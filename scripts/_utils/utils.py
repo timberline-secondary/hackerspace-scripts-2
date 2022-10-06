@@ -8,6 +8,7 @@ from urllib.request import urlopen
 import subprocess
 from PIL import Image
 import moviepy.editor as mp
+import urllib.request
 
 # from getpass import getpass
 
@@ -122,7 +123,13 @@ def verify_image_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None
     :returns: success, media_url, and local (if media_url is local path)
     """
     try:  # test if input is image
-        im = Image.open(file_url)
+        if local:
+            im = Image.open(file_url)
+        else:
+            urllib.request.urlretrieve(
+                file_url,
+                "tmp/download.png")
+            im = Image.open("tmp/download.png")
     except PIL.UnidentifiedImageError:  # input is not image
         return True, file_url, local
 
