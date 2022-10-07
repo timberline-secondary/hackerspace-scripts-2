@@ -1,3 +1,4 @@
+import io
 import pwd
 from typing import Union, Tuple
 
@@ -128,9 +129,9 @@ def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool]:
         return True, '/tmp/verified-svg.png', True
     else:
         return False, svg_url, False
-
-
-def verify_image_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None], bool]:
+        
+        
+def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool, Union[str, None], bool]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
     :returns: success, media_url, and local (if media_url is local path)
@@ -139,11 +140,14 @@ def verify_image_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None
         if local:
             im = Image.open(file_url)
         else:
-            urllib.request.urlretrieve(
-                file_url,
-                "tmp/download.png")
-            im = Image.open("tmp/download.png")
+            try:
+                path = io.BytesIO(urllib.request.urlopen(file_url).read())
+                im = Image.open(path)
+            except (URLError, ValueError):
+                print_error("Bad URL")
+                return False, file_url, local
     except PIL.UnidentifiedImageError:  # input is not image
+        print_error("Bad path")
         return True, file_url, local
 
     if mime == 'image/svg+xml':
@@ -271,6 +275,7 @@ def confirm(prompt, yes_is_default=True):
             return False
         else:
             return True
+
 
 # def get_admin_pw():
 #     # ask for admin password
