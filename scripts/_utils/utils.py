@@ -127,9 +127,14 @@ def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool,
         if local:
             im = Image.open(file_url)
         else:
-            path = io.BytesIO(urllib.request.urlopen(file_url).read())
-            im = Image.open(path)
+            try:
+                path = io.BytesIO(urllib.request.urlopen(file_url).read())
+                im = Image.open(path)
+            except (URLError, ValueError):
+                print_error("Bad URL")
+                return False, file_url, local
     except PIL.UnidentifiedImageError:  # input is not image
+        print_error("Bad path")
         return True, file_url, local
 
     if mime == 'image/gif':
