@@ -118,6 +118,19 @@ def process_gif(im, file_url) -> Tuple[bool, Union[str, None], bool]:
         return True, '/tmp/verified.mp4', True
 
 
+def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool]:
+    """
+    Processes svg to png
+    :returns: success, media_url, and local (if svg_url is local path)
+    """
+    command = 'inkscape -z -e {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
+    err = subprocess.run(command.split(" "), capture_output=True).stderr
+    if err == b'':
+        return True, '/tmp/verified-svg.png', True
+    else:
+        return False, svg_url, False
+
+
 def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool, Union[str, None], bool]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
@@ -137,7 +150,9 @@ def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool,
         print_error("Bad path")
         return True, file_url, local
 
-    if mime == 'image/gif':
+    if mime == 'image/svg+xml':
+        return process_svg(file_url)
+    elif mime == 'image/gif':
         return process_gif(im, file_url)
     else:  # if image is not a gif
         try:
@@ -260,6 +275,7 @@ def confirm(prompt, yes_is_default=True):
             return False
         else:
             return True
+
 
 # def get_admin_pw():
 #     # ask for admin password
