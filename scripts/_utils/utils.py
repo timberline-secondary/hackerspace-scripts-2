@@ -293,9 +293,3 @@ def confirm(prompt, yes_is_default=True):
 #         else:
 #             # bad password
 #             print_error("Incorrect Password. Try again.")
-
-
-if __name__ == "__main__":
-    file_url = input("> ")
-    success, media_url, local = verify_image_integrity(file_url, 'image/png', False)
-    print(success, media_url, local)
