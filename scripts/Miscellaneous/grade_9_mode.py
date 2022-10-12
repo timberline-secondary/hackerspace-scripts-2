@@ -31,7 +31,8 @@ def disengage():
 
 
 def grade_9_mode():
-    confirmation = utils.input_styled("Do you want to engage grade 9s? [e]ngage/[D]isengage (q to quit): \n")
+    utils.print_warning("Engaging grade 9 mode will:\n- Turn off TVs\n- Mute theme player\n")
+    confirmation = utils.input_styled("Do you want to engage grade 9s? [e]ngage/[D]isengage (q to quit): ")
     if confirmation and confirmation[0].lower() == "e":
         engage()
     elif confirmation and confirmation[0].lower() == "q":
