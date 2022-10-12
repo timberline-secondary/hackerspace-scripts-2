@@ -129,8 +129,23 @@ def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool]:
         return True, '/tmp/verified-svg.png', True
     else:
         return False, svg_url, False
-        
-        
+
+
+def remove_transparency(im, file_url) -> Tuple[bool, Union[str, None], bool]:
+    """
+    Removes transparent background from png to opt for a black background
+    :returns: success, media_url, and local (if svg_url is local path)
+    """
+    new_image = Image.new("RGBA", im.size, "BLACK")
+    new_image.paste(im, (0, 0), im)
+
+    try:
+        new_image.save('/tmp/corrected.png', **im.info)
+        return True, '/tmp/corrected.png', True
+    except PIL.UnidentifiedImageError:
+        return False, file_url, False
+
+
 def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool, Union[str, None], bool]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
@@ -152,6 +167,8 @@ def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool,
 
     if mime == 'image/svg+xml':
         return process_svg(file_url)
+    elif mime == 'image/png':
+        return remove_transparency(im, file_url)
     elif mime == 'image/gif':
         return process_gif(im, file_url)
     else:  # if image is not a gif
