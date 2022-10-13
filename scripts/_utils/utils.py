@@ -103,14 +103,14 @@ def is_ffmpeg_compatible(file_url) -> bool:
     return err == b''
 
 
-def process_gif(im, file_url) -> Tuple[bool, Union[str, None], bool]:
+def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool]:
     """
     Processes gif to static image or mp4
     :returns: success, media_url, and local (if media_url is local path)
     """
-    if not im.is_animated:  # gif with 1 frame -> png
-        im.seek(1)  # go to 1st frame
-        im.save('/tmp/verified.png', **im.info)  # save the first frame to a png img
+    if not image.is_animated:  # gif with 1 frame -> png
+        image.seek(1)  # go to 1st frame
+        image.save('/tmp/verified.png', **image.info)  # save the first frame to a png img
         return True, '/tmp/verified.png', True
     else:  # animated gif -> mp4
         clip = mp.VideoFileClip(file_url)
@@ -129,8 +129,23 @@ def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool]:
         return True, '/tmp/verified-svg.png', True
     else:
         return False, svg_url, False
-        
-        
+
+
+def remove_transparency(image, file_url) -> Tuple[bool, Union[str, None], bool]:
+    """
+    Removes transparent background from png to opt for a black background
+    :returns: success, media_url, and local (if svg_url is local path)
+    """
+    new_image = Image.new("RGBA", image.size, "BLACK")
+    new_image.paste(image, (0, 0), image)
+
+    try:
+        new_image.save('/tmp/corrected.png', **image.info)
+        return True, '/tmp/corrected.png', True
+    except PIL.UnidentifiedImageError:
+        return False, file_url, False
+
+
 def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool, Union[str, None], bool]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
@@ -152,6 +167,8 @@ def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool,
 
     if mime == 'image/svg+xml':
         return process_svg(file_url)
+    elif mime == 'image/png':
+        return remove_transparency(im, file_url)
     elif mime == 'image/gif':
         return process_gif(im, file_url)
     else:  # if image is not a gif
