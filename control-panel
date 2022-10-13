@@ -1,36 +1,51 @@
 #!/bin/bash
 
-installdir="/home/$USER/bin/hackerspace-scripts-2"
-FILE="/home/$USER/.profile"
-localdir="$(pwd)"
-string="export PATH=\$PATH:$localdir/"
-
-cd $installdir
-
-echo -e "\n### UPDATING ###\n"
-
-git pull
-
-if grep -q "$string" $FILE; then
-    echo "Already installed"
+if [ ! $# -eq 0 ]; then
+	case "$1" in
+		--docker | -d)
+		  echo -e "\n### BUILDING DOCKER ENV ###\n"
+			docker build -t control-panel .
+			echo -e "\n### REMOVING DANGLING IMAGES ###\n"
+			docker rmi --force $(docker images -f "dangling=true" -q)
+			echo -e "\n### RUNNING IMAGE ###\n"
+			docker run -it control-panel
+			;;
+	  *)
+	    echo -e "\n[ERR]: Flag not recognized\n";;
+	esac
 else
-    echo -e "\n### INSTALLING COMMAND ###\n"
-    echo -e "export PATH=\$PATH:$localdir/" >> $FILE
-    echo "Next time you can log out then back in to use 'control-panel' anywhere from the command line.\n"
+  installdir="/home/$USER/bin/hackerspace-scripts-2"
+  FILE="/home/$USER/.profile"
+  localdir="$(pwd)"
+  string="export PATH=\$PATH:$localdir/"
+
+  cd $installdir
+
+  echo -e "\n### UPDATING ###\n"
+
+  git pull
+
+  if grep -q "$string" $FILE; then
+      echo "Already installed"
+  else
+      echo -e "\n### INSTALLING COMMAND ###\n"
+      echo -e "export PATH=\$PATH:$localdir/" >> $FILE
+      echo "Next time you can log out then back in to use 'control-panel' anywhere from the command line.\n"
+  fi
+
+  if ! test -f "$installdir/env/bin/activate"; then
+      echo -e "\n### INSTALLING PYTHON ENVIRONMENT ###\n"
+      python3 -m venv $installdir/env
+  fi
+
+  source $installdir/env/bin/activate
+
+  echo -e "\n### UPDATING PYTHON ENVIRONMENT ###\n"
+  pip install -r requirements.txt
+
+  echo -e "\n### CHECKING INSTALLED PACAKGES ###\n"
+  python $installdir/bootstrap.py
+
+  echo -e "\n### RUNNING CONTROL PANEL ###\n"
+  python $installdir/controlpanel.py
 fi
-
-if ! test -f "$installdir/env/bin/activate"; then
-    echo -e "\n### INSTALLING PYTHON ENVIRONMENT ###\n"
-    python3 -m venv $installdir/env
-fi
-
-source $installdir/env/bin/activate
-
-echo -e "\n### UPDATING PYTHON ENVIRONMENT ###\n"
-pip install -r requirements.txt
-
-echo -e "\n### CHECKING INSTALLED PACAKGES ###\n"
-python $installdir/bootstrap.py
-
-echo -e "\n### RUNNING CONTROL PANEL ###\n"
-python $installdir/controlpanel.py
