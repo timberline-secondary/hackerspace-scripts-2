@@ -7,6 +7,8 @@ if [ ! $# -eq 0 ]; then
 			docker build -t control-panel .
 			echo -e "\n### REMOVING DANGLING IMAGES ###\n"
 			docker rmi --force $(docker images -f "dangling=true" -q)
+			echo -e "\n### REMOVING EXITED CONTAINERS S##\n"
+			docker rm $(docker ps -a -f status=exited -f status=created -q)
 			echo -e "\n### RUNNING IMAGE ###\n"
 			docker run -it control-panel
 			;;
