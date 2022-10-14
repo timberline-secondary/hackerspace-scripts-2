@@ -14,14 +14,15 @@ Install Instructions:
 
 Once install is complete, log out and back in again. You should  now be able to run the control-panel from anywhere by typing `control-panel` in a terminal.  You can also autocomplete by typing `cont` + <kbd>Tab</kbd>
 
- ### Docker setup instrutions:
- #### ⚠️ `This has to be done every update.`
+ ### 🐳 Docker instructions:
 
- 1. Open a Terminal (Ctrl + Alt + T)
- 2. ensure the working directory IS this repo (i.e. wherever it was cloned to)
- 3. Run `docker build -t control-panel .`
+To run the control-panel in a docker environment do the following:
 
- ### Docker run instructions:
+1. Open a Terminal (Ubuntu: Ctrl + Alt + T)
+2. Run the following: `control-panel --docker`
 
- 1. Open a Terminal (Ctrl + Alt + T)
- 2. Run `docker run -it control-panel`
+OR
+
+1. Open a Terminal (Ctrl + Alt + T)
+2. Ensure the working directory is this directory (i.e. `~/bin/hackerspace-scripts-2`)
+3. Run the following: `./control-panel --docker`
