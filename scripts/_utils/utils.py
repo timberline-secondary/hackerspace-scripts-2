@@ -163,10 +163,19 @@ def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool,
                 return False, file_url, local
     except PIL.UnidentifiedImageError:  # input is not image
         print_error("Bad path")
-        return True, file_url, local
+        return False, file_url, local
 
     if mime == 'image/svg+xml':
-        return process_svg(file_url)
+        success, path, _ = process_svg(file_url)
+        if success:
+            try:
+                image = Image.open(path)
+                return remove_transparency(image, path)
+            except PIL.UnidentifiedImageError:
+                print_error("Something went wrong")
+                return False, file_url, local
+        else:
+            return False, file_url, local
     elif mime == 'image/png':
         return remove_transparency(im, file_url)
     elif mime == 'image/gif':
