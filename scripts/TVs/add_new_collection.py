@@ -14,6 +14,7 @@ def add_new_collection():
 
     if not ssh_connection.dir_exists(server_filepath):
         ssh_connection.send_cmd('mkdir {}'.format(server_filepath))
+        utils.print_success(f"New collection \"{collection_name}\" was created successfully!")
     else:
         utils.print_error("Collection already exists")
 

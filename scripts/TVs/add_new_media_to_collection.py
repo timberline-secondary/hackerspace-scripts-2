@@ -10,6 +10,7 @@ def add_to_collection():
     ssh_connection = SSH(TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW)
     # get all collections in tv3
     collections = ssh_connection.send_cmd("find tv3 -type d", print_stdout=False)
+    # format the collection names from /tv3/<collection_name>/r/n -> <collection_name>
     collection_list = [c[4:-1] for c in collections.split('\n')[1:-1]]
 
     questions = [
