@@ -1,12 +1,9 @@
 import threading
 
+from scripts.TVs._utils import valid_tvs, TV_OFF_CMD, TV_ON_CMD
 from scripts._utils import ssh, pi, utils
 
 host_themes = "pi-themes"
-tvs = ["1", "2", "3", "4"]
-
-TV_OFF_CMD = "echo standby 0 | cec-client -s -d 1"
-TV_ON_CMD = "echo on 0 | cec-client -s -d 1"
 
 
 def tv_thread(command, tv_number):
@@ -20,7 +17,7 @@ def tv_thread(command, tv_number):
 def send_tvs_command(command):
     global thread
 
-    for tv_number in tvs:
+    for tv_number in valid_tvs:
         thread = threading.Thread(target=tv_thread, args=(command, tv_number,))
         thread.start()
 

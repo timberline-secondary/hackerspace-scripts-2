@@ -3,8 +3,6 @@ from scripts._utils import utils
 
 hostname = "pi-themes"
 
-valid_tvs = ['1', '2', '3', '4']
-
 
 def turn_tv_pi_off_and_on_again():
 
