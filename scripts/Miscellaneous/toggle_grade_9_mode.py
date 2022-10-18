@@ -5,6 +5,8 @@ from scripts._utils import ssh, pi, utils
 
 host_themes = "pi-themes"
 
+room_tvs = ["1", "2", "3"]
+
 
 def tv_command(command, tv_number):
     hostname = "pi-tv{}".format(tv_number)
@@ -17,7 +19,9 @@ def tv_command(command, tv_number):
 def manage_tv_threads(command):
     global thread
 
-    for tv_number in valid_tvs:
+    utils.print_styled("Toggling power of TVs 1-3", "\033[36m")
+
+    for tv_number in room_tvs:
         thread = threading.Thread(target=tv_command, args=(command, tv_number,))
         thread.start()
 
@@ -26,6 +30,7 @@ def manage_tv_threads(command):
 
 
 def engage():
+    utils.print_styled("Muting entrance theme machine...", "\033[36m")
     ssh_connection = ssh.SSH(host_themes, pi.username, pi.password)
     ssh_connection.send_cmd("amixer sset 'Headphone',0 0%")
 
@@ -33,6 +38,7 @@ def engage():
 
 
 def disengage():
+    utils.print_styled("Unmuting entrance theme machine...", "\033[36m")
     ssh_connection = ssh.SSH(host_themes, pi.username, pi.password)
     ssh_connection.send_cmd("amixer sset 'Headphone',0 100%")
 
