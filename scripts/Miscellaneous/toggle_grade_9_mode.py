@@ -1,6 +1,6 @@
 import threading
 
-from scripts.TVs._utils import valid_tvs, TV_OFF_CMD, TV_ON_CMD
+from scripts.TVs._utils import TV_OFF_CMD, TV_ON_CMD
 from scripts._utils import ssh, pi, utils
 
 host_themes = "pi-themes"
