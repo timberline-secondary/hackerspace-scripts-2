@@ -1,3 +1,4 @@
+import io
 import pwd
 from typing import Union, Tuple
 
@@ -102,14 +103,14 @@ def is_ffmpeg_compatible(file_url) -> bool:
     return err == b''
 
 
-def process_gif(im, file_url) -> Tuple[bool, Union[str, None], bool]:
+def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool]:
     """
     Processes gif to static image or mp4
     :returns: success, media_url, and local (if media_url is local path)
     """
-    if not im.is_animated:  # gif with 1 frame -> png
-        im.seek(1)  # go to 1st frame
-        im.save('/tmp/verified.png', **im.info)  # save the first frame to a png img
+    if not image.is_animated:  # gif with 1 frame -> png
+        image.seek(1)  # go to 1st frame
+        image.save('/tmp/verified.png', **image.info)  # save the first frame to a png img
         return True, '/tmp/verified.png', True
     else:  # animated gif -> mp4
         clip = mp.VideoFileClip(file_url)
@@ -117,7 +118,35 @@ def process_gif(im, file_url) -> Tuple[bool, Union[str, None], bool]:
         return True, '/tmp/verified.mp4', True
 
 
-def verify_image_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None], bool]:
+def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool]:
+    """
+    Processes svg to png
+    :returns: success, media_url, and local (if svg_url is local path)
+    """
+    command = 'inkscape -z -e {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
+    err = subprocess.run(command.split(" "), capture_output=True).stderr
+    if err == b'':
+        return True, '/tmp/verified-svg.png', True
+    else:
+        return False, svg_url, False
+
+
+def remove_transparency(image, file_url) -> Tuple[bool, Union[str, None], bool]:
+    """
+    Removes transparent background from png to opt for a black background
+    :returns: success, media_url, and local (if svg_url is local path)
+    """
+    new_image = Image.new("RGBA", image.size, "BLACK")
+    new_image.paste(image, (0, 0), image)
+
+    try:
+        new_image.save('/tmp/corrected.png', **image.info)
+        return True, '/tmp/corrected.png', True
+    except PIL.UnidentifiedImageError:
+        return False, file_url, False
+
+
+def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool, Union[str, None], bool]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
     :returns: success, media_url, and local (if media_url is local path)
@@ -126,14 +155,30 @@ def verify_image_integrity(file_url, mime, local) -> Tuple[bool, Union[str, None
         if local:
             im = Image.open(file_url)
         else:
-            urllib.request.urlretrieve(
-                file_url,
-                "tmp/download.png")
-            im = Image.open("tmp/download.png")
+            try:
+                path = io.BytesIO(urllib.request.urlopen(file_url).read())
+                im = Image.open(path)
+            except (URLError, ValueError):
+                print_error("Bad URL")
+                return False, file_url, local
     except PIL.UnidentifiedImageError:  # input is not image
-        return True, file_url, local
+        print_error("Bad path")
+        return False, file_url, local
 
-    if mime == 'image/gif':
+    if mime == 'image/svg+xml':
+        success, path, _ = process_svg(file_url)
+        if success:
+            try:
+                image = Image.open(path)
+                return remove_transparency(image, path)
+            except PIL.UnidentifiedImageError:
+                print_error("Something went wrong")
+                return False, file_url, local
+        else:
+            return False, file_url, local
+    elif mime == 'image/png':
+        return remove_transparency(im, file_url)
+    elif mime == 'image/gif':
         return process_gif(im, file_url)
     else:  # if image is not a gif
         try:
@@ -256,6 +301,7 @@ def confirm(prompt, yes_is_default=True):
             return False
         else:
             return True
+
 
 # def get_admin_pw():
 #     # ask for admin password
