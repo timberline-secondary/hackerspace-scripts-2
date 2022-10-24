@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-RUN apt-get -y update && apt-get install -y python-is-python3 git python3-venv sshpass nmap libmagic-dev ffmpeg
+RUN apt-get -y update && apt-get install -y python-is-python3 git python3-venv sshpass nmap libmagic-dev ffmpeg iputils-ping
 
 ENV USER=asparagus
 
