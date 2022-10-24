@@ -28,7 +28,7 @@ def empty_command(computer_number=None, password=None):
         utils.print_error(f"Couldn't remove the contents of /shared/ for computer {computer_number}.")
 
 
-def empty_shared_drive():
+def empty_shared_dir():
     password = getpass("Enter the admin password: ")
     numbers = utils.input_styled("Enter the computer numbers, seperated by spaces \n"
                                  "(where # is from hostname tbl-h10-#-s e.g: 2 15 30)\n"
