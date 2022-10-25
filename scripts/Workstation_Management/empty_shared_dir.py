@@ -1,8 +1,11 @@
 from getpass import getpass
+
+import inquirer
+
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-username = 'hackerspace_admin'
+username = 'jackson.doolittle'
 computer_host = None
 
 
@@ -19,10 +22,35 @@ def empty_command(computer_number=None, password=None):
         utils.print_warning("\nComputer is online, but can't connect. Maybe it's mining?\n")
         return False
 
-    command = "rm -rf /shared/*"
+    # get all dirs within /shared
+    dirs = ssh_connection.send_cmd("find /shared -type d", print_stdout=False)
+    # format the dirs names from /shared/<dir_name>/r/n -> <dir_name>
+    dir_list = [c[8:-1] for c in dirs.split('\n')[1:-1]]
+
+    questions = [
+        inquirer.Checkbox('dirs',
+                          message="Which would you like to empty? To select use arrow keys ←/→ and ENTER to confirm",
+                          choices=[*dir_list, "ALL", "[Quit]"],
+                          ),
+    ]
+
+    options = inquirer.prompt(questions)["dirs"]
+
+    # Test for quit and ALL first
+    if "[Quit]" in options or options == []:
+        return False
+    elif "ALL" in options:
+        command = "rm -rf /shared/*"
+    else:
+        command = f'rm -rf {" ".join(["/shared/" + dir_name for dir_name in options])}'
 
     ssh_connection.send_cmd(command, sudo=True)
-    if ssh_connection.send_cmd("ls /shared/") == "":
+
+    # test if still there
+    command = f'ls -d {" ".join(["/shared/" + dir_name for dir_name in options])} > /dev/null'
+    stdin, stdout, stderr = ssh_connection.client.exec_command(command)
+    exit_status = stdout.channel.recv_exit_status()
+    if exit_status != 0:
         utils.print_success("Successfully removed contents.")
     else:
         utils.print_error(f"Couldn't remove the contents of /shared/ for computer {computer_number}.")
