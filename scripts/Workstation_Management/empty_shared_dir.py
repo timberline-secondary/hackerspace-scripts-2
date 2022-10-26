@@ -5,7 +5,7 @@ import inquirer
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-username = 'jackson.doolittle'
+username = 'hackerspace_admin'
 computer_host = None
 
 
