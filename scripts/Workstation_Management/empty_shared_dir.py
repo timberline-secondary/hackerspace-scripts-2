@@ -1,12 +1,20 @@
-from getpass import getpass
-
+import os
 import inquirer
+from getpass import getpass
+from humanize import naturalsize
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
 username = 'hackerspace_admin'
 computer_host = None
+
+
+def get_size(file) -> str:
+    try:
+        naturalsize(os.stat(file).st_size)
+    except:
+        return "0 bytes"
 
 
 def empty_command(computer_number=None, password=None):
@@ -24,8 +32,8 @@ def empty_command(computer_number=None, password=None):
 
     # get all dirs within /shared
     dirs = ssh_connection.send_cmd("find /shared -type d", print_stdout=False)
-    # format the dirs names from /shared/<dir_name>/r/n -> <dir_name>
-    dir_list = [c[8:-1] for c in dirs.split('\n')[1:-1]]
+    # format the dirs names from /shared/<dir_name>/r/n -> <dir_name>, and add folder size with purple colour
+    dir_list = [f"{c[8:-1]} {utils.ByteStyle.HEADER}({get_size('/shared/' + c[8:-1])}){utils.ByteStyle.ENDC}" for c in dirs.split('\n')[1:-1]]
 
     questions = [
         inquirer.Checkbox('dirs',
