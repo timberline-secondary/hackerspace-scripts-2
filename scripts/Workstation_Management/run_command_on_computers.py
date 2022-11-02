@@ -5,7 +5,7 @@ import inquirer
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-username = 'matthew.baker'
+username = 'hackerspace_admin'
 computer_host = None
 
 
@@ -26,7 +26,7 @@ def run_command(computer_number=None, password=None, command=None):
         return False
 
     # run command
-    stdout = ssh_connection.send_cmd(command, print_stdout=False)
+    stdout = ssh_connection.send_cmd(command, sudo=True, print_stdout=False)
     utils.print_success(f"\nRan command with output of:\n")
     print("="*20 + ">\n")
     print(stdout)
