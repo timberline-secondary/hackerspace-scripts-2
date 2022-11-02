@@ -1,4 +1,3 @@
-import os
 import inquirer
 from getpass import getpass
 from humanize import naturalsize
@@ -10,11 +9,12 @@ username = 'hackerspace_admin'
 computer_host = None
 
 
-def get_size(file) -> str:
+def get_size(file, ssh_connection) -> str:
     try:
-        naturalsize(os.stat(file).st_size)
+        file_size = ssh_connection.send_cmd(f"du /shared/{file} -s 2>/dev/null", print_stdout=False)
+        return naturalsize(int(file_size.split("\t")[0]) * 1000)
     except:
-        return "0 bytes"
+        return "-- bytes"
 
 
 def empty_command(computer_number=None, password=None):
@@ -31,9 +31,11 @@ def empty_command(computer_number=None, password=None):
         return False
 
     # get all dirs within /shared
-    dirs = ssh_connection.send_cmd("find /shared -type d", print_stdout=False)
+    dirs = ssh_connection.send_cmd("dir /shared -m", print_stdout=False)
+
     # format the dirs names from /shared/<dir_name>/r/n -> <dir_name>, and add folder size with purple colour
-    dir_list = [f"{c[8:-1]} {utils.ByteStyle.HEADER}({get_size('/shared/' + c[8:-1])}){utils.ByteStyle.ENDC}" for c in dirs.split('\n')[1:-1]]
+    dirs = [n.strip() for n in dirs[:-2].split(",")]
+    dir_list = [f"{dir_name} {utils.ByteStyle.HEADER}({get_size(dir_name, ssh_connection)}){utils.ByteStyle.ENDC}" for dir_name in dirs]
 
     questions = [
         inquirer.Checkbox('dirs',
@@ -50,12 +52,12 @@ def empty_command(computer_number=None, password=None):
     elif "ALL" in options:
         command = "rm -rf /shared/*"
     else:
-        command = f'rm -rf {" ".join(["/shared/" + dir_name for dir_name in options])}'
+        command = f'rm -rf {" ".join(["/shared/" + dir_name.split(" ")[0] for dir_name in options])}'
 
     ssh_connection.send_cmd(command, sudo=True)
 
     # test if still there
-    command = f'ls -d {" ".join(["/shared/" + dir_name for dir_name in options])} > /dev/null'
+    command = f'ls -d {" ".join(["/shared/" + dir_name.split(" ")[0] for dir_name in options])} > /dev/null'
     stdin, stdout, stderr = ssh_connection.client.exec_command(command)
     exit_status = stdout.channel.recv_exit_status()
     if exit_status != 0:
@@ -71,6 +73,9 @@ def empty_shared_dir():
                                  " or 'all' to run on all computers: ")
 
     num_list = numbers.split()
+
+    if num_list == "":
+        return
 
     if num_list[0] == "all":
         num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
