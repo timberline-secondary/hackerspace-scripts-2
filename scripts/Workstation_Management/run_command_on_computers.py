@@ -5,7 +5,7 @@ import inquirer
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-username = 'hackerspace_admin'
+username = 'matthew.baker'
 computer_host = None
 
 
@@ -13,17 +13,17 @@ def run_command(computer_number=None, password=None, command=None, sudo=True):
     computer_host = utils.get_valid_hostname(computer_number)
 
     if command is None:
-        return
+        return False, computer_host
 
     if computer_host is None:
-        return
+        return False, "unknown host"
 
     # now that we know we have a connected computer, ssh into it and try to run command
     ssh_connection = SSH(computer_host, username, password)
 
     if not ssh_connection.is_connected():
         utils.print_warning("\nComputer is online, but can't connect. Maybe it's mining?\n")
-        return False
+        return False, computer_host
 
     # run command
     if type(command) == list:
