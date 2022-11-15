@@ -55,7 +55,7 @@ def get_media_url():
         # checks if file is what it really says it is
         mime_type_good = utils.verify_mimetype(media_url, expected_mime_type, local)
 
-        # returns necessary veriables to continue the code once mime type has been verified
+    # returns necessary veriables to continue the code once mime type has been verified
     return media_url, name_without_ext, extension, local
 
 
