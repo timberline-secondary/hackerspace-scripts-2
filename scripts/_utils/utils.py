@@ -73,12 +73,11 @@ def get_computers_prompt(hostname=None, password=None):
 
         if hostname == "q":
             print("Quitting this.")
-            return None
+            return None, None
 
         num_list = hostname.split()
 
         return num_list, password
-
 
 
 def verify_mimetype(file_url, mimetype_string, local=False):

@@ -30,6 +30,10 @@ def puppet_command(computer_number, password):
 def puppet_clear_certificates(hostname=None, password=None):
     num_list, password = utils.get_computers_prompt(hostname, password)
 
+    # options was quit
+    if num_list is None and password is None:
+        return False
+
     for num in num_list:
         utils.print_warning("Trying computer #{}...".format(num))
         puppet_command(num, password)
