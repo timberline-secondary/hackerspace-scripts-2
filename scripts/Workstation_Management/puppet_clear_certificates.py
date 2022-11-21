@@ -6,12 +6,7 @@ username = 'hackerspace_admin'
 
 
 def puppet_command(computer_number, password):
-    computer_host = utils.get_valid_hostname(computer_number)
-
-    if computer_host is None:
-        return
-
-    remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(computer_host)
+    remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(computer_number)
 
     # now that we know we have a connected computer, ssh into it and try to run command
     ssh_connection_puppet = SSH(puppet_host, username, password)
