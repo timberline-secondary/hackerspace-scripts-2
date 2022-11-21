@@ -5,7 +5,7 @@ from scripts._utils.ssh import SSH
 from scripts.TVs._utils import TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW
 
 
-def add_new_media_to_collection():
+def collection_add_media():
     # connect to hightower
     ssh_connection = SSH(TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW)
     # get all collections in tv3
