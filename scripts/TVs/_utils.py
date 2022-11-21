@@ -13,6 +13,7 @@ mime_types = {
     ".webm": "video/webm",
     ".mkv": "video/x-matroska",
     ".svg": "image/svg+xml",
+    ".gif": "image/gif"
 }
 
 TV_FILE_SERVER = "hightower"
