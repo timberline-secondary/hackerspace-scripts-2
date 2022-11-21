@@ -1,5 +1,6 @@
 import io
 import pwd
+from getpass import getpass
 from typing import Union, Tuple
 
 import PIL
@@ -58,6 +59,25 @@ def print_heading(title):
     print_styled("#" + title.center(width - 2, " ") + "#", color=ByteStyle.HEADER)
     print_styled("#" * width, color=ByteStyle.HEADER)
     print()
+
+
+# simple wrapper over common method
+def get_computers_prompt(hostname=None, password=None):
+    if password is None:
+        password = getpass("Enter the admin password: ")
+
+    if hostname is None:
+        hostname = input_styled("Enter the computer numbers or name, seperated by spaces \n"
+                                     "(where # is from hostname tbl-h10-#-s e.g: test 2 15 30)\n"
+                                     " or 'all' to run on all computers or [q]uit: ")
+
+        if hostname == "q":
+            print("Quitting this.")
+            return None, None
+
+        num_list = hostname.split()
+
+        return num_list, password
 
 
 def verify_mimetype(file_url, mimetype_string, local=False):

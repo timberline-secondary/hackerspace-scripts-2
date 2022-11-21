@@ -11,7 +11,11 @@ def remove_puppet_lock(ssh_connection, password=None, ):
 
     # check when last puppet run was by reading motd
     motd = ssh_connection.send_cmd('cat /etc/motd')
+    last_startup = ssh_connection.send_cmd(f"last reboot | head -1 | awk '{{printf \"%s %s %s {datetime.now().year} %s\", $5, $6, $7, $10}}' && echo ''")
 
+    """
+    MOTD PARSING
+    """
     pattern = r"Last run: (.*)"
 
     time_str = re.search(pattern, motd.strip())
@@ -27,10 +31,18 @@ def remove_puppet_lock(ssh_connection, password=None, ):
 
     time_since_last_puppet_run = datetime.now() - dt  # timedelta
 
-    print(f"That's {str(time_since_last_puppet_run)} ago.")
+    """
+    LAST SHUTDOWN PARSING
+    """
+    dt = datetime.strptime(last_startup, "%a %b %d %Y %I:%M")  # parse the last shutdown date
+
+    time_since_last_startup = datetime.now() - dt
+
+    print(f"That's {str(time_since_last_puppet_run)} ago for last puppet run.")
+    print(f"That's {str(time_since_last_startup)} ago for last startup time.")
 
     # should run every 30 minutes, but give 2 hours to be safe
-    if time_since_last_puppet_run.total_seconds() < 3600 * 2:
+    if time_since_last_puppet_run.total_seconds() < 3600 and time_since_last_startup.total_seconds() < 3600:
         return False
 
     print("Been more than 2 hours, so checking if puppet is locked...")
