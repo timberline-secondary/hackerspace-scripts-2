@@ -13,13 +13,19 @@ mime_types = {
     ".webm": "video/webm",
     ".mkv": "video/x-matroska",
     ".svg": "image/svg+xml",
+    ".gif": "image/gif"
 }
 
 TV_FILE_SERVER = "hightower"
 TV_FILE_SERVER_USER = "pi-slideshow"
 TV_FILE_SERVER_PW = "hackerberry"  # not secure, obvs.
 
-TV_ROOT = "/home/{}".format(TV_FILE_SERVER_USER)  
+TV_ROOT = "/home/{}".format(TV_FILE_SERVER_USER)
+
+valid_tvs = ['1', '2', '3', '4']
+
+TV_OFF_CMD = "echo standby 0 | cec-client -s -d 1"
+TV_ON_CMD = "echo on 0 | cec-client -s -d 1"
 
 
 def get_tv_containing_student(student_number):

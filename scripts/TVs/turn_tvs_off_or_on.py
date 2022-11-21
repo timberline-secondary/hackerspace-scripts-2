@@ -1,15 +1,12 @@
 import os
 from urllib.parse import urlparse
 from urllib.request import urlopen
+
+from scripts.TVs._utils import TV_ON_CMD, TV_OFF_CMD, valid_tvs
 from scripts._utils import pi
 
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
-
-valid_tvs = ['1', '2','3','4']
-
-TV_OFF_CMD = "echo standby 0 | cec-client -s -d 1"
-TV_ON_CMD = "echo on 0 | cec-client -s -d 1"
 
 
 def turn_tvs_off_or_on():

@@ -22,10 +22,10 @@ def get_media_url():
     mime_type_good = False
     # creates a loop so it alwasy goes back to the start instead of exiting the code
     while not mime_type_good:
-        media_url = utils.input_styled("Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url, \nor drag and drop a local file into the terminal: \n")
+        media_url = utils.input_styled("Paste image (png, jpg) or video (mp4, avi, mpeg, etc.) url, \nor drag and drop a local file into the terminal or [q]uit: \n")
 
         if media_url == "q":
-            return None, None, None
+            return "q", None, None, None
 
         # if file was pasted in, it may be surrounded in single quotes, remove them:
         if media_url[0] == "'" and media_url[-1] == "'":
@@ -55,28 +55,53 @@ def get_media_url():
         # checks if file is what it really says it is
         mime_type_good = utils.verify_mimetype(media_url, expected_mime_type, local)
 
-    # returns necessary veriables to continue the code once mime type has been verified
+        # If correct mime type verify integrity of media file
+        if mime_type_good:
+            success, media_url, local, extension = utils.verify_image_integrity(media_url, expected_mime_type, local, extension)
+            if not success:
+                return None, None, None
+
+        # returns necessary veriables to continue the code once mime type has been verified
     return media_url, name_without_ext, extension, local
 
 
 def add_new_media(username=None, tv=None):
+    is_quit = False
+
     media_url = True
-    while media_url:
+    username_invalid = True
+    while media_url and username_invalid:
         # gets and checks the url of the file
         media_url, name_without_ext, extension, local = get_media_url()
         if media_url is None:
             return
+        elif media_url is "q":
+            is_quit = True
+            break
 
         # collects information to name the file, and as to which tv to send it to
-        username_input = utils.input_styled("Enter username (default = {}): \n".format(username))
+        username_input = utils.input_styled("Enter username (default = {}) or [q]uit: \n".format(username))
         if not username_input:
             pass
         else:
             username = username_input
 
+        if username is None:
+            utils.print_warning("Please enter a valid username")
+            return
+        elif username == "q":
+            is_quit = True
+            break
+        else:
+            username_invalid = False
+
         tv = guess_tv(username)
         tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): ".format(tv))
         if not tv_input:
+            if tv_input is None:
+                utils.print_error("There is no TV with that name.")
+                return
+
             pass
         else:
             tv = tv_input
@@ -149,7 +174,8 @@ def add_new_media(username=None, tv=None):
         else:
             break
 
-    ssh_connection.close()
+    if not is_quit:
+        ssh_connection.close()
 
-    if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
-        refresh_slideshow(username=username)
+        if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
+            refresh_slideshow(username=username)

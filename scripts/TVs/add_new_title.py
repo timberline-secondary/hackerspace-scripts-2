@@ -13,6 +13,8 @@ SERVER_USERNAME = "pi-slideshow"
 def add_new_title():
 
     fullname, username = user_utils.get_and_confirm_user()
+    if not fullname:
+        return False
 
     fullname = fullname.title()
 

@@ -1,8 +1,16 @@
+import io
 import pwd
+from getpass import getpass
+from typing import Union, Tuple
+
+import PIL
 import magic
 from urllib.error import URLError
 from urllib.request import urlopen
 import subprocess
+from PIL import Image
+import moviepy.editor as mp
+import urllib.request
 
 # from getpass import getpass
 
@@ -53,7 +61,28 @@ def print_heading(title):
     print()
 
 
+# simple wrapper over common method
+def get_computers_prompt(hostname=None, password=None):
+    if password is None:
+        password = getpass("Enter the admin password: ")
+
+    if hostname is None:
+        hostname = input_styled("Enter the computer numbers or name, seperated by spaces \n"
+                                     "(where # is from hostname tbl-h10-#-s e.g: test 2 15 30)\n"
+                                     " or 'all' to run on all computers or [q]uit: ")
+
+        if hostname == "q":
+            print("Quitting this.")
+            return None, None
+
+        num_list = hostname.split()
+
+        return num_list, password
+
+
 def verify_mimetype(file_url, mimetype_string, local=False):
+    mt = ''
+
     if mimetype_string is None:
         print_error(" This media type is not supported.")
         return False
@@ -61,11 +90,11 @@ def verify_mimetype(file_url, mimetype_string, local=False):
     file_url = file_url.strip()
 
     if local:
-        try: 
+        try:
             mt = magic.from_file(file_url, mime=True)
         except FileNotFoundError as e:
             print("Can't find this file.")
-            print_error(str(e))          
+            print_error(str(e))
     else:  # web url
         try:
             with urlopen(file_url) as response:
@@ -80,8 +109,114 @@ def verify_mimetype(file_url, mimetype_string, local=False):
         print_success(f"File looks good: {mt}")
         return True
     else:
-        print_error(f"Something is funky about this file. I expected type '{mimetype_string}' but got '{ct}'.")
+        print_error(f"Something is funky about this file. I expected type '{mimetype_string}' but got '{mt}'.")
         return False
+
+
+def is_ffmpeg_compatible(file_url) -> bool:
+    """
+    Checks to see if the file (local and non-local) is compatible with ffmpeg.
+    :returns: success
+    """
+    command = "ffmpeg -y -v error -i " + file_url + " /tmp/verify-ffmpeg.mp4"
+    err = subprocess.run(command.split(" "), capture_output=True).stderr
+    return err == b''
+
+
+def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
+    """
+    Processes gif to static image or mp4
+    :returns: success, media_url, and local (if media_url is local path)
+    """
+    if not image.is_animated:  # gif with 1 frame -> png
+        image.seek(1)  # go to 1st frame
+        image.save('/tmp/verified.png', **image.info)  # save the first frame to a png img
+        return True, '/tmp/verified.png', True, ".png"
+    else:  # animated gif -> mp4
+        clip = mp.VideoFileClip(file_url)
+        clip.write_videofile("/tmp/verified.mp4")
+        return True, '/tmp/verified.mp4', True, ".mp4"
+
+
+def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool, str]:
+    """
+    Processes svg to png
+    :returns: success, media_url, and local (if svg_url is local path)
+    """
+    command = 'inkscape -z -e {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
+    err = subprocess.run(command.split(" "), capture_output=True).stderr
+    if err == b'':
+        return True, '/tmp/verified-svg.png', True, ".png"
+    else:
+        return False, svg_url, False, ".svg"
+
+
+def remove_transparency(image, file_url, extension) -> Tuple[bool, Union[str, None], bool, str]:
+    """
+    Removes transparent background from png to opt for a black background
+    :returns: success, media_url, local (if svg_url is local path), and extension
+    """
+    new_image = Image.new("RGBA", image.size, "BLACK")
+    new_image.paste(image, (0, 0), image)
+
+    try:
+        new_image.save('/tmp/corrected.png', **image.info)
+        return True, '/tmp/corrected.png', True, ".png"
+    except PIL.UnidentifiedImageError:
+        return False, file_url, False, extension
+
+
+def verify_image_integrity(file_url: str, mime: str, local: bool, extension: str) -> Tuple[bool, Union[str, None], bool, str]:
+    """
+    Verifies image media integrity (i.e. png, jpg, gif, etc.)
+    :returns: success, media_url, local (if media_url is local path), and extension
+    """
+    try:  # test if input is image
+        if local:
+            im = Image.open(file_url)
+        else:
+            try:
+                path = io.BytesIO(urllib.request.urlopen(file_url).read())
+                im = Image.open(path)
+            except (URLError, ValueError):
+                print_error("Bad URL")
+                return False, file_url, local, extension
+    except PIL.UnidentifiedImageError:  # input is not image
+        print_error("Bad path")
+        return False, file_url, local, extension
+
+    if mime == 'image/svg+xml':
+        success, path, _, _ = process_svg(file_url)
+        if success:
+            try:
+                image = Image.open(path)
+                return remove_transparency(image, path, extension)
+            except PIL.UnidentifiedImageError:
+                print_error("Something went wrong")
+                return False, file_url, local, extension
+        else:
+            return False, file_url, local, extension
+    elif mime == 'image/png':
+        return remove_transparency(im, file_url, extension)
+    elif mime == 'image/gif':
+        return process_gif(im, file_url)
+    else:  # if image is not a gif
+        try:
+            if not is_ffmpeg_compatible(file_url):  # Check if not compatible
+                im.save("/tmp/verified-ffmpeg.png")  # If not compatible re-save image
+                if is_ffmpeg_compatible("/tmp/verified-ffmpeg.png"):  # Check compatibility again
+                    # File converted to compatible image format
+                    return True, '/tmp/verified-ffmpeg.png', True, ".png"
+                else:
+                    print_error("Image cannot be verified nor converted.")  # File is corrupt
+                    return False, None, local, extension
+            else:
+                # file is already ffmpeg compatible
+                return True, file_url, local, extension
+        except Exception as e:
+            # subprocess error, or pillow saving error; file could not be verified
+            print_error(f'File could not be verified with mime: {mime}; {e}')
+            return False, None, local, extension
 
 
 def user_exists(username):
@@ -161,7 +296,7 @@ def input_plus(prompt, default=None, validation_method=None):
         return default
     elif response == "q":
         print("quitting...")
-        return response 
+        return response
     else:
         return response
 
