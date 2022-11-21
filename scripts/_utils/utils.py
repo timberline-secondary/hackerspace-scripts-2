@@ -89,7 +89,7 @@ def verify_mimetype(file_url, mimetype_string, local=False):
         print_success(f"File looks good: {mt}")
         return True
     else:
-        print_error(f"Something is funky about this file. I expected type '{mimetype_string}' but got '{ct}'.")
+        print_error(f"Something is funky about this file. I expected type '{mimetype_string}' but got '{mt}'.")
         return False
 
 
@@ -103,7 +103,7 @@ def is_ffmpeg_compatible(file_url) -> bool:
     return err == b''
 
 
-def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool]:
+def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Processes gif to static image or mp4
     :returns: success, media_url, and local (if media_url is local path)
@@ -111,14 +111,14 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool]:
     if not image.is_animated:  # gif with 1 frame -> png
         image.seek(1)  # go to 1st frame
         image.save('/tmp/verified.png', **image.info)  # save the first frame to a png img
-        return True, '/tmp/verified.png', True
+        return True, '/tmp/verified.png', True, ".png"
     else:  # animated gif -> mp4
         clip = mp.VideoFileClip(file_url)
         clip.write_videofile("/tmp/verified.mp4")
-        return True, '/tmp/verified.mp4', True
+        return True, '/tmp/verified.mp4', True, ".mp4"
 
 
-def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool]:
+def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Processes svg to png
     :returns: success, media_url, and local (if svg_url is local path)
@@ -126,30 +126,30 @@ def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool]:
     command = 'inkscape -z -e {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
     err = subprocess.run(command.split(" "), capture_output=True).stderr
     if err == b'':
-        return True, '/tmp/verified-svg.png', True
+        return True, '/tmp/verified-svg.png', True, ".png"
     else:
-        return False, svg_url, False
+        return False, svg_url, False, ".svg"
 
 
-def remove_transparency(image, file_url) -> Tuple[bool, Union[str, None], bool]:
+def remove_transparency(image, file_url, extension) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Removes transparent background from png to opt for a black background
-    :returns: success, media_url, and local (if svg_url is local path)
+    :returns: success, media_url, local (if svg_url is local path), and extension
     """
     new_image = Image.new("RGBA", image.size, "BLACK")
     new_image.paste(image, (0, 0), image)
 
     try:
         new_image.save('/tmp/corrected.png', **image.info)
-        return True, '/tmp/corrected.png', True
+        return True, '/tmp/corrected.png', True, ".png"
     except PIL.UnidentifiedImageError:
-        return False, file_url, False
+        return False, file_url, False, extension
 
 
-def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool, Union[str, None], bool]:
+def verify_image_integrity(file_url: str, mime: str, local: bool, extension: str) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
-    :returns: success, media_url, and local (if media_url is local path)
+    :returns: success, media_url, local (if media_url is local path), and extension
     """
     try:  # test if input is image
         if local:
@@ -160,24 +160,24 @@ def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool,
                 im = Image.open(path)
             except (URLError, ValueError):
                 print_error("Bad URL")
-                return False, file_url, local
+                return False, file_url, local, extension
     except PIL.UnidentifiedImageError:  # input is not image
         print_error("Bad path")
-        return False, file_url, local
+        return False, file_url, local, extension
 
     if mime == 'image/svg+xml':
-        success, path, _ = process_svg(file_url)
+        success, path, _, _ = process_svg(file_url)
         if success:
             try:
                 image = Image.open(path)
-                return remove_transparency(image, path)
+                return remove_transparency(image, path, extension)
             except PIL.UnidentifiedImageError:
                 print_error("Something went wrong")
-                return False, file_url, local
+                return False, file_url, local, extension
         else:
-            return False, file_url, local
+            return False, file_url, local, extension
     elif mime == 'image/png':
-        return remove_transparency(im, file_url)
+        return remove_transparency(im, file_url, extension)
     elif mime == 'image/gif':
         return process_gif(im, file_url)
     else:  # if image is not a gif
@@ -186,17 +186,17 @@ def verify_image_integrity(file_url: str, mime: str, local: bool) -> Tuple[bool,
                 im.save("/tmp/verified-ffmpeg.png")  # If not compatible re-save image
                 if is_ffmpeg_compatible("/tmp/verified-ffmpeg.png"):  # Check compatibility again
                     # File converted to compatible image format
-                    return True, '/tmp/verified-ffmpeg.png', True
+                    return True, '/tmp/verified-ffmpeg.png', True, ".png"
                 else:
                     print_error("Image cannot be verified nor converted.")  # File is corrupt
-                    return False, None, local
+                    return False, None, local, extension
             else:
                 # file is already ffmpeg compatible
-                return True, file_url, local
+                return True, file_url, local, extension
         except Exception as e:
             # subprocess error, or pillow saving error; file could not be verified
             print_error(f'File could not be verified with mime: {mime}; {e}')
-            return False, None, local
+            return False, None, local, extension
 
 
 def user_exists(username):
