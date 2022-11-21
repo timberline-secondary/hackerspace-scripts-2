@@ -6,7 +6,7 @@ from scripts.Workstation_Management.run_command_on_computers import run_command
 
 
 def lab_report(print_stdout=True):
-    password = getpass("Enter the admin password: ")
+    num_list, password = utils.get_computers_prompt()
 
     cpu_command = "top -bn2 | grep '%Cpu' | tail -1 | grep -P '(....|...) id,'|awk '{print 100-$8 \"%\"}'"
     last_boot = "last reboot | head -1 | awk 'BEGIN { FS = \" \" }; { print $5,$6,$7,$8 }'"
@@ -14,19 +14,12 @@ def lab_report(print_stdout=True):
 
     commands = ["hostname -I", "awk -F: 'BEGIN { FS = \"Last run: \" }; { print $2 }' /etc/motd",
                 last_boot, avail_space, "uname -r", cpu_command]
-    numbers = utils.input_styled("Enter the computer numbers, seperated by spaces \n"
-                                 "(where # is from hostname tbl-h10-#-s e.g: 2 15 30)\n"
-                                 " or 'all' to run on all computers: ")
+
+    # options was quit
+    if num_list is None and password is None:
+        return False
 
     outputs = []
-
-    num_list = numbers.split()
-
-    if num_list == "":
-        return
-
-    if num_list[0] == "all":
-        num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
 
     for num in num_list:
         utils.print_warning("Trying computer #{}...".format(num))
