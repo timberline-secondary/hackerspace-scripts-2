@@ -4,7 +4,7 @@ from scripts._utils import utils
 from scripts.TVs._utils import TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW
 
 
-def add_new_collection():
+def collection_create_new():
     collection_name = utils.input_styled("Name of new collection: \n")
 
     server_filepath = "tv3/{}/".format(collection_name)
