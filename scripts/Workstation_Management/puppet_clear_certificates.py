@@ -5,8 +5,8 @@ puppet_host = 'puppet'
 username = 'hackerspace_admin'
 
 
-def puppet_command(computer_number, password):
-    remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(computer_number)
+def puppet_command(computer_host, password):
+    remove_server_cert_cmd = "/opt/puppetlabs/bin/puppetserver ca clean --certname {}.hackerspace.tbl".format(computer_host)
 
     # now that we know we have a connected computer, ssh into it and try to run command
     ssh_connection_puppet = SSH(puppet_host, username, password)
@@ -31,4 +31,4 @@ def puppet_clear_certificates(hostname=None, password=None):
 
     for num in num_list:
         utils.print_warning("Trying computer #{}...".format(num))
-        puppet_command(num, password)
+        puppet_command(f"tbl-h10-{num}", password)
