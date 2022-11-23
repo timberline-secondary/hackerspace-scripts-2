@@ -1,6 +1,7 @@
 import inquirer
 from PIL import Image
 
+from scripts.TVs.refresh_slideshow import refresh_slideshow
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
@@ -74,5 +75,9 @@ def remove_media(username=None, tv=None):
 
         if not keep_going:
             ssh_connection.close()
-            utils.print_warning("\nDon't forget to refresh the user's video slideshow!\n")
+            refresh = utils.confirm("Would you like to refresh the user's video slideshow?")
+            if refresh:
+                refresh_slideshow(username)
+            else:
+                utils.print_warning("\nDon't forget to refresh the user's video slideshow!\n")
             return True
