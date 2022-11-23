@@ -37,19 +37,12 @@ def run_command(computer_number=None, password=None, command=None, sudo=True):
 
 
 def run_command_on_computers(print_stdout=True, sudo=False):
-    password = getpass("Enter the admin password: ")
     command = utils.input_plus("Enter the command to run")
-    numbers = utils.input_styled("Enter the computer numbers, seperated by spaces \n"
-                                 "(where # is from hostname tbl-h10-#-s e.g: 2 15 30)\n"
-                                 " or 'all' to run on all computers: ")
+    num_list, password = utils.get_computers_prompt()
 
-    num_list = numbers.split()
-
-    if num_list == "":
-        return
-
-    if num_list[0] == "all":
-        num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
+    # options was quit
+    if num_list is None and password is None:
+        return False
 
     outputs = []
 

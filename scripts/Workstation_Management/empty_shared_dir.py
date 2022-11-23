@@ -67,18 +67,11 @@ def empty_command(computer_number=None, password=None):
 
 
 def empty_shared_dir():
-    password = getpass("Enter the admin password: ")
-    numbers = utils.input_styled("Enter the computer numbers, seperated by spaces \n"
-                                 "(where # is from hostname tbl-h10-#-s e.g: 2 15 30)\n"
-                                 " or 'all' to run on all computers: ")
+    num_list, password = utils.get_computers_prompt()
 
-    num_list = numbers.split()
-
-    if num_list == "":
-        return
-
-    if num_list[0] == "all":
-        num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
+    # options was quit
+    if num_list is None and password is None:
+        return False
 
     for num in num_list:
         utils.print_warning("Trying computer #{}...".format(num))
