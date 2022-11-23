@@ -1,11 +1,9 @@
 from getpass import getpass
 
-import inquirer
-
 from scripts._utils import utils
 from scripts._utils.ssh import SSH
 
-username = 'matthew.baker'
+username = 'hackerspace_admin'
 computer_host = None
 
 
