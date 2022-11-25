@@ -171,6 +171,17 @@ def verify_image_integrity(file_url: str, mime: str, local: bool, extension: str
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
     :returns: success, media_url, local (if media_url is local path), and extension
     """
+    valid_types = [
+        "image/png",
+        "image/jpeg",
+        "image/svg+xml",
+        "image/gif"
+    ]
+
+    # this function is only for image media integrity :)
+    if mime not in valid_types:
+        return True, file_url, local, extension
+
     try:  # test if input is image
         if local:
             im = Image.open(file_url)
