@@ -171,6 +171,7 @@ def add_new_media(username=None, tv=None):
         # asks user if they want to add another image
         if utils.confirm("Would you like to add another image or video?"):
             media_url = True
+            username_invalid = True
         else:
             break
 
