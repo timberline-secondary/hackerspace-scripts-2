@@ -57,14 +57,14 @@ def guess_tv(username):
                 "I don't recognize the username '{}'.  It could be because they don't have an account in the Hackerspace with this username.  You can continue anyway tho.".format(username))
             return None
 
-        # Last name A-M = 1, N-Z = 2
+        # Last name A-L = 1, M-Z = 2
         # name variable will be fullname, split on spaces and take last element
         lastname = name.split()[-1]
-        if lastname[0].lower() <= 'M':
-            utils.print_warning("Suggesting TV 1 because their last name, {}, is A-M".format(lastname))
+        if lastname[0].lower() <= 'L':
+            utils.print_warning("Suggesting TV 1 because their last name, {}, is A-L".format(lastname))
             tv = 1
         else:
-            utils.print_warning("Suggesting TV 2 because their last name, {}, is N-Z".format(lastname))
+            utils.print_warning("Suggesting TV 2 because their last name, {}, is M-Z".format(lastname))
             tv = 2
 
     return tv
