@@ -68,7 +68,6 @@ def get_media_url():
 def add_new_media(username=None, tv=None):
     is_quit = False
 
-    media_url = True
     username_invalid = True
     while media_url and username_invalid:
         # gets and checks the url of the file
@@ -76,7 +75,6 @@ def add_new_media(username=None, tv=None):
         if media_url is None:
             return
         elif media_url is "q":
-            is_quit = True
             break
 
         # collects information to name the file, and as to which tv to send it to
@@ -90,7 +88,6 @@ def add_new_media(username=None, tv=None):
             utils.print_warning("Please enter a valid username")
             return
         elif username == "q":
-            is_quit = True
             break
         else:
             username_invalid = False
@@ -175,7 +172,6 @@ def add_new_media(username=None, tv=None):
         else:
             break
 
-    if not is_quit:
         ssh_connection.close()
 
         if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
