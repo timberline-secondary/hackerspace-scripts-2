@@ -68,8 +68,8 @@ def get_computers_prompt(hostname=None, password=None):
 
     if hostname is None:
         hostname = input_styled("Enter the computer numbers or name, seperated by spaces \n"
-                                     "(where # is from hostname tbl-h10-#-s e.g: test 2 15 30)\n"
-                                     " or 'all' to run on all computers or [q]uit: ")
+                                "(where # is from hostname tbl-h10-#-s e.g: test 2 15 30)\n"
+                                " or 'all' to run on all computers or [q]uit: ")
 
         if hostname == "q":
             print("Quitting this.")
@@ -123,6 +123,23 @@ def is_ffmpeg_compatible(file_url) -> bool:
     return err == b''
 
 
+def find_gif_duration(img_obj) -> float:
+    """
+    Returns duration of gif in seconds
+    """
+    img_obj.seek(0)  # move to the start of the gif, frame 0
+    tot_duration = 0
+    # run a while loop to loop through the frames
+    while True:
+        try:
+            frame_duration = img_obj.info['duration']  # returns current frame duration in milli sec.
+            tot_duration += frame_duration
+            # now move to the next frame of the gif
+            img_obj.seek(img_obj.tell() + 1)  # image.tell() = current frame
+        except EOFError:
+            return tot_duration / 1000 # this will return the tot_duration of the gif
+
+
 def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Processes gif to static image or mp4
@@ -133,9 +150,19 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
         image.save('/tmp/verified.png', **image.info)  # save the first frame to a png img
         return True, '/tmp/verified.png', True, ".png"
     else:  # animated gif -> mp4
-        clip = mp.VideoFileClip(file_url)
-        clip.write_videofile("/tmp/verified.mp4")
-        return True, '/tmp/verified.mp4', True, ".mp4"
+        duration = find_gif_duration(image)
+        if duration > 5:
+            clip = mp.VideoFileClip(file_url)
+            clip.write_videofile("/tmp/verified.mp4")
+            return True, '/tmp/verified.mp4', True, ".mp4"
+        else:
+            # 5 divided by the number of seconds + 1 (to compensate for flooring division)
+            num_of_loops = 5 // duration + 1
+            command = f'ffmpeg -stream_loop {num_of_loops} -i {file_url} /tmp/loop.gif -y;ffmpeg -i /tmp/loop.gif -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" /tmp/verified.mp4'
+            if subprocess.run(command, shell=True).returncode == 0:
+                return True, "/tmp/verified.mp4", True, ".mp4"
+            else:
+                return False, file_url, False, ".gif"
 
 
 def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool, str]:
@@ -166,7 +193,8 @@ def remove_transparency(image, file_url, extension) -> Tuple[bool, Union[str, No
         return False, file_url, False, extension
 
 
-def verify_image_integrity(file_url: str, mime: str, local: bool, extension: str) -> Tuple[bool, Union[str, None], bool, str]:
+def verify_image_integrity(file_url: str, mime: str, local: bool, extension: str) -> Tuple[
+    bool, Union[str, None], bool, str]:
     """
     Verifies image media integrity (i.e. png, jpg, gif, etc.)
     :returns: success, media_url, local (if media_url is local path), and extension
@@ -332,7 +360,6 @@ def confirm(prompt, yes_is_default=True):
             return False
         else:
             return True
-
 
 # def get_admin_pw():
 #     # ask for admin password
