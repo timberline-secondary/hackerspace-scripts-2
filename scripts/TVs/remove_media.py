@@ -1,7 +1,6 @@
 import subprocess
 
 import inquirer
-from PIL import Image
 
 from scripts.TVs.refresh_slideshow import refresh_slideshow
 from scripts._utils import utils
