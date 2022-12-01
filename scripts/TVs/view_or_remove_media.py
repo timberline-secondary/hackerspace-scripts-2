@@ -9,7 +9,7 @@ from scripts._utils.ssh import SSH
 from scripts.TVs._utils import get_tv_containing_student, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW, TV_ROOT
 
 
-def remove_media(username=None, tv=None):
+def view_or_remove_media(username=None, tv=None):
 
     ssh_connection = SSH(TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW)
 
