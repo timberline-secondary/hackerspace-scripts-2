@@ -1,3 +1,5 @@
+import subprocess
+
 import inquirer
 from PIL import Image
 
@@ -29,6 +31,18 @@ def remove_media(username=None, tv=None):
         command = 'ls {}'.format(filepath)
         dir_contents = ssh_connection.send_cmd(command, print_stdout=False).split()
 
+        # Get media files for student
+        media_command = "cd {}/tv{}/ && find {}.z.*".format(TV_ROOT, tv, username)
+        media_files = ssh_connection.send_cmd(media_command, print_stdout=False).split()
+
+        # Format media names to not have full path in name
+        fixed_media_names = [media.split("/")[-1] for media in media_files]
+
+        merge_point = len(dir_contents) - 1
+
+        # Merge lists
+        [dir_contents.append(file) for file in fixed_media_names]
+
         media_list = [
             inquirer.List('art',
                           message="Which file do you want to delete? I'll display it first so you can confirm.",
@@ -37,24 +51,22 @@ def remove_media(username=None, tv=None):
         ]
 
         art_file = inquirer.prompt(media_list)["art"]
-        art_file_full_path = filepath + art_file
+
+        # format art file fullpath
+        if dir_contents.index(art_file) < merge_point:
+            art_file_full_path = filepath + art_file
+        else:
+            art_file_full_path = "{}/tv{}/".format(TV_ROOT, tv) + art_file
 
         # Show the image with Pillow
         # Transfer locally
         local_copy = "/tmp/" + art_file
         ssh_connection.get_file(art_file_full_path, local_copy)
 
-        try:  
-            img = Image.open(local_copy)  
-        except IOError:
-            utils.print_error("File not found") 
-            ssh_connection.close()
-            return False
-
-        w, h = img.size
-        aspect_ratio = w / h
-        thumb = img.resize((400, int(400 / aspect_ratio)))
-        thumb.show()
+        try:
+            subprocess.run(["xdg-open", local_copy])
+        except:
+            utils.print_error(f"Unable to preview media at {local_copy}")
 
         delete_file = utils.confirm(
             "Are you sure you want to delete {}? Hopefully it popped up for you".format(art_file),
