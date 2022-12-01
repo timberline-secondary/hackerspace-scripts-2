@@ -69,6 +69,7 @@ def add_new_media(username=None, tv=None):
     is_quit = False
 
     username_invalid = True
+    media_url = True
     while media_url and username_invalid:
         # gets and checks the url of the file
         media_url, name_without_ext, extension, local = get_media_url()
