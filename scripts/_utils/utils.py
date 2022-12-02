@@ -160,6 +160,7 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
             num_of_loops = 5 // duration + 1
             command = f'ffmpeg -stream_loop {num_of_loops} -i {file_url} /tmp/loop.gif -y;ffmpeg -i /tmp/loop.gif -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" /tmp/verified.mp4'
             if subprocess.run(command, shell=True).returncode == 0:
+                print_success("Converted gif to mp4 with duration of 5 or above seconds")
                 return True, "/tmp/verified.mp4", True, ".mp4"
             else:
                 return False, file_url, False, ".gif"
