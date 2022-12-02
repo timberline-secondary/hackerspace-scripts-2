@@ -33,6 +33,8 @@ def view_or_remove_media(username=None, tv=None):
         # Get media files for student
         media_command = "cd {}/tv{}/ && find {}.z.*".format(TV_ROOT, tv, username)
         media_files = ssh_connection.send_cmd(media_command, print_stdout=False).split()
+        if media_files[0] == "find":
+            media_files = []
 
         # Format media names to not have full path in name
         fixed_media_names = [media.split("/")[-1] for media in media_files]
@@ -44,12 +46,14 @@ def view_or_remove_media(username=None, tv=None):
 
         media_list = [
             inquirer.List('art',
-                          message="Which file do you want to delete? I'll display it first so you can confirm.",
-                          choices=dir_contents,
+                          message="Which file do you want to view?",
+                          choices=dir_contents.append("[Quit]"),
                           ),
         ]
 
         art_file = inquirer.prompt(media_list)["art"]
+        if art_file == "[Quit]":
+            return False
 
         # format art file fullpath
         if dir_contents.index(art_file) < merge_point:
@@ -68,7 +72,7 @@ def view_or_remove_media(username=None, tv=None):
             utils.print_error(f"Unable to preview media at {local_copy}")
 
         delete_file = utils.confirm(
-            "Are you sure you want to delete {}? Hopefully it popped up for you".format(art_file),
+            "Would you like to delete {}? Hopefully it popped up for you".format(art_file),
             yes_is_default=False)
 
         if delete_file:
