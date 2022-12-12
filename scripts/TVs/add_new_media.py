@@ -95,7 +95,10 @@ def add_new_media(username=None, tv=None):
 
         tv = guess_tv(username)
         if tv is 'q':
-            break
+            # restart while loop
+            media_url = True
+            username_invalid = True
+            return
         tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): ".format(tv))
         if not tv_input:
             if tv_input is None:
