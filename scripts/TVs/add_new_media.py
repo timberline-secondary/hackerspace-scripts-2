@@ -171,9 +171,12 @@ def add_new_media(username=None, tv=None):
             media_url = True
             username_invalid = True
         else:
+            # close connection here
+            ssh_connection.close()
             break
 
         ssh_connection.close()
 
-        if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
-            refresh_slideshow(username=username)
+    if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
+        # refresh the slideshow
+        refresh_slideshow(username=username)
