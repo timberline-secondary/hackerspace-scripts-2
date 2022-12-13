@@ -5,3 +5,4 @@ python-magic==0.4.27
 moviepy==1.0.3
 sty==1.0.4
 humanize==4.4.0
+imageio==2.22.4
