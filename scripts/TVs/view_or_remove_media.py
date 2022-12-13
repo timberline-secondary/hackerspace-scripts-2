@@ -33,7 +33,8 @@ def view_or_remove_media(username=None, tv=None):
         # Get media files for student
         media_command = "cd {}/tv{}/ && find {}.z.*".format(TV_ROOT, tv, username)
         media_files = ssh_connection.send_cmd(media_command, print_stdout=False).split()
-        if media_files[0] == "find":
+        # command failed, return empty list
+        if media_files[0].startswith("find"):
             media_files = []
 
         # Format media names to not have full path in name
@@ -44,10 +45,13 @@ def view_or_remove_media(username=None, tv=None):
         # Merge lists
         [dir_contents.append(file) for file in fixed_media_names]
 
+        # Add quit option
+        dir_contents.append("[Quit]")
+
         media_list = [
             inquirer.List('art',
                           message="Which file do you want to view?",
-                          choices=dir_contents.append("[Quit]"),
+                          choices=dir_contents,
                           ),
         ]
 
