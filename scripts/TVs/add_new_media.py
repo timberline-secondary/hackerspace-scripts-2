@@ -66,7 +66,6 @@ def get_media_url():
 
 
 def add_new_media(username=None, tv=None):
-    students_to_refresh = []
     is_quit = False
 
     username_invalid = True
@@ -171,19 +170,13 @@ def add_new_media(username=None, tv=None):
         if utils.confirm("Would you like to add another image or video?"):
             media_url = True
             username_invalid = True
-            if username not in students_to_refresh:
-                students_to_refresh.append(username)
         else:
+            # close connection here
+            ssh_connection.close()
             break
 
         ssh_connection.close()
 
-    if utils.confirm("Do you want to generate a new video slideshow of these student's art?" if len(students_to_refresh) > 1 else "Do you want to generate a new video slideshow of this student's art?"):
-        # Simple counter
-        i = 0
-        for student in students_to_refresh:
-            i += 1
-            # Feedback for student currently being refreshed + percentage complete
-            utils.print_warning(f"Refreshing slideshow of {student} ({i}/{len(students_to_refresh)} [{i/len(students_to_refresh) * 100}])")
-            # refresh the slideshow
-            refresh_slideshow(username=student)
+    if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
+        # refresh the slideshow
+        refresh_slideshow(username=username)
