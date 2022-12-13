@@ -5,6 +5,7 @@ from typing import Union, Tuple
 
 import PIL
 import magic
+import imageio.v2 as imageio
 from urllib.error import URLError
 from urllib.request import urlopen
 import subprocess
@@ -156,14 +157,22 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
             clip.write_videofile("/tmp/verified.mp4")
             return True, '/tmp/verified.mp4', True, ".mp4"
         else:
-            # 5 divided by the number of seconds + 1 (to compensate for flooring division)
-            num_of_loops = 5 // duration + 1
-            command = f'ffmpeg -stream_loop {num_of_loops} -i {file_url} /tmp/loop.gif -y;ffmpeg -i /tmp/loop.gif -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" /tmp/verified.mp4'
-            if subprocess.run(command, shell=True).returncode == 0:
-                print_success("Converted gif to mp4 with duration of 5 or above seconds")
-                return True, "/tmp/verified.mp4", True, ".mp4"
-            else:
-                return False, file_url, False, ".gif"
+            # Read the GIF file
+            reader = imageio.get_reader(file_url)
+            # Get the list of frames and the frame duration
+            frames = reader.iter_data()
+            # Calculate the number of times the GIF needs to be looped to reach the target duration
+            n_loops = int((5 // duration) + 1)
+            # Create a new imageio.get_writer object to save the looped GIF
+            writer = imageio.get_writer('/tmp/verified.mp4', fps=30)
+            # Write each frame and its corresponding duration to the new GIF file
+            for i in range(n_loops):
+                for frame in frames:
+                    writer.append_data(frame)
+
+            # Close the writer to save the GIF
+            writer.close()
+            return True, "/tmp/verified.mp4", True, ".mp4"
 
 
 def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool, str]:
