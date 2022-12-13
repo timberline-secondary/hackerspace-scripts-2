@@ -98,7 +98,7 @@ def add_new_media(username=None, tv=None):
             # restart while loop
             media_url = True
             username_invalid = True
-            return
+            continue
         tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): ".format(tv))
         if not tv_input:
             if tv_input is None:
