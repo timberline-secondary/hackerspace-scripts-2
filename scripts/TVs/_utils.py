@@ -53,9 +53,10 @@ def guess_tv(username):
     if tv is None:
         name = user_utils.get_users_name(username)
         if name is None:
-            utils.print_error(
-                "I don't recognize the username '{}'.  It could be because they don't have an account in the Hackerspace with this username.  You can continue anyway tho.".format(username))
-            return None
+            if utils.confirm(f"I don't recognize the username {username}, it could be because they don't have an account in the Hackerspace with this username. Would you like to re-enter the username?"):
+                return None
+            else:
+                return 'q'
 
         # Last name A-L = 1, M-Z = 2
         # name variable will be fullname, split on spaces and take last element
