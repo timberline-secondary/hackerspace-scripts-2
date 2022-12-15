@@ -144,12 +144,16 @@ def find_gif_duration(img_obj) -> float:
 def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Processes gif to static image or mp4
+    (If the gif has 1 frame it will be converted to a png and transparency removed,
+     if it has duration of <5s it will loop over the gif to reach the target of >=5s and convert to mp4,
+     if it's already >=5s it will be converted directly)
     :returns: success, media_url, and local (if media_url is local path)
     """
     if not image.is_animated:  # gif with 1 frame -> png
         image.seek(1)  # go to 1st frame
         image.save('/tmp/verified.png', **image.info)  # save the first frame to a png img
-        return True, '/tmp/verified.png', True, ".png"
+        new_image = Image.open('/tmp/verified.png')
+        return remove_transparency(new_image, '/tmp/verified.png', ".png")
     else:  # animated gif -> mp4
         duration = find_gif_duration(image)
         if duration > 5:
