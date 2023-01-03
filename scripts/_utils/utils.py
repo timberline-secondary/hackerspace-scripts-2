@@ -147,6 +147,22 @@ def find_gif_duration(img_obj) -> float:
             return tot_duration / 1000 # this will return the tot_duration of the gif
 
 
+def remove_gif_transparency(image, file_url) -> str:
+    """
+    Removes the transparent background of a gif and replaces it with black
+    :returns: file_url
+    """
+
+    # Set the transparent pixels to black
+    image.info['transparency'] = 0
+
+    try:
+        image.save('/tmp/corrected.gif', **image.info)
+        return '/tmp/corrected.gif'
+    except PIL.UnidentifiedImageError:
+        return file_url
+
+
 def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Processes gif to static image or mp4
@@ -162,6 +178,7 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
         return remove_transparency(new_image, '/tmp/verified.png', ".png")
     else:  # animated gif -> mp4
         duration = find_gif_duration(image)
+        file_url = remove_gif_transparency(image, file_url)
         if duration > 5:
             clip = mp.VideoFileClip(file_url)
             clip.write_videofile("/tmp/verified.mp4")
@@ -169,15 +186,13 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
         else:
             # Read the GIF file
             reader = imageio.get_reader(file_url)
-            # Get the list of frames and the frame duration
-            frames = reader.iter_data()
             # Calculate the number of times the GIF needs to be looped to reach the target duration
             n_loops = int((5 // duration) + 1)
             # Create a new imageio.get_writer object to save the looped GIF
             writer = imageio.get_writer('/tmp/verified.mp4', fps=30)
             # Write each frame and its corresponding duration to the new GIF file
             for i in range(n_loops):
-                for frame in frames:
+                for frame in reader.iter_data():
                     writer.append_data(frame)
 
             # Close the writer to save the GIF
