@@ -189,7 +189,7 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
             # Calculate the number of times the GIF needs to be looped to reach the target duration
             n_loops = int((5 // duration) + 1)
             # Create a new imageio.get_writer object to save the looped GIF
-            writer = imageio.get_writer('/tmp/verified.mp4', fps=30)
+            writer = imageio.get_writer('/tmp/verified.mp4', fps=30, codec='h264')
             # Write each frame and its corresponding duration to the new GIF file
             for i in range(n_loops):
                 for frame in reader.iter_data():
