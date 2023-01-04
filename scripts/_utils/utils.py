@@ -78,6 +78,12 @@ def get_computers_prompt(hostname=None, password=None):
 
         num_list = hostname.split()
 
+        if num_list == "":
+            return
+
+        if num_list[0].lower() == "all":
+            num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
+
         return num_list, password
 
 

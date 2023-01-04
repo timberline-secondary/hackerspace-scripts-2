@@ -94,6 +94,11 @@ def add_new_media(username=None, tv=None):
             username_invalid = False
 
         tv = guess_tv(username)
+        if tv is 'q':
+            # restart while loop
+            media_url = True
+            username_invalid = True
+            continue
         tv_input = utils.input_styled("What TV # are you sending this to? (default = {}): ".format(tv))
         if not tv_input:
             if tv_input is None:
@@ -171,9 +176,12 @@ def add_new_media(username=None, tv=None):
             media_url = True
             username_invalid = True
         else:
+            # close connection here
+            ssh_connection.close()
             break
 
         ssh_connection.close()
 
-        if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
-            refresh_slideshow(username=username)
+    if utils.confirm("Do you want to generate a new video slideshow of this student's art?"):
+        # refresh the slideshow
+        refresh_slideshow(username=username)

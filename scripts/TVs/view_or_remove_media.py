@@ -1,5 +1,6 @@
+import subprocess
+
 import inquirer
-from PIL import Image
 
 from scripts.TVs.refresh_slideshow import refresh_slideshow
 from scripts._utils import utils
@@ -8,7 +9,7 @@ from scripts._utils.ssh import SSH
 from scripts.TVs._utils import get_tv_containing_student, TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW, TV_ROOT
 
 
-def remove_media(username=None, tv=None):
+def view_or_remove_media(username=None, tv=None):
 
     ssh_connection = SSH(TV_FILE_SERVER, TV_FILE_SERVER_USER, TV_FILE_SERVER_PW)
 
@@ -29,35 +30,53 @@ def remove_media(username=None, tv=None):
         command = 'ls {}'.format(filepath)
         dir_contents = ssh_connection.send_cmd(command, print_stdout=False).split()
 
+        # Get media files for student
+        media_command = "cd {}/tv{}/ && find {}.z.*".format(TV_ROOT, tv, username)
+        media_files = ssh_connection.send_cmd(media_command, print_stdout=False).split()
+        # command failed, return empty list
+        if media_files[0].startswith("find"):
+            media_files = []
+
+        # Format media names to not have full path in name
+        fixed_media_names = [media.split("/")[-1] for media in media_files]
+
+        merge_point = len(dir_contents) - 1
+
+        # Merge lists
+        [dir_contents.append(file) for file in fixed_media_names]
+
+        # Add quit option
+        dir_contents.append("[Quit]")
+
         media_list = [
             inquirer.List('art',
-                          message="Which file do you want to delete? I'll display it first so you can confirm.",
+                          message="Which file do you want to view?",
                           choices=dir_contents,
                           ),
         ]
 
         art_file = inquirer.prompt(media_list)["art"]
-        art_file_full_path = filepath + art_file
+        if art_file == "[Quit]":
+            return False
+
+        # format art file fullpath
+        if dir_contents.index(art_file) < merge_point:
+            art_file_full_path = filepath + art_file
+        else:
+            art_file_full_path = "{}/tv{}/".format(TV_ROOT, tv) + art_file
 
         # Show the image with Pillow
         # Transfer locally
         local_copy = "/tmp/" + art_file
         ssh_connection.get_file(art_file_full_path, local_copy)
 
-        try:  
-            img = Image.open(local_copy)  
-        except IOError:
-            utils.print_error("File not found") 
-            ssh_connection.close()
-            return False
-
-        w, h = img.size
-        aspect_ratio = w / h
-        thumb = img.resize((400, int(400 / aspect_ratio)))
-        thumb.show()
+        try:
+            subprocess.run(["xdg-open", local_copy])
+        except:
+            utils.print_error(f"Unable to preview media at {local_copy}")
 
         delete_file = utils.confirm(
-            "Are you sure you want to delete {}? Hopefully it popped up for you".format(art_file),
+            "Would you like to delete {}? Hopefully it popped up for you".format(art_file),
             yes_is_default=False)
 
         if delete_file:
