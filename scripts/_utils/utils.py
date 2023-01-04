@@ -134,17 +134,7 @@ def find_gif_duration(img_obj) -> float:
     """
     Returns duration of gif in seconds
     """
-    img_obj.seek(0)  # move to the start of the gif, frame 0
-    tot_duration = 0
-    # run a while loop to loop through the frames
-    while True:
-        try:
-            frame_duration = img_obj.info['duration']  # returns current frame duration in milli sec.
-            tot_duration += frame_duration
-            # now move to the next frame of the gif
-            img_obj.seek(img_obj.tell() + 1)  # image.tell() = current frame
-        except EOFError:
-            return tot_duration / 1000 # this will return the tot_duration of the gif
+    return img_obj.info["duration"] / 1000
 
 
 def remove_gif_transparency(image, file_url) -> str:
@@ -178,26 +168,24 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
         return remove_transparency(new_image, '/tmp/verified.png', ".png")
     else:  # animated gif -> mp4
         duration = find_gif_duration(image)
-        file_url = remove_gif_transparency(image, file_url)
         if duration > 5:
-            clip = mp.VideoFileClip(file_url)
-            clip.write_videofile("/tmp/verified.mp4")
-            return True, '/tmp/verified.mp4', True, ".mp4"
+            # FFMPEG command (without looping)
+            command = f"ffmpeg -i {file_url} -c:v libx264 -movflags faststart -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" /tmp/verified.mp4"
+            err = subprocess.run(command.split(" "), capture_output=True).stderr
+            if err == b'':
+                return True, '/tmp/verified.mp4', True, ".mp4"
+            else:
+                return False, file_url, False, ".gif"
         else:
-            # Read the GIF file
-            reader = imageio.get_reader(file_url)
             # Calculate the number of times the GIF needs to be looped to reach the target duration
             n_loops = int((5 // duration) + 1)
-            # Create a new imageio.get_writer object to save the looped GIF
-            writer = imageio.get_writer('/tmp/verified.mp4', fps=30, codec='h264')
-            # Write each frame and its corresponding duration to the new GIF file
-            for i in range(n_loops):
-                for frame in reader.iter_data():
-                    writer.append_data(frame)
-
-            # Close the writer to save the GIF
-            writer.close()
-            return True, "/tmp/verified.mp4", True, ".mp4"
+            # FFMPEG command
+            command = f"ffmpeg -stream_loop {n_loops} -i {file_url} -c:v libx264 -movflags faststart -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" /tmp/verified.mp4"
+            err = subprocess.run(command.split(" "), capture_output=True).stderr
+            if err == b'':
+                return True, '/tmp/verified.mp4', True, ".mp4"
+            else:
+                return False, file_url, False, ".gif"
 
 
 def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool, str]:
