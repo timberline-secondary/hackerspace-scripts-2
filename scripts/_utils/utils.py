@@ -13,6 +13,8 @@ from PIL import Image
 import moviepy.editor as mp
 import urllib.request
 
+import os
+
 # from getpass import getpass
 
 LOCALDOMAIN = "hackerspace.tbl"
@@ -182,7 +184,7 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
             # FFMPEG command (without looping)
             command = f"ffmpeg -y -i {file_url} -c:v libx264 -movflags faststart -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" /tmp/verified.mp4"
             print_warning(f"CONVERTING GIF -> MP4 (This could take a little bit)")
-            return_code = subprocess.run(command.split(" "), capture_output=True).returncode
+            return_code = os.system(command)
             if return_code != 2:
                 return True, '/tmp/verified.mp4', True, ".mp4"
             else:
@@ -193,7 +195,7 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
             # FFMPEG command
             command = f"ffmpeg -y -stream_loop {n_loops} -i {file_url} -c:v libx264 -movflags faststart -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" /tmp/verified.mp4"
             print_warning(f"CONVERTING GIF --[{n_loops} loops]-> MP4 (This could take a little bit)")
-            return_code = subprocess.run(command.split(" "), capture_output=True).returncode
+            return_code = os.system(command)
             if return_code != 2:
                 return True, '/tmp/verified.mp4', True, ".mp4"
             else:
