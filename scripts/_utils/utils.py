@@ -206,11 +206,12 @@ def remove_transparency(image, file_url, extension) -> Tuple[bool, Union[str, No
     Removes transparent background from png to opt for a black background
     :returns: success, media_url, local (if svg_url is local path), and extension
     """
-    new_image = Image.new("RGBA", image.size, "BLACK")
-    new_image.paste(image, (0, 0), image)
+
+    # convert alpha channel colors back to their respective color without any transparency
+    image.convert('RGB')
 
     try:
-        new_image.save('/tmp/corrected.png', **image.info)
+        image.save('/tmp/corrected.png', **image.info)
         return True, '/tmp/corrected.png', True, ".png"
     except PIL.UnidentifiedImageError:
         return False, file_url, False, extension
