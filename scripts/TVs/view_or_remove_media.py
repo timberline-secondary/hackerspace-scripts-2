@@ -60,7 +60,7 @@ def view_or_remove_media(username=None, tv=None):
             return False
 
         # format art file fullpath
-        if dir_contents.index(art_file) < merge_point:
+        if dir_contents.index(art_file) < merge_point + 1:
             art_file_full_path = filepath + art_file
         else:
             art_file_full_path = "{}/tv{}/".format(TV_ROOT, tv) + art_file
