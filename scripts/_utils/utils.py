@@ -208,10 +208,13 @@ def remove_transparency(image, file_url, extension) -> Tuple[bool, Union[str, No
     """
 
     # convert alpha channel colors back to their respective color without any transparency
-    image.convert('RGB')
+    image = image.convert('RGBA')
+
+    new_image = Image.new("RGBA", image.size, "BLACK")
+    new_image.paste(image, (0, 0), image)
 
     try:
-        image.save('/tmp/corrected.png', **image.info)
+        new_image.save('/tmp/corrected.png', **image.info)
         return True, '/tmp/corrected.png', True, ".png"
     except PIL.UnidentifiedImageError:
         return False, file_url, False, extension
@@ -401,3 +404,14 @@ def confirm(prompt, yes_is_default=True):
 #         else:
 #             # bad password
 #             print_error("Incorrect Password. Try again.")
+
+
+if __name__ == "__main__":
+    import os
+
+    success, media_url, local, ext = verify_image_integrity("https://d10ge8y4vx8iud.cloudfront.net/public_media/portfolios/video/2019/02/pikachu2.png", "image/png", local=False, extension=".png")
+
+    if success:
+        os.system(f"open {media_url}")
+    else:
+        print("FAIL")
