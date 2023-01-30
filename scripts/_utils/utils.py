@@ -74,19 +74,19 @@ def get_computers_prompt(hostname=None, password=None):
                                 "(where # is from hostname tbl-h10-#-s e.g: test 2 15 30)\n"
                                 " or 'all' to run on all computers or [q]uit: ")
 
-        if hostname == "q":
-            print("Quitting this.")
-            return None, None
+    if hostname == "q":
+        print("Quitting this.")
+        return None, None
 
-        num_list = hostname.split()
+    num_list = hostname.split()
 
-        if num_list == "":
-            return
+    if num_list == "":
+        return
 
-        if num_list[0].lower() == "all":
-            num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
+    if num_list[0].lower() == "all":
+        num_list = [f"{i}" for i in range(0, 32)]  # list of strings.  0 will cause problem if int instead of str
 
-        return num_list, password
+    return num_list, password
 
 
 def verify_mimetype(file_url, mimetype_string, local=False):
@@ -202,16 +202,26 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
                 return False, file_url, False, ".gif"
 
 
-def process_svg(svg_url) -> Tuple[bool, Union[str, None], bool, str]:
+def process_svg(svg_url, local) -> Tuple[bool, Union[str, None], bool, str]:
     """
     Processes svg to png
     :returns: success, media_url, and local (if svg_url is local path)
     """
-    command = 'inkscape -z -e {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
+    if not local:
+        path = urllib.request.urlopen(svg_url).read()
+        with open("/tmp/conversion.svg", "wb") as binary_file:
+            # Write bytes to file
+            binary_file.write(path)
+
+        svg_url = "/tmp/conversion.svg"
+
+    command = 'inkscape -z -o {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
     err = subprocess.run(command.split(" "), capture_output=True).stderr
-    if err == b'':
+    # deprecation warning gets printed to stderr unfortunately
+    if err == b'Warning: Option --without-gui= is deprecated\n':
         return True, '/tmp/verified-svg.png', True, ".png"
     else:
+        print_error("Unable to convert svg to png")
         return False, svg_url, False, ".svg"
 
 
@@ -251,22 +261,24 @@ def verify_image_integrity(file_url: str, mime: str, local: bool, extension: str
     if mime not in valid_types:
         return True, file_url, local, extension
 
-    try:  # test if input is image
-        if local:
-            im = Image.open(file_url)
-        else:
-            try:
-                path = io.BytesIO(urllib.request.urlopen(file_url).read())
-                im = Image.open(path)
-            except (URLError, ValueError):
-                print_error("Bad URL")
-                return False, file_url, local, extension
-    except PIL.UnidentifiedImageError:  # input is not image
-        print_error("Bad path")
-        return False, file_url, local, extension
+    # svg has separate processing because of vector graphics
+    if mime != "image/svg+xml":
+        try:  # test if input is image
+            if local:
+                im = Image.open(file_url)
+            else:
+                try:
+                    path = io.BytesIO(urllib.request.urlopen(file_url).read())
+                    im = Image.open(path)
+                except (URLError, ValueError):
+                    print_error("Bad URL")
+                    return False, file_url, local, extension
+        except PIL.UnidentifiedImageError:  # input is not image
+            print_error("Bad path or not image.")
+            return False, file_url, local, extension
 
     if mime == 'image/svg+xml':
-        success, path, _, _ = process_svg(file_url)
+        success, path, _, _ = process_svg(file_url, local)
         if success:
             try:
                 image = Image.open(path)
@@ -374,9 +386,9 @@ def input_plus(prompt, default=None, validation_method=None):
     response = input_styled(prompt).strip()
     if response == "":  # they just hit enter for default, or None
         return default
-    elif response == "q":
+    elif response.lower() == "q":
         print("quitting...")
-        return response
+        return response.lower()
     else:
         return response
 
@@ -418,14 +430,3 @@ def confirm(prompt, yes_is_default=True):
 #         else:
 #             # bad password
 #             print_error("Incorrect Password. Try again.")
-
-
-if __name__ == "__main__":
-    import os
-
-    success, media_url, local, ext = verify_image_integrity("https://d10ge8y4vx8iud.cloudfront.net/public_media/portfolios/video/2019/02/pikachu2.png", "image/png", local=False, extension=".png")
-
-    if success:
-        os.system(f"open {media_url}")
-    else:
-        print("FAIL")
