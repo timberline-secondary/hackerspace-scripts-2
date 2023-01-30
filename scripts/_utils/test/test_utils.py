@@ -5,19 +5,19 @@ from scripts._utils.utils import *
 
 TEST_IMAGES = [
     # transparent png
-    {"url": "https://d10ge8y4vx8iud.cloudfront.net/public_media/documents/2023/01/13/cat-png-cat-png-hd-1500.png", "mime": "image/png", "local": False, "ext": ".png"},
+    {"url": "https://github.com/timberline-secondary/hackerspace-scripts-2/blob/master/test_media/cat-png-cat-png-hd-1500.png", "mime": "image/png", "local": False, "ext": ".png"},
     # non-transparent png
-    {"url": "https://d10ge8y4vx8iud.cloudfront.net/public_media/documents/2023/01/13/cat1-1661521877.png", "mime": "image/png", "local": False, "ext": ".png"},
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/cat1-1661521877.png", "mime": "image/png", "local": False, "ext": ".png"},
     # non-transparent gif
-    {"url": "https://d10ge8y4vx8iud.cloudfront.net/public_media/portfolios/video/2022/11/canofasparaguspix_2GEezO4.gif", "mime": "image/gif", "local": False, "ext": ".gif"},
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/canofasparaguspix_2GEezO4.gif", "mime": "image/gif", "local": False, "ext": ".gif"},
     # transparent gif
-    {"url": "https://d10ge8y4vx8iud.cloudfront.net/public_media/documents/2023/01/13/yTkRkXGTE.gif", "mime": "image/gif", "local": False, "ext": ".gif"},
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/yTkRkXGTE.gif", "mime": "image/gif", "local": False, "ext": ".gif"},
     # non-transparent svg
-    {"url": "https://d10ge8y4vx8iud.cloudfront.net/public_media/documents/2023/01/13/generated.svg", "mime": "image/svg+xml", "local": False, "ext": ".svg"},
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/rat.svg", "mime": "image/svg+xml", "local": False, "ext": ".svg"},
     # transparent svg
-    {"url": "https://d10ge8y4vx8iud.cloudfront.net/public_media/documents/2023/01/13/transparent.svg", "mime": "image/svg+xml", "local": False, "ext": ".svg"},
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/icon.svg", "mime": "image/svg+xml", "local": False, "ext": ".svg"},
     # jpeg
-    {"url": "https://d10ge8y4vx8iud.cloudfront.net/public_media/documents/2023/01/13/happy_dog.jpg", "mime": "image/jpeg", "local": False, "ext": ".jpg"}
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/happy_dog.jpg", "mime": "image/jpeg", "local": False, "ext": ".jpg"}
 ]
 
 
