@@ -1,0 +1,23 @@
+name: Unit Tests
+
+on: ['push', 'pull_request']
+
+jobs:
+  test:
+    name: Unit Test
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-latest
+          - os: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'pip' # caching pip dependencies
+      - name: Install dependencies for ${{ matrix.config.os }}
+        run: pip install -r requirements.txt
+      - name: Run Tests
+        run: python -m unittest discover
