@@ -5,7 +5,7 @@ from scripts._utils.utils import *
 
 TEST_IMAGES = [
     # transparent png
-    {"url": "https://github.com/timberline-secondary/hackerspace-scripts-2/blob/master/test_media/cat-png-cat-png-hd-1500.png", "mime": "image/png", "local": False, "ext": ".png"},
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/cat-png-cat-png-hd-1500.png", "mime": "image/png", "local": False, "ext": ".png"},
     # non-transparent png
     {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/cat1-1661521877.png", "mime": "image/png", "local": False, "ext": ".png"},
     # non-transparent gif
