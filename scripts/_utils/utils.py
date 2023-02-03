@@ -9,7 +9,7 @@ import imageio.v2 as imageio
 from urllib.error import URLError
 from urllib.request import urlopen
 import subprocess
-from PIL import Image
+from PIL import Image, ImageSequence
 import moviepy.editor as mp
 import urllib.request
 
@@ -155,11 +155,20 @@ def remove_gif_transparency(image, file_url) -> str:
     :returns: file_url
     """
 
-    # Set the transparent pixels to black
-    image.info['transparency'] = 0
+    frames = []
+    for frame in ImageSequence.Iterator(image):
+        # Convert the transparency information to a boolean mask
+        alpha = frame.split()[-1].point(lambda x: 0 if x == 0 else 255, "1")
+        # Create a new image with the same size as each frame
+        frame_with_background = Image.new("RGBA", image.size, (0, 0, 0, 255))
+        # Paste the frame onto the black background
+        frame_with_background.paste(frame, (0, 0), alpha)
+        # Append the frame with the black background to the list of frames
+        frames.append(frame_with_background)
 
     try:
-        image.save('/tmp/corrected.gif', **image.info)
+        # Save the new gif with the black background
+        frames[0].save("/tmp/corrected.gif", save_all=True, append_images=frames[1:], optimization=False)
         return '/tmp/corrected.gif'
     except PIL.UnidentifiedImageError:
         return file_url
@@ -180,6 +189,7 @@ def process_gif(image, file_url) -> Tuple[bool, Union[str, None], bool, str]:
         return remove_transparency(new_image, '/tmp/verified.png', ".png")
     else:  # animated gif -> mp4
         duration = find_gif_duration(image)
+        file_url = remove_gif_transparency(image, file_url)
         if duration > 5:
             # FFMPEG command (without looping)
             command = f"ffmpeg -y -i {file_url} -c:v libx264 -movflags faststart -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" /tmp/verified.mp4"

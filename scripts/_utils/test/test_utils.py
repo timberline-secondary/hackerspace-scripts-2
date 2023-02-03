@@ -11,7 +11,7 @@ TEST_IMAGES = [
     # non-transparent gif
     {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/canofasparaguspix_2GEezO4.gif", "mime": "image/gif", "local": False, "ext": ".gif"},
     # transparent gif
-    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/yTkRkXGTE.gif", "mime": "image/gif", "local": False, "ext": ".gif"},
+    {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/mavey_locket.gif", "mime": "image/gif", "local": False, "ext": ".gif"},
     # non-transparent svg
     {"url": "https://raw.githubusercontent.com/timberline-secondary/hackerspace-scripts-2/master/test_media/rat.svg", "mime": "image/svg+xml", "local": False, "ext": ".svg"},
     # transparent svg
