@@ -228,10 +228,10 @@ def process_svg(svg_url, local) -> Tuple[bool, Union[str, None], bool, str]:
     command = 'inkscape -z -o {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
     err = subprocess.run(command.split(" "), capture_output=True).stderr
     # deprecation warning gets printed to stderr unfortunately
-    if err == b'Warning: Option --without-gui= is deprecated\n':
+    if b"Inkscape" not in err:
         return True, '/tmp/verified-svg.png', True, ".png"
     else:
-        print_error("Unable to convert svg to png")
+        print_error(f"Unable to convert svg to png: {err}")
         return False, svg_url, False, ".svg"
 
 

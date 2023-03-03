@@ -14,9 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
+      - uses: FedericoCarboni/setup-ffmpeg@v2
         with:
           python-version: '3.8'
           cache: 'pip' # caching pip dependencies
+      - name: Install non-python dependencies for ${{ matrix.config.os }}
+        run: sudo apt-get install inkscape
       - name: Install dependencies for ${{ matrix.config.os }}
         run: pip install -r requirements.txt
       - name: Run Tests
