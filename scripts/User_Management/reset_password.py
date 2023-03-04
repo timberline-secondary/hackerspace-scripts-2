@@ -20,6 +20,10 @@ def reset_password():
     password = getpass("Enter the admin password: ")
     ssh_connection = SSH(hostname, username, password)
 
+    # check if connection was established successfully
+    if not ssh_connection.is_connected():
+        return
+
     prompt_string = "{}@{}:~$".format(username, hostname)
     command_response_list = [
         ("sudo passwd {}".format(student_number), "[sudo] password for {}:".format(username), None),
