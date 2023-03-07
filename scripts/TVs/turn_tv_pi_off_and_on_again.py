@@ -4,7 +4,8 @@ from scripts._utils import utils
 hostname = "pi-themes"
 
 
-def turn_tv_pi_off_and_on_again():
+def turn_tv_pi_off_and_on_again(tv=None):
+    if tv is None:
+        tv = utils.input_styled("Which TV #? (1-4) ")
 
-    tv = utils.input_styled("Which TV #? (1-4) ")
     reboot_pi(f'pi-tv{tv}')
