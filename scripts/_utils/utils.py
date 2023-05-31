@@ -217,19 +217,21 @@ def process_svg(svg_url, local) -> Tuple[bool, Union[str, None], bool, str]:
     Processes svg to png
     :returns: success, media_url, and local (if svg_url is local path)
     """
+    svg_path = "/tmp/conversion.svg"
+    png_path = "/tmp/verified-svg.png"
     if not local:
         path = urllib.request.urlopen(svg_url).read()
-        with open("/tmp/conversion.svg", "wb") as binary_file:
+        with open(svg_path, "wb") as binary_file:
             # Write bytes to file
             binary_file.write(path)
 
-        svg_url = "/tmp/conversion.svg"
-
-    command = 'inkscape -z -o {} -w 1920 -h 1080 {}'.format('/tmp/verified-svg.png', svg_url)
+    # -w 1920 option will distort the image.  by just providing one dimension, aspect ratio is maintained
+    command = 'inkscape -z -e {} -h 1080 {}'.format(png_path, svg_path)
     err = subprocess.run(command.split(" "), capture_output=True).stderr
+
     # deprecation warning gets printed to stderr unfortunately
-    if b"Inkscape" not in err:
-        return True, '/tmp/verified-svg.png', True, ".png"
+    if b"Inkscape" not in err:  # TODO: this is bad and misses legit errors.
+        return True, png_path, True, ".png"
     else:
         print_error(f"Unable to convert svg to png: {err}")
         return False, svg_url, False, ".svg"
