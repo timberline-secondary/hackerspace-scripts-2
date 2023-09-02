@@ -23,8 +23,20 @@ def set_flex_schedule():
     ssh_connection.get_file("/home/pi/clock/components/schedule.json", "/tmp/schedule.json")  # download the schedule file locally
 
     def select_schedule():
-        # get user input on the flex index
-        flex_input = utils.input_styled("Which index should the flex schedule be? (int) > ")
+        # open the schedule.json file
+        f = open("/tmp/schedule.json", "r")
+        data = json.loads(f.read())
+
+        # onyl used for listing the options, tracks iterations of loop
+        i = 0
+
+        for sched in data["schedule"]:
+            # print list of descriptions for schedules
+            print(f'{i}. {sched["description"]}')
+            i += 1
+
+        # get user input on the flex index, this will preview and then prompt a confirmation afterwards
+        flex_input = utils.input_styled("Which schedule do you want to preview? (int) (q to quit) > ")
         if flex_input.lower() == 'q':  # q chosen as option; quit.
             return True
         elif not flex_input.isdigit():  # Flex input was not a number.
@@ -34,9 +46,6 @@ def set_flex_schedule():
         # get only number if number in string
         index = [int(s) for s in flex_input.split() if s.isdigit()][0]
 
-        # open the schedule.json
-        f = open("/tmp/schedule.json", "r")
-        data = json.loads(f.read())
         try:
             print("\n" + data["schedule"][index]["description"] + "\n")  # Print the description of the schedule
         except IndexError:
