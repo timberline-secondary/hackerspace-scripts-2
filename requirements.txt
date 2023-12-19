@@ -1,4 +1,4 @@
-paramiko==2.10.1
+paramiko==3.4.0
 Pillow==9.3.0
 inquirer==2.10.0
 python-magic==0.4.27
